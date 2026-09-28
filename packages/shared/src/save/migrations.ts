@@ -1,0 +1,48 @@
+import { SAVE_SCHEMA_VERSION, type SaveGame } from './types.js';
+
+type AnySave = Record<string, unknown> & { schemaVersion?: number };
+
+/**
+ * Forward migrations: MIGRATIONS[n] upgrades a save from version n to n+1.
+ * Add an entry here whenever SaveGame changes and bump SAVE_SCHEMA_VERSION.
+ */
+const MIGRATIONS: Record<number, (save: AnySave) => AnySave> = {};
+
+export function migrateSave(raw: unknown): SaveGame {
+  if (typeof raw !== 'object' || raw === null) throw new Error('Invalid save');
+  let save = { ...(raw as AnySave) };
+  let version = typeof save.schemaVersion === 'number' ? save.schemaVersion : 1;
+  if (version > SAVE_SCHEMA_VERSION) throw new Error('Save is from a newer game version');
+  while (version < SAVE_SCHEMA_VERSION) {
+    const step = MIGRATIONS[version];
+    if (!step) throw new Error(`No migration from save version ${version}`);
+    save = step(save);
+    version += 1;
+  }
+  return { ...save, schemaVersion: SAVE_SCHEMA_VERSION } as unknown as SaveGame;
+}
+
+/** Migrates and sanity-checks a save received from an untrusted client. */
+export function validateSave(raw: unknown): SaveGame {
+  const save = migrateSave(raw);
+  const int = (v: unknown, max: number) =>
+    typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= max;
+  if (
+    typeof save.nickname !== 'string' ||
+    save.nickname.length > 40 ||
+    !int(save.hat, 255) ||
+    !int(save.chapter, 99) ||
+    !int(save.dollars, 1_000_000) ||
+    !int(save.stars, 10_000)
+  ) {
+    throw new Error('Ugyldig spilfil');
+  }
+  return {
+    schemaVersion: save.schemaVersion,
+    nickname: save.nickname,
+    hat: save.hat,
+    chapter: save.chapter,
+    dollars: save.dollars,
+    stars: save.stars,
+  };
+}

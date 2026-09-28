@@ -1,0 +1,17 @@
+{
+  "name": "@western/tts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "tsx src/render.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@western/shared": "*",
+    "tsx": "^4.23.15"
+  },
+  "exports": {
+    "./piper": "./src/piper.ts"
+  }
+}

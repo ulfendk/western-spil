@@ -1,0 +1,16 @@
+# Local build & run: docker compose up --build  ->  http://localhost:2567
+services:
+  western-spil:
+    build:
+      context: .
+      args:
+        APP_VERSION: local
+    image: western-spil:local
+    ports:
+      - '2567:2567'
+    volumes:
+      - western-data:/data
+    restart: unless-stopped
+
+volumes:
+  western-data:

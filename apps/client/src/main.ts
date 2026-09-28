@@ -1,0 +1,41 @@
+import '@fontsource/rye/400.css';
+import '@fontsource/patrick-hand/400.css';
+import './style.css';
+import { Game } from './game/game.js';
+import { updater } from './pwa/updater.js';
+import { store } from './save/store.js';
+import { Hud } from './ui/hud.js';
+import { Screens } from './ui/screens.js';
+
+updater.start();
+void store.sync();
+
+const canvas = document.querySelector<HTMLCanvasElement>('#game')!;
+const ui = document.querySelector<HTMLElement>('#ui')!;
+
+const game = new Game(canvas, {
+  onPause: () => pause(),
+  onPlayers: (count, online) => hud.setPlayers(count, online),
+});
+
+const screens = new Screens(ui, { play: () => play() });
+const hud = new Hud(
+  () => pause(),
+  (emote) => game.emote(emote),
+);
+
+function play() {
+  screens.hide();
+  hud.show(true);
+  // In-game is not a safe point for applying updates.
+  updater.setSafe(false);
+  game.start(store.save.nickname, store.save.hat);
+}
+
+function pause() {
+  game.pause();
+  hud.show(false);
+  screens.pause(() => play());
+}
+
+screens.splash();

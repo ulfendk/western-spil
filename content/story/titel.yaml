@@ -1,0 +1,9 @@
+# Title screen greeting. Line ids are stable: changing text re-renders the audio.
+id: titel
+lines:
+  - id: velkommen
+    speaker: kanel
+    text: >-
+      Nå, så du er den nye grønskolling? Jeg hedder Kanel, og jeg er den klogeste hest
+      vest for Mississippi. Sæt dig op i sadlen, makker. Vi skal hele vejen til
+      Stillehavet, og solen venter ikke på nogen!

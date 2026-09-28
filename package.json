@@ -1,0 +1,41 @@
+{
+  "name": "western-spil",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "packages/shared",
+    "apps/server",
+    "apps/client",
+    "tools/tts"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,client -c yellow,cyan \"npm run dev -w @western/server\" \"npm run dev -w @western/client\"",
+    "build": "npm run build -w @western/client && npm run build -w @western/server",
+    "start": "npm run start -w @western/server",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "vitest run",
+    "tts": "npm run render -w @western/tts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.0.0",
+    "concurrently": "^10.0.5",
+    "eslint": "^10.11.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.9",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.70.1",
+    "vitest": "^5.0.2"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "allowScripts": {
+    "esbuild": true,
+    "msgpackr-extract": false
+  }
+}

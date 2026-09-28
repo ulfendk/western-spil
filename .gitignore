@@ -1,0 +1,12 @@
+node_modules/
+dist/
+dev-dist/
+.data/
+*.log
+.env
+tools/tts/.cache/
+apps/client/public/narration/
+apps/client/public/pwa-*.png
+apps/client/public/maskable-*.png
+apps/client/public/apple-touch-icon*.png
+apps/client/public/favicon.ico

@@ -1,0 +1,17 @@
+# Portainer → Stacks → Add stack → Web editor: paste this file.
+# Put nginx (TLS) in front of port 2567 — see docs/deploy.md.
+services:
+  western-spil:
+    image: ghcr.io/ulfendk/western-spil:latest
+    container_name: western-spil
+    ports:
+      - '2567:2567'
+    volumes:
+      # Saves (SQLite), nightly database backups and the TTS cache. Don't lose this volume!
+      - western-data:/data
+    environment:
+      - TZ=Europe/Copenhagen
+    restart: unless-stopped
+
+volumes:
+  western-data:
