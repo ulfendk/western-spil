@@ -9,13 +9,16 @@ A Danish first-person Wild West adventure for kids aged 8–12, in a comic-book 
 
 ## Structure
 
-| Path              | What                                                                                        |
-| ----------------- | ------------------------------------------------------------------------------------------- |
-| `packages/shared` | Protocol, dialogue format, saves and backups, rejsekode (shared by client and server)       |
-| `apps/client`     | Three.js + Vite + PWA (service worker with safe-point auto-update)                          |
-| `apps/server`     | Colyseus (town rooms) + Express (static files, `/api/saves`, `/api/tts`), SQLite in `/data` |
-| `tools/tts`       | Renders `content/story/*.yaml` to MP3 with Piper                                            |
-| `content/story`   | Dialogue scripts (Danish)                                                                   |
+| Path                  | What                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------- |
+| `packages/shared`     | Protocol, dialogue format, saves and backups, rejsekode (shared by client and server)       |
+| `apps/client`         | Three.js + Vite + PWA (service worker with safe-point auto-update)                          |
+| `apps/server`         | Colyseus (town rooms) + Express (static files, `/api/saves`, `/api/tts`), SQLite in `/data` |
+| `tools/voice`         | Offline Røst-v3 narration renderer (Python/Docker) → `content/narration`                    |
+| `tools/tts`           | Collects narration for the build; Piper fallback for unvoiced lines                         |
+| `content/story`       | Dialogue scripts (Danish)                                                                   |
+| `content/narration`   | Voiced lines (committed)                                                                    |
+| `content/voices.yaml` | Voice per speaker + pronunciation lexicon                                                   |
 
 ## Development
 
