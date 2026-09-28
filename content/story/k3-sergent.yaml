@@ -1,0 +1,20 @@
+# Meeting Sergent Holm at the fort gate.
+id: k3-sergent
+lines:
+  - id: holdt
+    speaker: sergent
+    text: Holdt! Hvem der? Nå, det er bare en grønskolling og en hest.
+  - id: holm
+    speaker: sergent
+    text: Jeg er Sergent Holm. Min far kom fra Danmark, så jeg taler lidt dansk.
+  - id: telegraf
+    speaker: sergent
+    text: Vi har et problem. Telegrafen virker ikke. Vi kan ikke sende besked mod vest.
+  - id: gaet
+    speaker: kanel
+    text: Lad mig gætte. Fire par støvler. Fra lille til kæmpestor.
+  - id: talende
+    speaker: sergent
+    text: >-
+      En hest, der taler? Nu har jeg set det hele. Gå ind til telegrafisten. Hun ved mere.
+    say: En hest der taler? Nu har jeg set det hele. Gå ind til telegrafisten. Hun ved mere.

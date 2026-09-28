@@ -1,4 +1,4 @@
-import { regionInfo, type RegionId } from '@western/shared';
+import { REGIONS, regionInfo, type RegionId } from '@western/shared';
 import type { Game } from '../game/game.js';
 import { store } from '../save/store.js';
 import { TownLife } from '../town/townLife.js';
@@ -7,6 +7,7 @@ import { h } from '../ui/dom.js';
 import { Chapter1 } from './chapter1.js';
 import type { ChapterBase } from './chapterBase.js';
 import { Chapter2 } from './chapter2.js';
+import { Chapter3 } from './chapter3.js';
 
 /**
  * Owns the active chapter and town for the region the player is in, and handles
@@ -32,7 +33,7 @@ export class Director {
   /** Regions the player may travel to (every region up to their latest chapter). */
   unlockedRegions(): RegionId[] {
     const reached = store.save.chapter;
-    return (['st-louis', 'praerien'] as RegionId[]).filter((r) => regionInfo(r).chapter <= reached);
+    return REGIONS.filter((r) => r.chapter <= reached).map((r) => r.id);
   }
 
   start() {
@@ -81,12 +82,12 @@ export class Director {
   }
 
   private makeChapter(): ChapterBase<string> {
-    return this.game.region === 'praerien'
-      ? (new Chapter2(this.game, this.hud) as unknown as ChapterBase<string>)
-      : (new Chapter1(
-          this.game,
-          this.hud,
-          () => void this.travel('praerien'),
-        ) as unknown as ChapterBase<string>);
+    const chapter =
+      this.game.region === 'fortet'
+        ? new Chapter3(this.game, this.hud)
+        : this.game.region === 'praerien'
+          ? new Chapter2(this.game, this.hud, () => void this.travel('fortet'))
+          : new Chapter1(this.game, this.hud, () => void this.travel('praerien'));
+    return chapter as unknown as ChapterBase<string>;
   }
 }

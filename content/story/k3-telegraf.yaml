@@ -1,0 +1,35 @@
+# Ruth the telegraphist explains the cut line.
+id: k3-telegraf
+lines:
+  - id: ruth
+    speaker: telegrafist
+    text: Goddag. Jeg hedder Ruth, og jeg passer telegrafen.
+  - id: bip
+    speaker: telegrafist
+    text: >-
+      Med telegrafen sender vi beskeder gennem en lang ledning. Hvert bogstav bliver til korte
+      og lange bip.
+  - id: klippet
+    speaker: telegrafist
+    text: >-
+      Men i nat er ledningen blevet klippet over. Nogen vil ikke have, at vi advarer de andre
+      forter.
+    choices:
+      - text: Hvem gør sådan noget?
+        flag: spurgte-ruth
+        say: Tryk på nummer et for at spørge hvem der gør sådan noget.
+        lines:
+          - id: hatte
+            speaker: telegrafist
+            text: Fire mænd red forbi i nat. De havde meget forskellige størrelser hatte.
+      - text: Jeg finder stedet!
+        say: Tryk på nummer to for at love at finde stedet.
+        lines:
+          - id: oejne
+            speaker: telegrafist
+            text: Godt! Tag Kanel med. Han har gode øjne.
+  - id: paele
+    speaker: telegrafist
+    text: >-
+      Følg telegrafpælene langs jernbanen, og find stedet, hvor ledningen er klippet over.
+    say: Følg telegrafpælene langs jernbanen og find stedet hvor ledningen er klippet over.

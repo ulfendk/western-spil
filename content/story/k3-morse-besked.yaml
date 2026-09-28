@@ -1,0 +1,8 @@
+# After the SOS practice.
+id: k3-morse-besked
+lines:
+  - id: rigtige
+    speaker: telegrafist
+    text: >-
+      Flot! Nu den rigtige besked. Send FIRE HATTE. Så ved de, hvem de skal holde øje med.
+    say: Flot! Nu den rigtige besked. Send fire hatte. Så ved de hvem de skal holde øje med.

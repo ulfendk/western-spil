@@ -1,0 +1,11 @@
+# Kapitel 3 – Fortet. Plays when the player arrives at Fort Kearny.
+id: k3-intro
+lines:
+  - id: fort
+    speaker: fortaeller
+    text: >-
+      Efter mange dages rejse når Kanel og du frem til Fort Kearny. Soldaterne holder vagt over
+      sporet mod vest.
+  - id: havre
+    speaker: kanel
+    text: Et fort! Her er der helt sikkert havre. Soldater har altid havre.

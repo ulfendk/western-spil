@@ -11,6 +11,10 @@ export const RAIL_X = 64;
 export interface FlatZone {
   z0: number;
   z1: number;
+  /** Centre line of the zone; defaults to the trail (a town's main street). */
+  x?: number;
+  /** Half-width that is fully flat; it blends out over another 16 m. */
+  halfWidth?: number;
 }
 
 /** A shallow river crossing the land roughly east–west. */
@@ -66,7 +70,7 @@ export function railHeight(z: number): number {
 /** Gentle ground level along a flat zone's main street. */
 function zoneHeight(zone: FlatZone, z: number): number {
   const zc = THREE.MathUtils.clamp(z, zone.z0, zone.z1);
-  return rawHeight(trailX(zc), zc) * 0.2;
+  return rawHeight(zone.x ?? trailX(zc), zc) * 0.2;
 }
 
 /** River bed level at a point along the river (the water sits a little above it). */
@@ -91,7 +95,9 @@ export function heightAt(x: number, z: number): number {
       THREE.MathUtils.smoothstep(z, zone.z0 - 18, zone.z0 - 4) *
       (1 - THREE.MathUtils.smoothstep(z, zone.z1 + 4, zone.z1 + 18));
     if (inZ <= 0) continue;
-    const inX = 1 - THREE.MathUtils.smoothstep(Math.abs(x - trailX(z)), 26, 42);
+    const half = zone.halfWidth ?? 26;
+    const inX =
+      1 - THREE.MathUtils.smoothstep(Math.abs(x - (zone.x ?? trailX(z))), half, half + 16);
     h = THREE.MathUtils.lerp(h, zoneHeight(zone, z), inZ * inX);
   }
   // Carve a shallow river with gently sloping banks.

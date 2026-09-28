@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import type { RegionId } from '@western/shared';
 import type { Herd, Horse } from './animals.js';
 import type { Circle, Colliders } from './colliders.js';
+import type { Fort } from './fort.js';
+import { buildFortet, FORTET_TERRAIN } from './regions/fortet.js';
 import { buildPraerien, PRAERIEN_TERRAIN } from './regions/praerien.js';
 import { buildStLouis, ST_LOUIS_TERRAIN } from './regions/stLouis.js';
 import { setTerrain } from './terrain.js';
@@ -11,6 +13,7 @@ export { heightAt, trailX, WORLD_HALF, riverWater, terrainProfile } from './terr
 export { SUN_DIR } from './sky.js';
 export type { TownSpots, TownConfig } from './town.js';
 export type { Herd, Horse } from './animals.js';
+export type { Fort } from './fort.js';
 
 /** The river crossing on the prairie: banks on each side of the trail. */
 export interface RiverCrossing {
@@ -36,6 +39,8 @@ export interface World {
   // Region-specific extras.
   setPosterVisible?(visible: boolean): void;
   setWheelFixed?(fixed: boolean): void;
+  setWireFixed?(fixed: boolean): void;
+  fort?: Fort;
   herd?: Herd;
   kanel?: Horse;
   river?: RiverCrossing;
@@ -47,6 +52,10 @@ export interface WorldOptions {
 
 /** Builds a region into the (empty) scene. The land's shape is switched first. */
 export function buildWorld(scene: THREE.Scene, region: RegionId, opts: WorldOptions): World {
+  if (region === 'fortet') {
+    setTerrain(FORTET_TERRAIN);
+    return buildFortet(scene, opts);
+  }
   if (region === 'praerien') {
     setTerrain(PRAERIEN_TERRAIN);
     return buildPraerien(scene, opts);

@@ -211,3 +211,100 @@ export function buildPerson(o: PersonOptions): Npc {
   };
   return npc;
 }
+
+/** A cavalry soldier in a blue uniform and kepi. `sergeant` adds yellow chevrons. */
+export function buildSoldier(
+  opts: { sergeant?: boolean; moustache?: boolean } = {},
+): Npc & { step(phase: number): void } {
+  const blue = '#2f4a78';
+  const skin = '#f1c9a0';
+  const npc = new THREE.Group() as Npc & { step(phase: number): void };
+  const body = new THREE.Group();
+  npc.add(body);
+  const legs: THREE.Object3D[] = [];
+  for (const side of [-1, 1]) {
+    const leg = new THREE.Group();
+    leg.position.set(side * 0.13, 0.95, 0);
+    leg.add(part(new THREE.CapsuleGeometry(0.1, 0.55, 4, 8), '#5b6f96', [0, -0.35, 0]));
+    // Yellow cavalry stripe down the trousers.
+    leg.add(part(new THREE.BoxGeometry(0.02, 0.55, 0.05), '#e0b84a', [side * 0.1, -0.35, 0]));
+    leg.add(part(new THREE.CylinderGeometry(0.11, 0.12, 0.35, 10), '#1e1a16', [0, -0.78, 0]));
+    body.add(leg);
+    legs.push(leg);
+  }
+  body.add(part(new THREE.CapsuleGeometry(0.25, 0.45, 4, 12), blue, [0, 1.33, 0]));
+  body.add(part(new THREE.CylinderGeometry(0.26, 0.26, 0.07, 14), '#3a2615', [0, 1.02, 0]));
+  body.add(part(new THREE.BoxGeometry(0.09, 0.07, 0.04), '#e0b84a', [0, 1.02, -0.26]));
+  for (let i = 0; i < 4; i++)
+    body.add(part(new THREE.SphereGeometry(0.025, 6, 4), '#e0b84a', [0, 1.5 - i * 0.12, -0.25]));
+  for (const side of [-1, 1]) {
+    const arm = new THREE.Group();
+    arm.position.set(side * 0.33, 1.58, 0);
+    arm.add(part(new THREE.CapsuleGeometry(0.075, 0.45, 4, 8), blue, [0, -0.27, 0]));
+    arm.add(part(new THREE.SphereGeometry(0.07, 8, 6), skin, [0, -0.57, 0]));
+    if (opts.sergeant) {
+      for (let i = 0; i < 3; i++)
+        arm.add(
+          part(new THREE.BoxGeometry(0.16, 0.025, 0.02), '#e0b84a', [
+            0,
+            -0.12 - i * 0.05,
+            side * 0.07,
+          ]),
+        );
+    }
+    body.add(arm);
+    legs.push(arm);
+  }
+  body.add(part(new THREE.SphereGeometry(0.21, 16, 12), skin, [0, 1.92, 0]));
+  body.add(part(new THREE.SphereGeometry(0.045, 8, 6), '#e8b088', [0, 1.9, -0.21]));
+  for (const side of [-1, 1])
+    body.add(part(new THREE.SphereGeometry(0.026, 6, 4), '#1b1b1b', [side * 0.07, 1.96, -0.185]));
+  if (opts.moustache)
+    body.add(
+      part(
+        new THREE.CapsuleGeometry(0.03, 0.16, 4, 6),
+        '#6b4423',
+        [0, 1.84, -0.2],
+        [0, 0, Math.PI / 2],
+      ),
+    );
+  // Kepi: a tilted cylinder cap with a short visor.
+  body.add(
+    part(new THREE.CylinderGeometry(0.17, 0.21, 0.24, 14), blue, [0, 2.12, 0.02], [0.15, 0, 0]),
+  );
+  body.add(
+    part(
+      new THREE.CylinderGeometry(0.13, 0.13, 0.025, 12, 1, false, Math.PI / 2, Math.PI),
+      '#1e1a16',
+      [0, 2.02, -0.14],
+    ),
+  );
+  body.add(part(new THREE.CircleGeometry(0.035, 8), '#e0b84a', [0, 2.13, -0.19]));
+  outline(body, 0.018);
+
+  let target: THREE.Vector3 | null = null;
+  npc.lookAtPlayer = (p) => (target = p);
+  /** Marching pose for the parade (phase in radians). */
+  npc.step = (phase) => {
+    const swing = Math.sin(phase) * 0.5;
+    legs[0]!.rotation.x = swing;
+    legs[1]!.rotation.x = -swing;
+    legs[2]!.rotation.x = -swing * 0.8;
+    legs[3]!.rotation.x = swing * 0.8;
+    body.position.y = Math.abs(Math.sin(phase)) * 0.05;
+  };
+  npc.update = (dt, time) => {
+    let desired = 0;
+    if (target) {
+      const local = npc.worldToLocal(target.clone());
+      desired = Math.atan2(-local.x, -local.z);
+    }
+    const diff = Math.atan2(
+      Math.sin(desired - body.rotation.y),
+      Math.cos(desired - body.rotation.y),
+    );
+    body.rotation.y += diff * (1 - Math.exp(-dt * 4));
+    if (!target) body.position.y = Math.sin(time * 1.2) * 0.005;
+  };
+  return npc;
+}

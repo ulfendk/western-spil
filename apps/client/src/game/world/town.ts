@@ -47,6 +47,8 @@ export const ST_LOUIS_TOWN: TownConfig = {
 
 export interface TownSpots {
   config: TownConfig;
+  /** Is this point inside the town (for the first-visit welcome)? */
+  contains(p: THREE.Vector3): boolean;
   /** Middle of the main street. */
   center: THREE.Vector3;
   /** Horseshoe pit: throw line, stake and throwing direction (unit vector). */
@@ -55,7 +57,13 @@ export interface TownSpots {
   pitDir: THREE.Vector3;
 }
 
-function signTexture(text: string, bg: string, fg: string, w = 512, h = 128): THREE.CanvasTexture {
+export function signTexture(
+  text: string,
+  bg: string,
+  fg: string,
+  w = 512,
+  h = 128,
+): THREE.CanvasTexture {
   const c = document.createElement('canvas');
   c.width = w;
   c.height = h;
@@ -179,7 +187,7 @@ function waterTower(): THREE.Group {
   return outline(g, 0.03);
 }
 
-function barrel(): THREE.Group {
+export function barrel(): THREE.Group {
   const g = new THREE.Group();
   g.add(part(new THREE.CylinderGeometry(0.34, 0.34, 0.9, 12), '#a8743d', [0, 0.45, 0]));
   for (const y of [0.2, 0.7])
@@ -202,7 +210,7 @@ function trough(): THREE.Group {
  * Gable roof over a w×d body of height h: two slopes meeting in a ridge that runs
  * front to back, plus triangular gable ends.
  */
-function gableRoof(w: number, d: number, h: number, color: string, rise = 1.3): THREE.Group {
+export function gableRoof(w: number, d: number, h: number, color: string, rise = 1.3): THREE.Group {
   const g = new THREE.Group();
   const half = w / 2 + 0.3;
   const slope = Math.hypot(half, rise);
@@ -332,6 +340,7 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders, cfg: TownCon
   const cz = (cfg.zStart + cfg.zEnd) / 2;
   return {
     config: cfg,
+    contains: (p) => p.z > cfg.zStart && p.z < cfg.zEnd && Math.abs(p.x - street(p.z)) < 26,
     center: new THREE.Vector3(street(cz), heightAt(street(cz), cz), cz),
     pitStart,
     pitStake,
@@ -340,7 +349,7 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders, cfg: TownCon
 }
 
 /** Sand pit with a throw line and an iron stake, plus a scoreboard sign. */
-function buildPit(start: THREE.Vector3, stake: THREE.Vector3): THREE.Group {
+export function buildPit(start: THREE.Vector3, stake: THREE.Vector3): THREE.Group {
   const g = new THREE.Group();
   const len = start.distanceTo(stake);
   const mid = start.clone().lerp(stake, 0.5);

@@ -1,0 +1,9 @@
+# First time the player walks into the fort.
+id: by-fortet
+lines:
+  - id: velkommen
+    speaker: sergent
+    text: Velkommen på Fort Kearny! Soldaterne spiller hestesko på paradepladsen i fritiden.
+  - id: havre
+    speaker: kanel
+    text: Og jeg har stadig ikke fået havre.

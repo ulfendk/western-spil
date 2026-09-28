@@ -1,6 +1,5 @@
 import { regionInfo } from '@western/shared';
 import type { Game } from '../game/game.js';
-import { trailX } from '../game/world/index.js';
 import { HorseshoeClient } from '../minigames/horseshoe.js';
 import { store } from '../save/store.js';
 import { DialogueRunner } from '../story/dialogue.js';
@@ -47,9 +46,8 @@ export class TownLife {
       this.prompt.hidden = true;
       return;
     }
-    const cfg = this.game.world.town.config;
     const p = this.game.playerPosition;
-    const inTown = p.z > cfg.zStart && p.z < cfg.zEnd && Math.abs(p.x - trailX(p.z)) < 26;
+    const inTown = this.game.world.town.contains(p);
     const flag = `set-${regionInfo(this.game.region).townId}`;
     if (inTown && !store.save.progress.flags.includes(flag)) void this.welcome(flag);
     const nearPit = p.distanceTo(this.game.world.town.pitStart) < 3.5;

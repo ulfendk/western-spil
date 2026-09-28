@@ -100,6 +100,11 @@ class Narrator {
     }
   }
 
+  /** The shared (tap-unlocked) audio context, also used for sound effects. */
+  audioContext(): AudioContext | null {
+    return this.context();
+  }
+
   private context(): AudioContext | null {
     if (!this.ctx) {
       try {

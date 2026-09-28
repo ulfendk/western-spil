@@ -1,0 +1,7 @@
+# After the parade.
+id: k3-parade-klar
+lines:
+  - id: venstre
+    speaker: sergent
+    text: Venstre, højre, venstre! Sikke en parade. Tak for hjælpen, grønskolling.
+    say: Venstre højre venstre! Sikke en parade. Tak for hjælpen grønskolling.

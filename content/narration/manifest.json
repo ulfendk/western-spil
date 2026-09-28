@@ -1,4 +1,14 @@
 {
+  "by-fortet.velkommen": {
+    "file": "8142b0a36aeed4a6.mp3",
+    "text": "Velkommen på Fort Kearny! Soldaterne spiller hestesko på paradepladsen i fritiden.",
+    "speaker": "sergent"
+  },
+  "by-fortet.havre": {
+    "file": "d681e9c45426c7a3.mp3",
+    "text": "Og jeg har stadig ikke fået havre.",
+    "speaker": "kanel"
+  },
   "by-st-louis.velkommen": {
     "file": "010596f773b776db.mp3",
     "text": "Velkommen til St. Louis! Her mødes grønskollinger fra hele prærien.",
@@ -448,6 +458,161 @@
     "file": "557135c431d98160.mp3",
     "text": "Bøvl-brødrene. De er stadig efter os. Godt, at jeg er en hurtig hest.",
     "speaker": "kanel"
+  },
+  "k3-intro.fort": {
+    "file": "cc7fe596853ed3de.mp3",
+    "text": "Efter mange dages rejse når Kanel og du frem til Fort Kearny. Soldaterne holder vagt over sporet mod vest.",
+    "speaker": "fortaeller"
+  },
+  "k3-intro.havre": {
+    "file": "3f0a1192c5ac8618.mp3",
+    "text": "Et fort! Her er der helt sikkert havre. Soldater har altid havre.",
+    "speaker": "kanel"
+  },
+  "k3-ledning.her": {
+    "file": "358f2e54b79ab550.mp3",
+    "text": "Her er det. Ledningen hænger og dingler. Og se, fire par støvlespor igen.",
+    "speaker": "kanel"
+  },
+  "k3-ledning.splejs": {
+    "file": "58c7716172f349ba.mp3",
+    "text": "Du binder de to ender sammen og snor dem godt. Nu kan strømmen løbe igen.",
+    "speaker": "fortaeller"
+  },
+  "k3-ledning.tilbage": {
+    "file": "5c2056b160256aab.mp3",
+    "text": "Flot. Nu tilbage til Ruth. Og måske lidt havre på vejen.",
+    "speaker": "kanel"
+  },
+  "k3-morse-besked.rigtige": {
+    "file": "ca65e7ab7ed0a1d2.mp3",
+    "text": "Flot! Nu den rigtige besked. Send FIRE HATTE. Så ved de, hvem de skal holde øje med.",
+    "speaker": "telegrafist"
+  },
+  "k3-morse-klar.sendt": {
+    "file": "6115a2e7c14e8250.mp3",
+    "text": "Beskeden er sendt! Du er en ægte telegrafist.",
+    "speaker": "telegrafist"
+  },
+  "k3-morse-klar.svar": {
+    "file": "4ed3ea6a98f9d801.mp3",
+    "text": "Tik tik tik. Lidt efter kommer der svar fra fortet i vest.",
+    "speaker": "fortaeller"
+  },
+  "k3-morse-klar.tak": {
+    "file": "44d4c15474458b0d.mp3",
+    "text": "De skriver, tak. Vi holder øje med fire hatte.",
+    "speaker": "telegrafist"
+  },
+  "k3-morse-klar.parade": {
+    "file": "1491ca5c64f900a3.mp3",
+    "text": "Kaptajnen vil ære dig med en parade. Stil dig op på paradepladsen!",
+    "speaker": "sergent"
+  },
+  "k3-morse.virker": {
+    "file": "9397a54920295774.mp3",
+    "text": "Ledningen virker igen! Nu skal vi sende en advarsel til fortet i vest.",
+    "speaker": "telegrafist"
+  },
+  "k3-morse.prik": {
+    "file": "1b8554c5f4cf11a4.mp3",
+    "text": "Et kort tryk er en prik. Et langt tryk er en streg. Kortet viser dig, hvordan hvert bogstav skal lyde.",
+    "speaker": "telegrafist"
+  },
+  "k3-morse.sos": {
+    "file": "25b6a1705d97076d.mp3",
+    "text": "Vi øver først med SOS. Det betyder hjælp, og alle telegrafister kender det.",
+    "speaker": "telegrafist"
+  },
+  "k3-parade-klar.venstre": {
+    "file": "3ec9a3b2d476129c.mp3",
+    "text": "Venstre, højre, venstre! Sikke en parade. Tak for hjælpen, grønskolling.",
+    "speaker": "sergent"
+  },
+  "k3-parade.takt": {
+    "file": "93f9d667211fff87.mp3",
+    "text": "Trommen slår takten. Tryk, hver gang en tromme når stregen, så marcherer soldaterne i takt.",
+    "speaker": "sergent"
+  },
+  "k3-sergent.holdt": {
+    "file": "e7244422386ca45b.mp3",
+    "text": "Holdt! Hvem der? Nå, det er bare en grønskolling og en hest.",
+    "speaker": "sergent"
+  },
+  "k3-sergent.holm": {
+    "file": "23467eff156c36f8.mp3",
+    "text": "Jeg er Sergent Holm. Min far kom fra Danmark, så jeg taler lidt dansk.",
+    "speaker": "sergent"
+  },
+  "k3-sergent.telegraf": {
+    "file": "eb37d8101f779554.mp3",
+    "text": "Vi har et problem. Telegrafen virker ikke. Vi kan ikke sende besked mod vest.",
+    "speaker": "sergent"
+  },
+  "k3-sergent.gaet": {
+    "file": "9eb9aba44071cf57.mp3",
+    "text": "Lad mig gætte. Fire par støvler. Fra lille til kæmpestor.",
+    "speaker": "kanel"
+  },
+  "k3-sergent.talende": {
+    "file": "424ca5964187d81f.mp3",
+    "text": "En hest, der taler? Nu har jeg set det hele. Gå ind til telegrafisten. Hun ved mere.",
+    "speaker": "sergent"
+  },
+  "k3-slut.forter": {
+    "file": "abdcd427f2268dcb.mp3",
+    "text": "Nu ved alle forter besked om Bøvl-brødrene. Men de ved stadig ikke, hvor naglen er.",
+    "speaker": "kanel"
+  },
+  "k3-slut.bjerge": {
+    "file": "d99353e12b3ba07a.mp3",
+    "text": "Mod vest rejser bjergene sig. Klippebjergene venter på Kanel og grønskollingen.",
+    "speaker": "fortaeller"
+  },
+  "k3-slut.bakke": {
+    "file": "e37a499e6bd893b6.mp3",
+    "text": "Bjerge. Det betyder op ad bakke. Hele vejen. Jeg håber, du har havre med.",
+    "speaker": "kanel"
+  },
+  "k3-telegraf.ruth": {
+    "file": "7548928454d1fbbe.mp3",
+    "text": "Goddag. Jeg hedder Ruth, og jeg passer telegrafen.",
+    "speaker": "telegrafist"
+  },
+  "k3-telegraf.bip": {
+    "file": "36fd21e14052d29c.mp3",
+    "text": "Med telegrafen sender vi beskeder gennem en lang ledning. Hvert bogstav bliver til korte og lange bip.",
+    "speaker": "telegrafist"
+  },
+  "k3-telegraf.klippet": {
+    "file": "1516ae0250cbe48a.mp3",
+    "text": "Men i nat er ledningen blevet klippet over. Nogen vil ikke have, at vi advarer de andre forter.",
+    "speaker": "telegrafist"
+  },
+  "k3-telegraf.klippet-valg1": {
+    "file": "9f297a1aafccff6e.mp3",
+    "text": "Tryk på nummer et for at spørge hvem der gør sådan noget.",
+    "speaker": "fortaeller"
+  },
+  "k3-telegraf.hatte": {
+    "file": "ea763b3df87a93e8.mp3",
+    "text": "Fire mænd red forbi i nat. De havde meget forskellige størrelser hatte.",
+    "speaker": "telegrafist"
+  },
+  "k3-telegraf.klippet-valg2": {
+    "file": "3cec188ec11d5b37.mp3",
+    "text": "Tryk på nummer to for at love at finde stedet.",
+    "speaker": "fortaeller"
+  },
+  "k3-telegraf.oejne": {
+    "file": "e0d18637c1a51722.mp3",
+    "text": "Godt! Tag Kanel med. Han har gode øjne.",
+    "speaker": "telegrafist"
+  },
+  "k3-telegraf.paele": {
+    "file": "d6a2b850a6f204a8.mp3",
+    "text": "Følg telegrafpælene langs jernbanen, og find stedet, hvor ledningen er klippet over.",
+    "speaker": "telegrafist"
   },
   "titel.velkommen": {
     "file": "61a87cd4c855d8b6.mp3",

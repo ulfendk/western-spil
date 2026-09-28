@@ -1025,3 +1025,184 @@ h3 {
 .map-stop:disabled {
   color: var(--ink);
 }
+
+/* Telegraph (Morse code) */
+.morse-word {
+  display: flex;
+  gap: 6px;
+  font-family: 'Rye', serif;
+  font-size: clamp(1.4rem, 5vw, 2.2rem);
+  color: var(--paper);
+  text-shadow: 2px 2px 0 var(--ink);
+}
+
+.morse-word span {
+  min-width: 1ch;
+  text-align: center;
+  opacity: 0.55;
+}
+
+.morse-word .sent {
+  opacity: 1;
+  color: #bfe3a0;
+}
+
+.morse-word .now {
+  opacity: 1;
+  color: var(--sand);
+  text-decoration: underline;
+}
+
+.morse-card {
+  background: var(--paper);
+  border: 4px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 8px 28px;
+  text-align: center;
+  min-width: 220px;
+}
+
+.morse-letter {
+  font-family: 'Rye', serif;
+  font-size: 3rem;
+  line-height: 1.1;
+}
+
+.morse-code {
+  font-size: 2rem;
+  letter-spacing: 0.2em;
+}
+
+.morse-typed {
+  font-size: 1.6rem;
+  letter-spacing: 0.2em;
+  color: var(--red-dark);
+  min-height: 1.6em;
+}
+
+.morse-key {
+  width: 150px;
+  height: 90px;
+  border: 4px solid var(--ink);
+  border-radius: 50% 50% 16px 16px;
+  background: radial-gradient(circle at 50% 35%, #d9a441, #8a5a2b);
+  box-shadow: 0 8px 0 var(--ink);
+  font-family: 'Rye', serif;
+  font-size: 1.3rem;
+  color: #2a1a0c;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.morse-key.down {
+  transform: translateY(6px);
+  box-shadow: 0 2px 0 var(--ink);
+}
+
+.morse-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 520px;
+}
+
+.morse-legend span {
+  background: rgba(255, 244, 214, 0.9);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 1.1rem;
+}
+
+.shake {
+  animation: shake 0.35s;
+}
+
+@keyframes shake {
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}
+
+/* Parade (rhythm) */
+.parade {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.parade-lane {
+  position: absolute;
+  left: 50%;
+  bottom: max(120px, calc(env(safe-area-inset-bottom) + 120px));
+  transform: translateX(-50%);
+  width: min(640px, calc(100% - 24px));
+  height: 72px;
+  background: rgba(255, 244, 214, 0.9);
+  border: 4px solid var(--ink);
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.parade-line {
+  position: absolute;
+  left: 15%;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  margin-left: -3px;
+  background: var(--red);
+}
+
+.parade-note {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.4rem;
+  transition: opacity 0.2s;
+}
+
+.parade-note.hit {
+  opacity: 0 !important;
+}
+
+.parade-note.missed {
+  filter: grayscale(1);
+}
+
+.parade-feedback {
+  position: absolute;
+  left: 50%;
+  bottom: max(205px, calc(env(safe-area-inset-bottom) + 205px));
+  transform: translateX(-50%);
+  font-family: 'Rye', serif;
+  font-size: 2rem;
+  text-shadow: 2px 2px 0 var(--ink);
+}
+
+.parade-feedback.good {
+  color: #bfe3a0;
+}
+
+.parade-feedback.miss {
+  color: #f6b3a0;
+}
+
+.parade-tap {
+  position: absolute;
+  left: 50%;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(320px, calc(100% - 24px));
+  pointer-events: auto;
+  touch-action: none;
+}

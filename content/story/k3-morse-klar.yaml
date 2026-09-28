@@ -1,0 +1,15 @@
+# The warning has been sent.
+id: k3-morse-klar
+lines:
+  - id: sendt
+    speaker: telegrafist
+    text: Beskeden er sendt! Du er en ægte telegrafist.
+  - id: svar
+    speaker: fortaeller
+    text: Tik tik tik. Lidt efter kommer der svar fra fortet i vest.
+  - id: tak
+    speaker: telegrafist
+    text: De skriver, tak. Vi holder øje med fire hatte.
+  - id: parade
+    speaker: sergent
+    text: Kaptajnen vil ære dig med en parade. Stil dig op på paradepladsen!

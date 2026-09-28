@@ -1,0 +1,9 @@
+# Cavalry parade rhythm game.
+id: k3-parade
+lines:
+  - id: takt
+    speaker: sergent
+    text: >-
+      Trommen slår takten. Tryk, hver gang en tromme når stregen, så marcherer soldaterne i
+      takt.
+    say: Trommen slår takten. Tryk hver gang en tromme når stregen så marcherer soldaterne i takt.

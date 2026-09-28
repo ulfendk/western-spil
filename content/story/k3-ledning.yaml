@@ -1,0 +1,12 @@
+# At the cut telegraph wire.
+id: k3-ledning
+lines:
+  - id: her
+    speaker: kanel
+    text: Her er det. Ledningen hænger og dingler. Og se, fire par støvlespor igen.
+  - id: splejs
+    speaker: fortaeller
+    text: Du binder de to ender sammen og snor dem godt. Nu kan strømmen løbe igen.
+  - id: tilbage
+    speaker: kanel
+    text: Flot. Nu tilbage til Ruth. Og måske lidt havre på vejen.

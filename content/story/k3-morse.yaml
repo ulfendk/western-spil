@@ -1,0 +1,14 @@
+# Morse code minigame: instructions.
+id: k3-morse
+lines:
+  - id: virker
+    speaker: telegrafist
+    text: Ledningen virker igen! Nu skal vi sende en advarsel til fortet i vest.
+  - id: prik
+    speaker: telegrafist
+    text: >-
+      Et kort tryk er en prik. Et langt tryk er en streg. Kortet viser dig, hvordan hvert
+      bogstav skal lyde.
+  - id: sos
+    speaker: telegrafist
+    text: Vi øver først med SOS. Det betyder hjælp, og alle telegrafister kender det.

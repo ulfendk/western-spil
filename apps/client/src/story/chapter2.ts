@@ -40,7 +40,7 @@ const STEPS: Record<Step, StepInfo> = {
     marker: { spot: 'townArch', height: 7 },
     reach: { spot: 'townArch', radius: 14 },
   },
-  done: { objective: 'Kast hestesko i Støvby. Kapitel 3 er på vej!' },
+  done: { objective: 'Rejs videre mod vest via rejsekortet i pausemenuen' },
 };
 
 /** Chapter 2 – "Prærien": the wagon train, bison photos and the river crossing. */
@@ -56,7 +56,11 @@ export class Chapter2 extends ChapterBase<Step> {
     if (e.code === 'KeyC' && !this.cameraButton.hidden && !this.camera) void this.openCamera();
   };
 
-  constructor(game: Game, hud: Hud) {
+  constructor(
+    game: Game,
+    hud: Hud,
+    private travelOn: () => void,
+  ) {
     super(game, hud, 'k2', STEPS, [
       'intro',
       'find-train',
@@ -202,8 +206,11 @@ export class Chapter2 extends ChapterBase<Step> {
     await this.showChapterCard(
       'Kapitel 2',
       'Prærien',
-      'Flot klaret! Kapitel 3 – Fortet – er på vej. Imens kan du kaste hestesko i Støvby.',
-      [{ label: 'Fortsæt', primary: true }],
+      'Flot klaret! Nu venter Fort Kearny længere mod vest.',
+      [
+        { label: 'Rejs videre til Fortet 🐴', primary: true, action: this.travelOn },
+        { label: 'Bliv lidt i Støvby' },
+      ],
     );
   }
 }
