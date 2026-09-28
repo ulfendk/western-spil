@@ -52,6 +52,7 @@ def main() -> None:
 
     content: Path = args.content
     voices = yaml.safe_load((content / "voices.yaml").read_text())
+    lexicon = voices.get("lexicon") or {}
     out_dir = content / "narration"
     out_dir.mkdir(exist_ok=True)
     manifest_path = out_dir / "manifest.json"
@@ -62,7 +63,7 @@ def main() -> None:
         doc = yaml.safe_load(f.read_text())
         for line in walk(doc["lines"]):
             text = " ".join(line["text"].split())
-            spoken = " ".join(line.get("say", line["text"]).split())
+            spoken = apply_lexicon(" ".join(line.get("say", line["text"]).split()), lexicon)
             lines.append((f"{doc['id']}.{line['id']}", line["speaker"], text, spoken))
 
     model = None
@@ -100,6 +101,13 @@ def main() -> None:
             f.unlink()
             print(f"[voice] removed stale {f.name}")
     print(f"[voice] manifest: {len(manifest)} lines")
+
+
+def apply_lexicon(text: str, lexicon: dict) -> str:
+    """Replaces words the voice mispronounces with a spelling it reads correctly."""
+    for word, spoken in lexicon.items():
+        text = re.sub(rf"(?<!\w){re.escape(word)}(?!\w)", spoken, text)
+    return text
 
 
 def write_manifest(path: Path, manifest: dict) -> None:

@@ -5,6 +5,13 @@
 # pitch: semitones (post-processing), tempo: speed factor.
 # Changing anything here re-renders that speaker's lines.
 engine: roest-v3
+
+# Pronunciation fixes, applied to every voiced line before rendering (the screen text is
+# untouched). Spell words the way a Danish reader should say them. Abbreviations with a
+# full stop ("St.") also confuse the sentence splitter, so always spell them out here.
+lexicon:
+  St. Louis: Sænt Luis
+
 speakers:
   fortaeller:
     prompt: builtin:nic
