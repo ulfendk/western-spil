@@ -15,6 +15,13 @@ lines:
     ]);
   });
 
+  it('keeps an optional spoken wording', () => {
+    const script = parseDialogue(
+      'id: a\nlines:\n  - {id: x, speaker: kanel, text: "Hej, makker", say: "Hej makker"}',
+    );
+    expect(script.lines[0]).toMatchObject({ text: 'Hej, makker', say: 'Hej makker' });
+  });
+
   it('rejects unknown speakers and duplicate ids', () => {
     expect(() => parseDialogue('id: a\nlines:\n  - {id: x, speaker: bob, text: hi}')).toThrow(
       /unknown speaker/,

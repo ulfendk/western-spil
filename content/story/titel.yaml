@@ -1,4 +1,6 @@
 # Title screen greeting. Line ids are stable: changing text re-renders the audio.
+# `text` is shown on screen; optional `say` is what the voice reads (e.g. without a
+# comma the voice would pause too long on).
 id: titel
 lines:
   - id: velkommen
@@ -6,4 +8,8 @@ lines:
     text: >-
       Nå, så du er den nye grønskolling? Jeg hedder Kanel, og jeg er den klogeste hest
       vest for Mississippi. Sæt dig op i sadlen, makker. Vi skal hele vejen til
+      Stillehavet, og solen venter ikke på nogen!
+    say: >-
+      Nå, så du er den nye grønskolling? Jeg hedder Kanel, og jeg er den klogeste hest
+      vest for Mississippi. Sæt dig op i sadlen makker. Vi skal hele vejen til
       Stillehavet, og solen venter ikke på nogen!

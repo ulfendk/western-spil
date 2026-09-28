@@ -7,7 +7,7 @@ import {
   type Animated,
 } from './animals.js';
 import { buildCampfire, buildCampProps, buildFence, buildSign } from './camp.js';
-import { Colliders } from './colliders.js';
+import { Colliders, type Circle } from './colliders.js';
 import { buildMesas, buildMountains } from './landscape.js';
 import { buildRailway } from './railway.js';
 import { buildSky, SUN_DIR } from './sky.js';
@@ -22,7 +22,7 @@ export interface World {
   colliders: Colliders;
   sun: THREE.DirectionalLight;
   /** Moving obstacles (the train) as circles, refreshed every frame. */
-  dynamicColliders(): { x: number; z: number; r: number }[];
+  dynamicColliders(): readonly Circle[];
   update(dt: number, time: number): void;
   spawn: THREE.Vector3;
 }
@@ -67,6 +67,16 @@ export function buildWorld(scene: THREE.Scene, opts: WorldOptions): World {
   animated.push(fire);
   colliders.add(fire.position.x, fire.position.z, 1.0);
   scene.add(place(buildCampProps(), camp.x + 2, camp.y + 2));
+  // Log seats and bedroll around the fire (offsets match buildCampProps).
+  for (const [dx, dz, r] of [
+    [-0.5, 1.9, 0.4],
+    [0.5, 1.9, 0.4],
+    [-1.8, -0.3, 0.4],
+    [-1.6, 0.7, 0.4],
+    [1.9, -0.9, 0.6],
+  ] as const) {
+    colliders.add(camp.x + 2 + dx, camp.y + 2 + dz, r);
+  }
 
   const fence = place(buildFence(24), camp.x + 8, camp.y - 12);
   scene.add(fence);
@@ -88,7 +98,7 @@ export function buildWorld(scene: THREE.Scene, opts: WorldOptions): World {
     }),
   );
 
-  const railway = buildRailway();
+  const railway = buildRailway(colliders);
   scene.add(railway);
   animated.push(railway);
 
@@ -111,11 +121,16 @@ export function buildWorld(scene: THREE.Scene, opts: WorldOptions): World {
   scene.add(sun, sun.target);
   scene.fog = new THREE.Fog('#f5d49a', 140, 900);
 
+  const moving: Circle[] = [];
   const spawnZ = 44;
   return {
     colliders,
     sun,
-    dynamicColliders: () => railway.trainCollider,
+    dynamicColliders: () => {
+      moving.length = 0;
+      moving.push(...railway.trainCollider, ...herd.colliders);
+      return moving;
+    },
     spawn: new THREE.Vector3(trailX(spawnZ), heightAt(trailX(spawnZ), spawnZ), spawnZ),
     update(dt, time) {
       wind.value = time;

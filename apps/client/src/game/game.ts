@@ -153,7 +153,12 @@ export class Game {
     const right = new THREE.Vector3(-forward.z, 0, forward.x);
     const pos = this.camera.position;
     pos.addScaledVector(forward, move.y * speed * dt).addScaledVector(right, move.x * speed * dt);
-    this.world.colliders.resolve(pos, PLAYER_RADIUS, this.world.dynamicColliders());
+    const obstacles = [...this.world.dynamicColliders()];
+    // Other players are solid too.
+    for (const avatar of this.remotes.values()) {
+      obstacles.push({ x: avatar.root.position.x, z: avatar.root.position.z, r: 0.35 });
+    }
+    this.world.colliders.resolve(pos, PLAYER_RADIUS, obstacles);
     pos.x = THREE.MathUtils.clamp(pos.x, -WORLD_HALF, WORLD_HALF);
     pos.z = THREE.MathUtils.clamp(pos.z, -WORLD_HALF, WORLD_HALF);
 

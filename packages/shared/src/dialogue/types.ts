@@ -9,7 +9,10 @@ export interface Speaker {
 export interface DialogueLine {
   id: string;
   speaker: SpeakerId;
+  /** What's shown on screen (correct punctuation). */
   text: string;
+  /** Optional wording for the voice only, e.g. without a comma the TTS pauses too long on. */
+  say?: string;
 }
 
 export interface DialogueScript {

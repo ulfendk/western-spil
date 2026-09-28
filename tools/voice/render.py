@@ -61,15 +61,17 @@ def main() -> None:
     for f in sorted((content / "story").glob("*.yaml")):
         doc = yaml.safe_load(f.read_text())
         for line in doc["lines"]:
-            lines.append((f"{doc['id']}.{line['id']}", line["speaker"], " ".join(line["text"].split())))
+            text = " ".join(line["text"].split())
+            spoken = " ".join(line.get("say", line["text"]).split())
+            lines.append((f"{doc['id']}.{line['id']}", line["speaker"], text, spoken))
 
     model = None
     model_dir = None
     manifest = {}
-    for line_id, speaker, text in lines:
+    for line_id, speaker, text, spoken in lines:
         voice = voices["speakers"][speaker]
         key = hashlib.sha1(
-            json.dumps({"engine": voices["engine"], "voice": voice, "text": text}, sort_keys=True).encode()
+            json.dumps({"engine": voices["engine"], "voice": voice, "text": spoken}, sort_keys=True).encode()
         ).hexdigest()[:16]
         name = f"{key}.mp3"
         manifest[line_id] = {"file": name, "text": text, "speaker": speaker}
@@ -86,8 +88,8 @@ def main() -> None:
             continue
         if model is None:
             model_dir, model = load_model()
-        print(f"[voice] {line_id} ({speaker}): {text[:60]}…", flush=True)
-        render_line(model, model_dir, content, voice, text, target, seed=int(key[:8], 16))
+        print(f"[voice] {line_id} ({speaker}): {spoken[:60]}…", flush=True)
+        render_line(model, model_dir, content, voice, spoken, target, seed=int(key[:8], 16))
 
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
     used = {v["file"] for v in manifest.values()}

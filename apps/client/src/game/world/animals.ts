@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { mulberry32 } from '../noise.js';
 import { outline, part } from '../toon.js';
+import type { Circle } from './colliders.js';
 import { heightAt } from './terrain.js';
 
 export interface Animated {
@@ -188,8 +189,13 @@ function buildBison(): THREE.Group {
 }
 
 /** A slowly grazing, wandering herd. */
-export function buildBisonHerd(center: THREE.Vector2, count: number): THREE.Group & Animated {
-  const herd = new THREE.Group() as THREE.Group & Animated;
+export function buildBisonHerd(
+  center: THREE.Vector2,
+  count: number,
+): THREE.Group & Animated & { colliders: Circle[] } {
+  const herd = new THREE.Group() as THREE.Group & Animated & { colliders: Circle[] };
+  // Two circles per bison (shaggy front + rump), refreshed as they wander.
+  herd.colliders = [];
   const rand = mulberry32(77);
   const members = Array.from({ length: count }, () => {
     const bison = buildBison();
@@ -197,6 +203,7 @@ export function buildBisonHerd(center: THREE.Vector2, count: number): THREE.Grou
     bison.scale.setScalar(s);
     const state = {
       obj: bison,
+      scale: s,
       x: center.x + (rand() - 0.5) * 40,
       z: center.y + (rand() - 0.5) * 30,
       heading: rand() * Math.PI * 2,
@@ -222,6 +229,15 @@ export function buildBisonHerd(center: THREE.Vector2, count: number): THREE.Grou
       m.z -= Math.cos(m.heading) * m.walk * dt;
       m.obj.position.set(m.x, heightAt(m.x, m.z), m.z);
       m.obj.rotation.y = m.heading;
+    }
+    herd.colliders.length = 0;
+    for (const m of members) {
+      const fx = -Math.sin(m.heading);
+      const fz = -Math.cos(m.heading);
+      herd.colliders.push(
+        { x: m.x + fx * 0.75 * m.scale, z: m.z + fz * 0.75 * m.scale, r: 0.95 * m.scale },
+        { x: m.x - fx * 0.55 * m.scale, z: m.z - fz * 0.55 * m.scale, r: 0.75 * m.scale },
+      );
     }
   };
   return herd;

@@ -168,6 +168,7 @@ export function buildVegetation(opts: VegetationOptions): THREE.Group {
     dummy.scale.set(s * (1 + rand() * 0.4), s, s);
     dummy.updateMatrix();
     bushes.setMatrixAt(i, dummy.matrix);
+    opts.colliders.add(x, z, 0.45 * s);
     bushes.setColorAt(i, tint.setHSL(0.2 + rand() * 0.08, 0.22, 0.45 + rand() * 0.12));
   }
   group.add(bushes);

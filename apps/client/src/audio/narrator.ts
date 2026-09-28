@@ -50,7 +50,7 @@ class Narrator {
     const file = (await this.loadManifest())[line.id];
     if (file) return `/narration/${file}`;
     const rate = SPEAKERS[line.speaker].lengthScale ?? 1;
-    return `/api/tts?text=${encodeURIComponent(line.text)}&rate=${rate}`;
+    return `/api/tts?text=${encodeURIComponent(line.say ?? line.text)}&rate=${rate}`;
   }
 }
 

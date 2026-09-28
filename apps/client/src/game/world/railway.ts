@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
 import { mesh, outline, part } from '../toon.js';
 import type { Animated } from './animals.js';
+import type { Colliders } from './colliders.js';
 import { RAIL_X, railHeight, WORLD_SIZE } from './terrain.js';
 
 const GAUGE = 1.435;
@@ -9,8 +10,9 @@ const Z_START = WORLD_SIZE * 0.9;
 const Z_END = -WORLD_SIZE * 0.9;
 
 /** Track (ties + two rails), telegraph poles with sagging wires, and a passing steam train. */
-export function buildRailway(): THREE.Group &
-  Animated & { trainCollider: { x: number; z: number; r: number }[] } {
+export function buildRailway(
+  colliders: Colliders,
+): THREE.Group & Animated & { trainCollider: { x: number; z: number; r: number }[] } {
   const group = new THREE.Group() as THREE.Group &
     Animated & { trainCollider: { x: number; z: number; r: number }[] };
 
@@ -69,6 +71,7 @@ export function buildRailway(): THREE.Group &
       pole.add(part(new THREE.CylinderGeometry(0.05, 0.05, 0.14, 6), '#6fb3a8', [x, 6.73, 0]));
     pole.position.set(poleX, y, z);
     group.add(outline(pole, 0.02));
+    colliders.add(poleX, z, 0.3);
     poleTops.push(new THREE.Vector3(poleX, y + 6.8, z));
   }
   const wirePts: number[] = [];
