@@ -1,3 +1,4 @@
+import { RENAMED_ADJECTIVES } from '../nicknames.js';
 import { SAVE_SCHEMA_VERSION, type SaveGame } from './types.js';
 
 type AnySave = Record<string, unknown> & { schemaVersion?: number };
@@ -9,6 +10,12 @@ type AnySave = Record<string, unknown> & { schemaVersion?: number };
 const MIGRATIONS: Record<number, (save: AnySave) => AnySave> = {
   // v2: story progress within the chapter.
   1: (save) => ({ ...save, progress: { step: 'intro', flags: [] } }),
+  // v3: nicknames with a non-Danish adjective get the Danish replacement.
+  2: (save) => {
+    const [adj, ...rest] = String(save.nickname ?? '').split(' ');
+    const renamed = adj && RENAMED_ADJECTIVES[adj];
+    return renamed ? { ...save, nickname: [renamed, ...rest].join(' ') } : save;
+  },
 };
 
 export function migrateSave(raw: unknown): SaveGame {

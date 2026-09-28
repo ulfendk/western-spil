@@ -18,11 +18,13 @@ lines:
     choices:
       - text: Kan heste tale?
         flag: spurgte-kanel-om-tale
+        say: Tryk på nummer et for at spørge om heste kan tale.
         lines:
           - id: lytter
             speaker: kanel
             text: Selvfølgelig kan heste tale. Folk lytter bare aldrig.
       - text: Jeg går i gang!
+        say: Tryk på nummer to for at gå i gang med at pakke.
         lines:
           - id: oeje
             speaker: kanel

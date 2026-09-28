@@ -7,14 +7,14 @@ lines:
   - id: knae
     speaker: pind
     text: Men nu er mine knæ for gamle. Og denne opgave er den vigtigste af dem alle.
-  - id: spiger
+  - id: nagle
     speaker: pind
     text: >-
-      I denne kasse ligger den gyldne spiger. Den skal slås i den allersidste skinne, når
+      I denne kasse ligger den gyldne nagle. Den skal slås i det allersidste stykke spor, når
       jernbanen fra øst møder jernbanen fra vest.
   - id: promontory
     speaker: pind
-    text: Stedet hedder Promontory. Det ligger langt ude i Utah. Den tiende maj skal spigeren være der.
+    text: Stedet hedder Promontory. Det ligger langt ude i Utah. Den tiende maj skal naglen være der.
   - id: kasse
     speaker: fortaeller
     text: Pind rækker dig en lille, tung kasse. Den er fint pakket ind og bundet med snor.
@@ -25,12 +25,14 @@ lines:
     choices:
       - text: Hvem er de?
         flag: spurgte-om-broedrene
+        say: Tryk på nummer et for at spørge hvem de er.
         lines:
           - id: boevl
             speaker: pind
             text: Bøvl-brødrene! De er ikke særlig kloge. Men de giver aldrig op.
       - text: Jeg passer på den!
         flag: lovede-at-passe-paa
+        say: Tryk på nummer to for at love at passe på den.
         lines:
           - id: godt
             speaker: pind

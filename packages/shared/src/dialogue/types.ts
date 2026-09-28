@@ -7,8 +7,13 @@ export interface Speaker {
 }
 
 export interface DialogueChoice {
-  /** Button text (the player's answer; not voiced). */
+  /** Button text (the player's answer). */
   text: string;
+  /**
+   * Voiced hint read by the narrator while the answers are shown, e.g.
+   * "Tryk på nummer et for at spørge hvem de er". Id: "<line id>-valg<n>".
+   */
+  prompt?: DialogueLine;
   /** Flag recorded in the save when this answer is picked. */
   flag?: string;
   /** Lines that follow this answer before the conversation continues. */
@@ -44,7 +49,10 @@ export function allLines(script: DialogueScript): DialogueLine[] {
   const walk = (lines: DialogueLine[]) => {
     for (const line of lines) {
       out.push(line);
-      for (const choice of line.choices ?? []) walk(choice.lines);
+      for (const choice of line.choices ?? []) {
+        if (choice.prompt) out.push(choice.prompt);
+        walk(choice.lines);
+      }
     }
   };
   walk(script.lines);

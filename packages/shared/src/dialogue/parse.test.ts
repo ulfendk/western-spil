@@ -45,6 +45,7 @@ lines:
     choices:
       - text: Hvem er de?
         flag: spurgte-om-broedrene
+        say: Tryk på nummer et for at spørge hvem de er.
         lines:
           - { id: svar1, speaker: pind, text: Bøvl-brødrene! }
       - text: Jeg passer på den!
@@ -60,7 +61,16 @@ lines:
   });
 
   it('lists nested lines for voicing', () => {
-    expect(allLines(script).map((l) => l.id)).toEqual(['pind.spoerg', 'pind.svar1', 'pind.slut']);
+    expect(allLines(script).map((l) => l.id)).toEqual([
+      'pind.spoerg',
+      'pind.spoerg-valg1',
+      'pind.svar1',
+      'pind.slut',
+    ]);
+    expect(script.lines[0]!.choices![0]!.prompt).toMatchObject({
+      speaker: 'fortaeller',
+      text: 'Tryk på nummer et for at spørge hvem de er.',
+    });
   });
 
   it('rejects a single answer', () => {

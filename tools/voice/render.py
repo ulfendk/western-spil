@@ -62,7 +62,7 @@ def main() -> None:
     for f in sorted((content / "story").glob("*.yaml")):
         doc = yaml.safe_load(f.read_text())
         for line in walk(doc["lines"]):
-            text = " ".join(line["text"].split())
+            text = " ".join(str(line["text"]).split())
             spoken = apply_lexicon(" ".join(line.get("say", line["text"]).split()), lexicon)
             lines.append((f"{doc['id']}.{line['id']}", line["speaker"], text, spoken))
 
@@ -117,10 +117,13 @@ def write_manifest(path: Path, manifest: dict) -> None:
 
 
 def walk(lines):
-    """Yields every line, including those inside answer choices."""
+    """Yields every line, including voiced answer prompts and lines inside choices."""
     for line in lines:
         yield line
-        for choice in line.get("choices", []):
+        for n, choice in enumerate(line.get("choices", []), start=1):
+            if choice.get("say"):
+                # Same id scheme as the game's parser: "<line id>-valg<n>".
+                yield {"id": f"{line['id']}-valg{n}", "speaker": "fortaeller", "text": choice["say"]}
             yield from walk(choice.get("lines", []))
 
 

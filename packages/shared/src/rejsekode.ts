@@ -37,7 +37,7 @@ export const REJSEKODE_WORDS = [
   'ulv',
   'ræv',
   'bjørn',
-  'uglen',
+  'ugle',
   'slange',
   'damp',
   'fløjte',
@@ -50,14 +50,14 @@ export const REJSEKODE_WORDS = [
   'reb',
   'hammer',
   'søm',
-  'spiger',
+  'nagle',
   'banjo',
   'kaffe',
   'bønner',
   'brød',
   'æble',
   'kanel',
-  'mule',
+  'æsel',
   'ko',
   'kalv',
   'kvæg',
@@ -76,7 +76,10 @@ export function generateRejsekode(randomInt: (max: number) => number): string {
   );
 }
 
-const WORD_SET = new Set<string>(REJSEKODE_WORDS);
+/** Words used in older codes before they were swapped for clearer Danish ones. */
+const LEGACY_WORDS = ['uglen', 'spiger', 'mule'];
+
+const WORD_SET = new Set<string>([...REJSEKODE_WORDS, ...LEGACY_WORDS]);
 
 /** Normalises user input ("Hest Kaktus, ...") to canonical form, or null if invalid. */
 export function normalizeRejsekode(input: string): string | null {

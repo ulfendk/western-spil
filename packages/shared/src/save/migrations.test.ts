@@ -24,3 +24,10 @@ describe('save v1 -> v2', () => {
     expect(() => validateSave(save)).toThrow(/Ugyldig/);
   });
 });
+
+describe('save v2 -> v3', () => {
+  it('renames non-Danish nickname adjectives', () => {
+    const v2 = { ...newSave('x'), schemaVersion: 2, nickname: 'Snilde Ida' };
+    expect(migrateSave(v2).nickname).toBe('Flinke Ida');
+  });
+});

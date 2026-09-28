@@ -147,7 +147,7 @@ export class Chapter1 {
     switch (this.step) {
       case 'find-pind': {
         const flags = await this.talk('k1-pind');
-        toast('📦 Du fik kassen med den gyldne spiger');
+        toast('📦 Du fik kassen med den gyldne nagle');
         this.setStep('find-kanel', flags);
         break;
       }

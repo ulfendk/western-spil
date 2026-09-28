@@ -1,8 +1,20 @@
-import { SPEAKERS, type DialogueLine, type DialogueScript, type SpeakerId } from '@western/shared';
+import {
+  allLines,
+  SPEAKERS,
+  type DialogueLine,
+  type DialogueScript,
+  type SpeakerId,
+} from '@western/shared';
+import { settings } from '../settings.js';
 import { narrator } from '../audio/narrator.js';
 import { h } from '../ui/dom.js';
 
 const AUTO_ADVANCE_MS = 900;
+
+/** If a line can't be voiced, give time to read it before moving on. */
+function readingTimeMs(text: string): number {
+  return 2500 + text.length * 70;
+}
 
 export interface DialogueOptions {
   /** Called when a new line starts, e.g. to turn the camera towards the speaker. */
@@ -38,6 +50,7 @@ export class DialogueRunner {
     const flags: string[] = [];
     this.skipping = false;
     this.root.hidden = false;
+    narrator.preload(allLines(script));
     try {
       await this.playLines(script.lines, flags, opts);
     } finally {
@@ -104,6 +117,8 @@ export class DialogueRunner {
     await new Promise<void>((resolve) => {
       let done = false;
       let timer = 0;
+      /** Bumped on each (re)play so an interrupted playback can't schedule the next line. */
+      let attempt = 0;
       const finish = () => {
         if (done) return;
         done = true;
@@ -112,34 +127,44 @@ export class DialogueRunner {
         narrator.stop();
         resolve();
       };
-      // Tap anywhere on the bubble, the Next button or the keyboard to continue.
+      const speak = () => {
+        const mine = ++attempt;
+        clearTimeout(timer);
+        void narrator.play(line).then((played) => {
+          if (done || mine !== attempt) return;
+          if (line.choices) {
+            // Answers appear once the question has been asked.
+            finishTyping();
+            finish();
+          } else if (played) {
+            // Voiced lines move on by themselves.
+            timer = window.setTimeout(finish, AUTO_ADVANCE_MS);
+          } else if (settings.narration) {
+            // Voice unavailable (offline, blocked audio): move on after reading time.
+            timer = window.setTimeout(finish, readingTimeMs(line.text));
+          }
+          // With narration turned off, the reader taps Next themselves.
+        });
+      };
+      // Tap the bubble, the Next button or press Space/E/Enter to continue.
       this.advance = () => {
         if (typed < line.text.length) finishTyping();
         else finish();
       };
       bubble.onclick = (e) => {
-        if (e.target === bubble || e.target === text) this.advance?.();
+        if (!(e.target as HTMLElement).closest('button')) this.advance?.();
       };
       next.onclick = finish;
       skip.onclick = () => {
         this.skipping = true;
         finish();
       };
-      replay.onclick = () => void narrator.play(line);
-      // Lines with answers wait for the answer instead of auto-advancing.
+      replay.onclick = speak;
       if (line.choices) {
         next.hidden = true;
         skip.hidden = true;
-        void narrator.play(line).then(() => {
-          finishTyping();
-          finish();
-        });
-        return;
       }
-      void narrator.play(line).then((played) => {
-        // Voiced lines move on by themselves; silent ones wait for the reader.
-        if (played && !done) timer = window.setTimeout(finish, AUTO_ADVANCE_MS);
-      });
+      speak();
     });
   }
 
@@ -147,15 +172,26 @@ export class DialogueRunner {
     return new Promise((resolve) => {
       const buttons = line.choices!.map((choice, i) => {
         const b = h('button', { class: 'btn dialogue-choice' }, `${i + 1}. ${choice.text}`);
-        b.onclick = () => resolve(choice);
+        b.onclick = () => {
+          narrator.stop();
+          resolve(choice);
+        };
         return b;
       });
       const box = h('div', { class: 'dialogue-choices' }, ...buttons);
       this.root.append(box);
       this.advance = null;
+      // Read the options aloud ("Tryk på nummer et for at …"); answering stops it.
+      void (async () => {
+        for (const choice of line.choices!) {
+          if (!choice.prompt || !box.isConnected) break;
+          await narrator.play(choice.prompt);
+        }
+      })();
       const onKey = (e: KeyboardEvent) => {
         const n = Number(e.key) - 1;
         if (line.choices![n]) {
+          narrator.stop();
           window.removeEventListener('keydown', onKey);
           resolve(line.choices![n]!);
         }

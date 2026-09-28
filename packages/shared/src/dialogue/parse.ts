@@ -47,11 +47,18 @@ export function parseDialogue(source: string): DialogueScript {
       if (c.flag !== undefined && typeof c.flag !== 'string') {
         throw new Error(`${lineId}: choice ${i} flag must be text`);
       }
+      if (c.say !== undefined && typeof c.say !== 'string') {
+        throw new Error(`${lineId}: choice ${i} "say" must be text`);
+      }
       const choice: DialogueChoice = {
         text: c.text.trim(),
         lines: Array.isArray(c.lines) ? parseLines(c.lines) : [],
       };
       if (c.flag) choice.flag = c.flag;
+      if (c.say) {
+        const say = c.say.trim();
+        choice.prompt = { id: `${lineId}-valg${i + 1}`, speaker: 'fortaeller', text: say };
+      }
       return choice;
     });
   };

@@ -8,7 +8,7 @@ const ADJECTIVES = [
   'Stille',
   'Seje',
   'Rappe',
-  'Snilde',
+  'Flinke',
   'Vilde',
 ];
 
@@ -32,7 +32,12 @@ export function randomNickname(rand: () => number = Math.random): string {
   return `${pick(ADJECTIVES)} ${pick(NAMES)}`;
 }
 
-const ALLOWED = new Set(ADJECTIVES.flatMap((a) => NAMES.map((n) => `${a} ${n}`)));
+/** Retired adjectives, mapped to their replacement. */
+export const RENAMED_ADJECTIVES: Record<string, string> = { Snilde: 'Flinke' };
+
+const ALLOWED = new Set(
+  [...ADJECTIVES, ...Object.keys(RENAMED_ADJECTIVES)].flatMap((a) => NAMES.map((n) => `${a} ${n}`)),
+);
 
 /** Server-side check so a tampered client can't pick an arbitrary name. */
 export function isValidNickname(name: string): boolean {

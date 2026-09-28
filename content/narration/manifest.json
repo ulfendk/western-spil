@@ -34,10 +34,20 @@
     "text": "Gå hen til vognen og pak den. Tungt nederst og let øverst. Det ved selv et æsel.",
     "speaker": "kanel"
   },
+  "k1-kanel.tungt-valg1": {
+    "file": "74c48b9888348e3d.mp3",
+    "text": "Tryk på nummer et for at spørge om heste kan tale.",
+    "speaker": "fortaeller"
+  },
   "k1-kanel.lytter": {
     "file": "077d53d1b429eab2.mp3",
     "text": "Selvfølgelig kan heste tale. Folk lytter bare aldrig.",
     "speaker": "kanel"
+  },
+  "k1-kanel.tungt-valg2": {
+    "file": "4bae5f761d80a9a5.mp3",
+    "text": "Tryk på nummer to for at gå i gang med at pakke.",
+    "speaker": "fortaeller"
   },
   "k1-kanel.oeje": {
     "file": "f42ac4b4bd3bb9a6.mp3",
@@ -74,14 +84,14 @@
     "text": "Men nu er mine knæ for gamle. Og denne opgave er den vigtigste af dem alle.",
     "speaker": "pind"
   },
-  "k1-pind.spiger": {
-    "file": "ffbb666f03e4f35f.mp3",
-    "text": "I denne kasse ligger den gyldne spiger. Den skal slås i den allersidste skinne, når jernbanen fra øst møder jernbanen fra vest.",
+  "k1-pind.nagle": {
+    "file": "f4f4f958a038bbb1.mp3",
+    "text": "I denne kasse ligger den gyldne nagle. Den skal slås i det allersidste stykke spor, når jernbanen fra øst møder jernbanen fra vest.",
     "speaker": "pind"
   },
   "k1-pind.promontory": {
-    "file": "91f25c39205180f8.mp3",
-    "text": "Stedet hedder Promontory. Det ligger langt ude i Utah. Den tiende maj skal spigeren være der.",
+    "file": "2cef445f1566ee82.mp3",
+    "text": "Stedet hedder Promontory. Det ligger langt ude i Utah. Den tiende maj skal naglen være der.",
     "speaker": "pind"
   },
   "k1-pind.kasse": {
@@ -94,10 +104,20 @@
     "text": "Pas godt på den. Der går rygter om fire brødre, der gerne vil stjæle den.",
     "speaker": "pind"
   },
+  "k1-pind.rygter-valg1": {
+    "file": "4081e13b7a2d3ed2.mp3",
+    "text": "Tryk på nummer et for at spørge hvem de er.",
+    "speaker": "fortaeller"
+  },
   "k1-pind.boevl": {
     "file": "9a28d941ca5515d3.mp3",
     "text": "Bøvl-brødrene! De er ikke særlig kloge. Men de giver aldrig op.",
     "speaker": "pind"
+  },
+  "k1-pind.rygter-valg2": {
+    "file": "8d672734e1f3a429.mp3",
+    "text": "Tryk på nummer to for at love at passe på den.",
+    "speaker": "fortaeller"
   },
   "k1-pind.godt": {
     "file": "bb9440298f157008.mp3",
@@ -145,8 +165,8 @@
     "speaker": "kanel"
   },
   "k1-slut.rejsen": {
-    "file": "283fd52f9622d054.mp3",
-    "text": "Og sådan begyndte rejsen mod vest. Med en gylden spiger, en snakkesalig hest og fire brødre i hælene.",
+    "file": "0824755c24f8c90f.mp3",
+    "text": "Og sådan begyndte rejsen mod vest. Med en gylden nagle, en snakkesalig hest og fire brødre i hælene.",
     "speaker": "fortaeller"
   },
   "k1-slut.snorker": {

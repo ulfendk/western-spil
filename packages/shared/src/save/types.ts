@@ -1,4 +1,4 @@
-export const SAVE_SCHEMA_VERSION = 2;
+export const SAVE_SCHEMA_VERSION = 3;
 
 /** Where the player is in the story. */
 export interface StoryProgress {

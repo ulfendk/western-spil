@@ -14,6 +14,12 @@ describe('rejsekode', () => {
     );
   });
 
+  it('still accepts codes made with retired words', () => {
+    expect(normalizeRejsekode('spiger mule uglen hest hest hest')).toBe(
+      'spiger-mule-uglen-hest-hest-hest',
+    );
+  });
+
   it('rejects wrong length or unknown words', () => {
     expect(normalizeRejsekode('hest kaktus')).toBeNull();
     expect(normalizeRejsekode('hest kaktus sadel lasso vogn pizza')).toBeNull();
