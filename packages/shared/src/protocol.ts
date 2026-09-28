@@ -2,12 +2,13 @@
  * Bump whenever client/server messages or room state change incompatibly.
  * Clients with a different version are rejected and forced to update.
  */
-export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_VERSION = 2;
 
 /** Close/error code the server uses when the client's protocol is outdated. */
 export const ERR_OUTDATED_CLIENT = 4400;
 
 export const ROOM_TOWN = 'town';
+export const ROOM_HORSESHOE = 'hestesko';
 
 export type TownId = 'st-louis' | 'stoevby' | 'fortet' | 'soelvkloeften' | 'promontory';
 
@@ -24,6 +25,14 @@ export interface TownJoinOptions {
 export interface TownClientMessages {
   move: { x: number; y: number; z: number; ry: number };
   emote: { emote: Emote };
+  /** A preset phrase (index into PHRASES); there is no free text chat. */
+  say: { phrase: number };
+}
+
+/** Broadcast by the town room when someone says a preset phrase. */
+export interface TownSaid {
+  id: string;
+  phrase: number;
 }
 
 export const EMOTES = ['wave', 'hat', 'jump'] as const;

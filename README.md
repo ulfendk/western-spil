@@ -31,6 +31,13 @@ npm run lint && npm run typecheck
 
 Run `npm run tts` once to copy the committed narration into the dev client. Add `?debug` to the URL to expose `window.game`, e.g. `game.debugView(x, z, yaw)` or `game.time = 29` (to see the train).
 
+## Multiplayer
+
+- **Town:** St. Louis, east of the starting camp, is a shared town. Everyone online sees each other there.
+- **Safe chat:** players talk with preset Danish phrases and emotes only (the 💬 button, or T). There's no free text. Phrases live in `packages/shared/src/phrases.ts` and are voiced in `content/story/fraser.yaml`. Only ever append new phrases, because the index is sent over the network.
+- **Hestesko:** the horseshoe toss (`HorseshoeRoom`) is for 1–4 players at the pit on the square. The server decides every throw using the shared rules in `packages/shared/src/horseshoe.ts`.
+- **Protocol version:** when messages or room state change incompatibly, bump `PROTOCOL_VERSION` in `packages/shared/src/protocol.ts`. Older clients are then told to update.
+
 ## Writing story content
 
 Each conversation is a YAML file in `content/story/`. The quest logic that decides _when_ each one plays lives in `apps/client/src/story/` (chapter 1: `chapter1.ts`).

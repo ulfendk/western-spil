@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { Emote } from '@western/shared';
+import { PHRASES, type Emote } from '@western/shared';
 import { TownConnection } from '../net/town.js';
 import { settings } from '../settings.js';
 import { RemoteAvatar } from './avatars.js';
@@ -18,6 +18,8 @@ export interface GameHooks {
   onPlayers(count: number, online: boolean): void;
   /** Called every frame while playing (story triggers, interaction prompts). */
   onFrame?(dt: number): void;
+  /** A preset phrase was said nearby; `distance` is null for our own. */
+  onSaid?(phrase: number, distance: number | null): void;
 }
 
 /** The first-person prairie scene (M0 playground) with shared-town presence. */
@@ -112,17 +114,60 @@ export class Game {
           this.remotes.delete(id);
         },
         onStatus: (status, count) => this.hooks.onPlayers(count, status === 'online'),
+        onSaid: (id, phrase, self) => {
+          // Our own phrase was already shown when we said it.
+          if (self) return;
+          const avatar = this.remotes.get(id);
+          if (!avatar) return;
+          avatar.say(PHRASES[phrase]!.text);
+          this.hooks.onSaid?.(phrase, avatar.root.position.distanceTo(this.camera.position));
+        },
       });
       // M0: the prairie playground stands in for the St. Louis town hub.
       void this.town.join('st-louis', nickname, hat);
     }
   }
 
-  /** Debug helper: place the camera somewhere and look in a direction. */
-  debugView(x: number, z: number, yaw: number, pitch = 0) {
-    this.camera.position.set(x, heightAt(x, z) + EYE_HEIGHT, z);
+  /** Put the player somewhere (minigames, debug) and tell the other players right away. */
+  setView(x: number, z: number, yaw: number, pitch = 0) {
+    const ground = heightAt(x, z);
+    this.camera.position.set(x, ground + EYE_HEIGHT, z);
     this.controls.yaw = yaw;
     this.controls.pitch = pitch;
+    this.lookTarget = null;
+    this.town?.sendMove(x, ground, z, yaw, true);
+  }
+
+  /** Turn the view (e.g. aiming in a minigame) without moving. */
+  setYaw(yaw: number) {
+    this.controls.yaw = yaw;
+    const p = this.playerPosition;
+    this.town?.sendMove(p.x, p.y, p.z, yaw);
+  }
+
+  get yaw(): number {
+    return this.controls.yaw;
+  }
+
+  /** Debug helper: place the camera somewhere and look in a direction. */
+  debugView(x: number, z: number, yaw: number, pitch = 0) {
+    this.setView(x, z, yaw, pitch);
+  }
+
+  /** Add something (e.g. a flying horseshoe) to the 3D scene. */
+  addToScene(obj: THREE.Object3D) {
+    this.scene.add(obj);
+  }
+
+  /** Say a preset phrase: shown and heard locally right away, then sent to the others. */
+  say(phrase: number) {
+    this.hooks.onSaid?.(phrase, null);
+    this.town?.sendSay(phrase);
+  }
+
+  /** Walking around freely (not paused and not locked by a conversation or minigame). */
+  get isPlaying(): boolean {
+    return this.running && !this.inputLocked;
   }
 
   pause() {

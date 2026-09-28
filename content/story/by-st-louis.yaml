@@ -1,0 +1,12 @@
+# First time the player walks into St. Louis.
+id: by-st-louis
+lines:
+  - id: velkommen
+    speaker: fortaeller
+    text: Velkommen til St. Louis! Her mødes grønskollinger fra hele prærien.
+  - id: hestesko
+    speaker: fortaeller
+    text: På pladsen ved saloonen kan I kaste hestesko om kap.
+  - id: penge
+    speaker: kanel
+    text: Pas godt på pengene i byen. Og på mig. Mest på mig.

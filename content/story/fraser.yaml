@@ -1,0 +1,30 @@
+# Preset phrases players say to each other (see packages/shared/src/phrases.ts).
+# Line ids must match the phrase ids there.
+id: fraser
+lines:
+  - id: hej
+    speaker: spiller
+    text: Hej makker!
+  - id: godt
+    speaker: spiller
+    text: Godt klaret!
+  - id: hestesko
+    speaker: spiller
+    text: Skal vi spille hestesko?
+  - id: foelg
+    speaker: spiller
+    text: Følg mig!
+  - id: tak
+    speaker: spiller
+    text: Mange tak!
+  - id: hjaelp
+    speaker: spiller
+    text: Kan du hjælpe mig?
+  - id: jiha
+    speaker: spiller
+    text: Jiii-haa!
+    say: Jii haa!
+  - id: farvel
+    speaker: spiller
+    text: Farvel, makker!
+    say: Farvel makker!

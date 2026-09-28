@@ -1,4 +1,3 @@
-import type { Emote } from '@western/shared';
 import { store } from '../save/store.js';
 import { h } from './dom.js';
 
@@ -10,17 +9,21 @@ export class Hud {
   private actions: HTMLElement;
   private hint: HTMLElement;
 
-  constructor(onPause: () => void, onEmote: (e: Emote) => void) {
+  constructor(onPause: () => void, onChat: () => void) {
     const pause = h('button', { class: 'hud-btn', title: 'Pause', ariaLabel: 'Pause' }, '⏸');
     pause.onclick = onPause;
-    const wave = h('button', { class: 'hud-btn', title: 'Vink', ariaLabel: 'Vink' }, '👋');
-    wave.onclick = () => onEmote('wave');
+    const chat = h(
+      'button',
+      { class: 'hud-btn', title: 'Sig noget (T)', ariaLabel: 'Sig noget' },
+      '💬',
+    );
+    chat.onclick = onChat;
     this.hint = h(
       'div',
       { class: 'hud-hint' },
-      'WASD/pile for at gå · Shift for at løbe · E for at tale · Esc for pause',
+      'WASD/pile for at gå · Shift for at løbe · E for at tale · T for at sige noget · Esc for pause',
     );
-    this.actions = h('div', { class: 'hud-actions' }, wave, pause);
+    this.actions = h('div', { class: 'hud-actions' }, chat, pause);
     this.el = h(
       'div',
       { class: 'hud', hidden: true },

@@ -68,6 +68,25 @@ class Narrator {
     });
   }
 
+  /**
+   * Plays a short extra clip (a phrase someone said) on top of whatever else is going on,
+   * quieter the further away it is. Skipped while a conversation is being narrated.
+   */
+  async playExtra(line: DialogueLine, loudness = 1): Promise<void> {
+    if (!settings.narration || this.current || loudness <= 0) return;
+    const url = await this.urlFor(line);
+    const buffer = url ? await this.buffer(url) : null;
+    const ctx = this.context();
+    if (!buffer || !ctx || !this.gain || ctx.state !== 'running') return;
+    const gain = ctx.createGain();
+    gain.gain.value = settings.volume * Math.min(1, loudness);
+    gain.connect(ctx.destination);
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(gain);
+    source.start();
+  }
+
   stop() {
     this.generation++;
     if (this.current) {

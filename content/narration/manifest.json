@@ -1,4 +1,104 @@
 {
+  "by-st-louis.velkommen": {
+    "file": "010596f773b776db.mp3",
+    "text": "Velkommen til St. Louis! Her mødes grønskollinger fra hele prærien.",
+    "speaker": "fortaeller"
+  },
+  "by-st-louis.hestesko": {
+    "file": "2dd81fa7d14fac6f.mp3",
+    "text": "På pladsen ved saloonen kan I kaste hestesko om kap.",
+    "speaker": "fortaeller"
+  },
+  "by-st-louis.penge": {
+    "file": "48c9d067194f05c8.mp3",
+    "text": "Pas godt på pengene i byen. Og på mig. Mest på mig.",
+    "speaker": "kanel"
+  },
+  "fraser.hej": {
+    "file": "8bd643ab0a2df973.mp3",
+    "text": "Hej makker!",
+    "speaker": "spiller"
+  },
+  "fraser.godt": {
+    "file": "448906ae66f8d54a.mp3",
+    "text": "Godt klaret!",
+    "speaker": "spiller"
+  },
+  "fraser.hestesko": {
+    "file": "890d58e51675b2c9.mp3",
+    "text": "Skal vi spille hestesko?",
+    "speaker": "spiller"
+  },
+  "fraser.foelg": {
+    "file": "f85f9f2e1147832a.mp3",
+    "text": "Følg mig!",
+    "speaker": "spiller"
+  },
+  "fraser.tak": {
+    "file": "da1f8c656ded2729.mp3",
+    "text": "Mange tak!",
+    "speaker": "spiller"
+  },
+  "fraser.hjaelp": {
+    "file": "cec2922f5486b877.mp3",
+    "text": "Kan du hjælpe mig?",
+    "speaker": "spiller"
+  },
+  "fraser.jiha": {
+    "file": "ae2d0c23867af783.mp3",
+    "text": "Jiii-haa!",
+    "speaker": "spiller"
+  },
+  "fraser.farvel": {
+    "file": "ec5c281d01349fb6.mp3",
+    "text": "Farvel, makker!",
+    "speaker": "spiller"
+  },
+  "hestesko.regler": {
+    "file": "9b8e6d50b22236da.mp3",
+    "text": "Hestesko! Kast skoen, så den lander rundt om pælen. Hold knappen nede, og slip når måleren er lige tilpas.",
+    "speaker": "kanel"
+  },
+  "hestesko.sigt": {
+    "file": "243411642837c85d.mp3",
+    "text": "Du kan sigte til siden med pilene. Men pælen står lige foran dig.",
+    "speaker": "kanel"
+  },
+  "hestesko.din-tur": {
+    "file": "ce886d5a1b1ff02c.mp3",
+    "text": "Det er din tur!",
+    "speaker": "fortaeller"
+  },
+  "hestesko.ringer": {
+    "file": "e0899c8c7a2c1b67.mp3",
+    "text": "Ringer! Tre point!",
+    "speaker": "fortaeller"
+  },
+  "hestesko.taet": {
+    "file": "143effe4056571f4.mp3",
+    "text": "Tæt på! To point.",
+    "speaker": "fortaeller"
+  },
+  "hestesko.naer": {
+    "file": "6be51beaf37851a1.mp3",
+    "text": "Et point.",
+    "speaker": "fortaeller"
+  },
+  "hestesko.forbi": {
+    "file": "3e8d75ba3085f46a.mp3",
+    "text": "Forbi. Ingen point.",
+    "speaker": "fortaeller"
+  },
+  "hestesko.vandt": {
+    "file": "321274fba5464069.mp3",
+    "text": "Du vandt! Ikke dårligt for en grønskolling.",
+    "speaker": "kanel"
+  },
+  "hestesko.slut": {
+    "file": "5b6b727f0edb1574.mp3",
+    "text": "Godt kæmpet! Skal vi tage en runde mere?",
+    "speaker": "kanel"
+  },
   "k1-intro.aar": {
     "file": "c1dd4ca75ed3ad7b.mp3",
     "text": "Året er 1869. Amerika er stort og vildt. Tværs over prærien bygger man en jernbane fra øst til vest.",

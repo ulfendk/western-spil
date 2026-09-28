@@ -6,6 +6,8 @@ import {
   type Emote,
   type TownId,
   type TownJoinOptions,
+  type TownSaid,
+  isValidPhrase,
 } from '@western/shared';
 import { updater } from '../pwa/updater.js';
 import { colyseusEndpoint } from './endpoint.js';
@@ -29,6 +31,8 @@ export interface TownEvents {
   onChange(id: string, p: RemotePlayer): void;
   onLeave(id: string): void;
   onStatus(status: 'online' | 'offline', count: number): void;
+  /** Someone (possibly us: `self`) said a preset phrase. */
+  onSaid(id: string, phrase: number, self: boolean): void;
 }
 
 /** Connection to a shared frontier town. The game keeps working solo if this fails. */
@@ -74,13 +78,21 @@ export class TownConnection {
       this.events.onStatus('online', count());
       this.events.onLeave(id);
     });
+    room.onMessage('said', (msg: TownSaid) => {
+      if (isValidPhrase(msg?.phrase))
+        this.events.onSaid(msg.id, msg.phrase, msg.id === room.sessionId);
+    });
     room.onLeave(() => this.events.onStatus('offline', 0));
   }
 
-  /** Sends our position at most 10 times per second. */
-  sendMove(x: number, y: number, z: number, ry: number) {
+  sendSay(phrase: number) {
+    this.room?.send('say', { phrase });
+  }
+
+  /** Sends our position at most 10 times per second (or right away with `force`). */
+  sendMove(x: number, y: number, z: number, ry: number, force = false) {
     const now = performance.now();
-    if (!this.room || now - this.lastSent < 100) return;
+    if (!this.room || (!force && now - this.lastSent < 100)) return;
     this.lastSent = now;
     this.room.send('move', { x, y, z, ry });
   }

@@ -29,6 +29,8 @@ export class RemoteAvatar {
   private walkPhase = 0;
   private emoteTime = 0;
   private emoteKind = '';
+  private bubble: THREE.Sprite | null = null;
+  private bubbleTime = 0;
 
   constructor(nickname: string, hat: number) {
     const h = hashString(nickname);
@@ -130,7 +132,22 @@ export class RemoteAvatar {
     this.emoteTime = 1.6;
   }
 
+  /** Comic speech bubble over the head for a few seconds. */
+  say(text: string) {
+    this.bubble?.removeFromParent();
+    this.bubble = speechBubble(text);
+    this.root.add(this.bubble);
+    this.bubbleTime = 4;
+  }
+
   update(dt: number) {
+    if (this.bubble) {
+      this.bubbleTime -= dt;
+      if (this.bubbleTime <= 0) {
+        this.bubble.removeFromParent();
+        this.bubble = null;
+      }
+    }
     const before = this.root.position.clone();
     const k = 1 - Math.exp(-dt * 10);
     this.root.position.lerp(this.target, k);
@@ -152,10 +169,16 @@ export class RemoteAvatar {
         // Raise the right arm and wave it.
         this.rightArm.rotation.x = 0;
         this.rightArm.rotation.z = 2.6 + Math.sin(this.emoteTime * 14) * 0.35;
+      } else if (this.emoteKind === 'hat') {
+        // Tip the hat: a little bow with the hand to the brim.
+        const bow = Math.sin(Math.min(1, (1.6 - this.emoteTime) / 1.6) * Math.PI);
+        this.body.rotation.x = -bow * 0.35;
+        this.rightArm.rotation.x = -bow * 2.4;
       } else {
         this.body.position.y = Math.abs(Math.sin(this.emoteTime * Math.PI * 3)) * 0.5;
       }
     } else {
+      this.body.rotation.x = 0;
       this.rightArm.rotation.z = THREE.MathUtils.lerp(this.rightArm.rotation.z, 0.12, k);
       this.rightArm.rotation.x = swing * 0.8;
     }
@@ -189,6 +212,37 @@ function nameTag(text: string): THREE.Sprite {
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false }));
   sprite.scale.set(2.4, 0.45, 1);
   sprite.position.y = 2.85;
+  return sprite;
+}
+
+function speechBubble(text: string): THREE.Sprite {
+  const canvas = document.createElement('canvas');
+  canvas.width = 640;
+  canvas.height = 150;
+  const ctx = canvas.getContext('2d')!;
+  ctx.font = '56px "Patrick Hand", sans-serif';
+  const w = Math.min(620, ctx.measureText(text).width + 60);
+  const x0 = (640 - w) / 2;
+  ctx.fillStyle = '#ffffff';
+  ctx.strokeStyle = '#1b1b1b';
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.roundRect(x0, 6, w, 100, 40);
+  ctx.moveTo(300, 104);
+  ctx.lineTo(320, 140);
+  ctx.lineTo(340, 104);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#1b1b1b';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 320, 58);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false }));
+  sprite.scale.set(3.2, 0.75, 1);
+  sprite.position.y = 3.5;
+  sprite.renderOrder = 11;
   return sprite;
 }
 

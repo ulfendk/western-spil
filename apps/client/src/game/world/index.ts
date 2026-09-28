@@ -14,10 +14,12 @@ import { buildRailway } from './railway.js';
 import { buildSky, SUN_DIR } from './sky.js';
 import { buildTerrain, buildTrail, heightAt, trailX } from './terrain.js';
 import { buildVegetation, wind } from './vegetation.js';
+import { buildTown, TOWN, type TownSpots } from './town.js';
 import { buildWagon } from './wagon.js';
 
 export { heightAt, trailX, WORLD_HALF } from './terrain.js';
 export { SUN_DIR } from './sky.js';
+export { TOWN, type TownSpots } from './town.js';
 
 /** Named places the story refers to (ground positions). */
 export interface Spots {
@@ -32,6 +34,7 @@ export interface Spots {
 export interface World {
   colliders: Colliders;
   spots: Spots;
+  town: TownSpots;
   /** Show or hide the Bøvl brothers' wanted poster on the signpost. */
   setPosterVisible(visible: boolean): void;
   /** Let NPCs turn towards the player when close. */
@@ -114,6 +117,13 @@ export function buildWorld(scene: THREE.Scene, opts: WorldOptions): World {
   animated.push(pind);
   colliders.add(pind.position.x, pind.position.z, 0.45);
 
+  const town = buildTown(scene, colliders);
+  // Keep cacti and bushes off the main street and the square.
+  const townKeepOut = [];
+  for (let z = TOWN.zStart - 8; z <= TOWN.zEnd + 4; z += 10) {
+    townKeepOut.push({ x: trailX(z), z, r: 21 });
+  }
+
   scene.add(
     buildVegetation({
       density: opts.vegetationDensity,
@@ -121,6 +131,7 @@ export function buildWorld(scene: THREE.Scene, opts: WorldOptions): World {
       keepOut: [
         { x: camp.x, z: camp.y, r: 13 },
         { x: sign.position.x, z: sign.position.z, r: 2 },
+        ...townKeepOut,
       ],
     }),
   );
@@ -160,6 +171,7 @@ export function buildWorld(scene: THREE.Scene, opts: WorldOptions): World {
       sign: sign.position.clone(),
       trailWest: new THREE.Vector3(trailX(westZ), heightAt(trailX(westZ), westZ), westZ),
     },
+    town,
     setPosterVisible: (visible) => (poster.visible = visible),
     setPlayerPosition: (p) => pind.lookAtPlayer(p.distanceTo(pind.position) < 9 ? p : null),
     sun,

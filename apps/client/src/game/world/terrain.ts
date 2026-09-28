@@ -23,10 +23,25 @@ export function railHeight(z: number): number {
   return (fbm(RAIL_X * 0.008, z * 0.006, 2, 7) - 0.5) * 8 + 0.5;
 }
 
+/** Z range of the town, whose ground is levelled so buildings stand straight. */
+const TOWN_Z = [100, 178] as const;
+
+/** Gentle ground level along the town's main street. */
+function townHeight(z: number): number {
+  const zc = THREE.MathUtils.clamp(z, TOWN_Z[0], TOWN_Z[1]);
+  return rawHeight(trailX(zc), zc) * 0.2;
+}
+
 export function heightAt(x: number, z: number): number {
   let h = rawHeight(x, z);
   // Flatten the trail so wagons (and kids) can follow it.
   h *= 0.25 + 0.75 * THREE.MathUtils.smoothstep(Math.abs(x - trailX(z)), 4, 18);
+  // Level the town and blend it smoothly into the prairie around it.
+  const inTownZ =
+    THREE.MathUtils.smoothstep(z, TOWN_Z[0] - 18, TOWN_Z[0] - 4) *
+    (1 - THREE.MathUtils.smoothstep(z, TOWN_Z[1] + 4, TOWN_Z[1] + 18));
+  const inTownX = 1 - THREE.MathUtils.smoothstep(Math.abs(x - trailX(z)), 26, 42);
+  h = THREE.MathUtils.lerp(h, townHeight(z), inTownZ * inTownX);
   // Blend into the railway embankment.
   const rail = 1 - THREE.MathUtils.smoothstep(Math.abs(x - RAIL_X), 3.5, 16);
   return THREE.MathUtils.lerp(h, railHeight(z), rail);

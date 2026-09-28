@@ -1,9 +1,10 @@
 import { Server } from '@colyseus/core';
 import { WebSocketTransport } from '@colyseus/ws-transport';
-import { ROOM_TOWN } from '@western/shared';
+import { ROOM_HORSESHOE, ROOM_TOWN } from '@western/shared';
 import { config } from './config.js';
 import { scheduleBackups } from './db.js';
 import { configureHttp } from './http.js';
+import { HorseshoeRoom } from './rooms/HorseshoeRoom.js';
 import { TownRoom } from './rooms/TownRoom.js';
 
 const server = new Server({
@@ -18,6 +19,8 @@ const server = new Server({
 
 // One room per town; filterBy shards players of the same town into rooms of up to 16.
 server.define(ROOM_TOWN, TownRoom).filterBy(['townId']);
+// One horseshoe pit per town: players at the same pit meet in the same lobby.
+server.define(ROOM_HORSESHOE, HorseshoeRoom).filterBy(['townId']);
 
 scheduleBackups();
 

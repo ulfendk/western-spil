@@ -5,7 +5,9 @@ import {
   PROTOCOL_VERSION,
   TOWN_MAX_PLAYERS,
   isValidNickname,
+  isValidPhrase,
   type TownClientMessages,
+  type TownSaid,
   type TownJoinOptions,
 } from '@western/shared';
 import { TownPlayer, TownState } from './TownState.js';
@@ -17,6 +19,7 @@ export class TownRoom extends Room<{ state: TownState }> {
   override maxClients = TOWN_MAX_PLAYERS;
   override maxMessagesPerSecond = 30;
   override state = new TownState();
+  private lastSaid = new Map<string, number>();
 
   override onCreate(options: TownJoinOptions) {
     this.state.townId = options.townId;
@@ -29,6 +32,17 @@ export class TownRoom extends Room<{ state: TownState }> {
       player.y = clamp(msg.y, -50, 200);
       player.z = clamp(msg.z, -WORLD_HALF_SIZE, WORLD_HALF_SIZE);
       player.ry = msg.ry;
+    });
+
+    this.onMessage('say', (client, msg: TownClientMessages['say']) => {
+      const now = Date.now();
+      // At most one phrase every 1.5 s per player, so nobody can spam the town.
+      if (!isValidPhrase(msg?.phrase) || now - (this.lastSaid.get(client.sessionId) ?? 0) < 1500) {
+        return;
+      }
+      this.lastSaid.set(client.sessionId, now);
+      const said: TownSaid = { id: client.sessionId, phrase: msg.phrase };
+      this.broadcast('said', said);
     });
 
     this.onMessage('emote', (client, msg: TownClientMessages['emote']) => {
@@ -61,6 +75,7 @@ export class TownRoom extends Room<{ state: TownState }> {
 
   override onLeave(client: Client) {
     this.state.players.delete(client.sessionId);
+    this.lastSaid.delete(client.sessionId);
   }
 }
 

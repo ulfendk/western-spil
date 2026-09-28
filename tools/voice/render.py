@@ -90,7 +90,13 @@ def main() -> None:
         if model is None:
             model_dir, model = load_model()
         print(f"[voice] {line_id} ({speaker}): {spoken[:60]}…", flush=True)
-        render_line(model, model_dir, content, voice, spoken, target, seed=int(key[:8], 16))
+        try:
+            render_line(model, model_dir, content, voice, spoken, target, seed=int(key[:8], 16))
+        except RuntimeError as err:
+            # Don't lose the whole run over one line; the game falls back to Piper for it.
+            print(f"[voice] FAILED {line_id}: {err}", flush=True)
+            del manifest[line_id]
+            continue
         # Save progress after every line so an interrupted run loses nothing.
         write_manifest(manifest_path, {**old, **manifest})
 

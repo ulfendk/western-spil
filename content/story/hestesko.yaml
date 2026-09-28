@@ -1,0 +1,36 @@
+# Horseshoe toss minigame in town.
+id: hestesko
+lines:
+  - id: regler
+    speaker: kanel
+    text: >-
+      Hestesko! Kast skoen, så den lander rundt om pælen. Hold knappen nede, og slip når
+      måleren er lige tilpas.
+    say: >-
+      Hestesko! Kast skoen så den lander rundt om pælen. Hold knappen nede og slip når
+      måleren er lige tilpas.
+  - id: sigt
+    speaker: kanel
+    text: Du kan sigte til siden med pilene. Men pælen står lige foran dig.
+  - id: din-tur
+    speaker: fortaeller
+    text: Det er din tur!
+  - id: ringer
+    speaker: fortaeller
+    text: Ringer! Tre point!
+  - id: taet
+    speaker: fortaeller
+    text: Tæt på! To point.
+  - id: naer
+    speaker: fortaeller
+    text: Et point.
+  - id: forbi
+    speaker: fortaeller
+    text: Forbi. Ingen point.
+  - id: vandt
+    speaker: kanel
+    text: Du vandt! Ikke dårligt for en grønskolling.
+    say: Du vandt! Ikke dårligt for en grønskolling.
+  - id: slut
+    speaker: kanel
+    text: Godt kæmpet! Skal vi tage en runde mere?

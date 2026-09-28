@@ -74,6 +74,11 @@ export class Chapter1 {
     });
   }
 
+  /** True while a conversation or the packing puzzle is on screen. */
+  get isBusy(): boolean {
+    return this.busy;
+  }
+
   private get step(): Step {
     const s = store.save.progress.step as Step;
     return s in STEPS ? s : 'intro';
