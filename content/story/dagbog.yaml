@@ -1,0 +1,39 @@
+# Kanel's journal: one true bit of history per chapter, unlocked when the chapter is done.
+id: dagbog
+lines:
+  - id: k1
+    speaker: kanel
+    text: >-
+      St. Louis ligger ved den store Mississippi-flod. Byen blev kaldt porten til Vesten,
+      fordi mange rejsende startede deres tur her. Også heste. Især kloge heste.
+    say: >-
+      St. Louis ligger ved den store Mississippi flod. Byen blev kaldt porten til Vesten,
+      fordi mange rejsende startede deres tur her. Også heste. Især kloge heste.
+  - id: k2
+    speaker: kanel
+    text: >-
+      Prærien er et kæmpe græsland midt i Amerika. Engang levede der millioner af bisoner
+      der. Nybyggerne kørte i prærievogne, og en tur kunne tage et halvt år.
+  - id: k3
+    speaker: kanel
+    text: >-
+      Med telegrafen kunne man sende beskeder med strøm gennem lange ledninger. Morsekoden
+      består af korte og lange signaler. De hedder prikker og streger.
+  - id: k4
+    speaker: kanel
+    text: >-
+      Lakota-folket fulgte bisonerne på prærien. De brugte næsten hele dyret: kød til mad,
+      skind til telte og tøj, og knogler til redskaber. Lakota-folket findes stadig i dag.
+    say: >-
+      Lakota folket fulgte bisonerne på prærien. De brugte næsten hele dyret. Kød til mad,
+      skind til telte og tøj, og knogler til redskaber. Lakota folket findes stadig i dag.
+  - id: k5
+    speaker: kanel
+    text: >-
+      I Klippebjergene fandt man guld og sølv. Tusindvis af mennesker rejste derhen for at
+      blive rige. De fleste fandt kun sten og sand. Og ondt i ryggen.
+  - id: k6
+    speaker: kanel
+    text: >-
+      Den tiende maj 1869 blev de to jernbaner forbundet ved Promontory i Utah. Nu kunne man
+      rejse fra kyst til kyst på en uge. Før tog det flere måneder.

@@ -1,0 +1,25 @@
+# Meeting Formand Morten in Sølvkløften.
+id: k5-morten
+lines:
+  - id: hej
+    speaker: morten
+    text: Hej med jer! Jeg er Morten, formand i sølvminen her i Sølvkløften.
+  - id: tunnel
+    speaker: morten
+    text: >-
+      Dårlige nyheder. Passet over bjerget er fuld af sne. Og i nat sprængte nogen indgangen
+      til vejtunnelen.
+  - id: gaet
+    speaker: kanel
+    text: Fire nogen. Med fire hatte, gætter jeg.
+    say: Fire nogen. Med fire hatte gætter jeg.
+  - id: mine
+    speaker: morten
+    text: >-
+      Hvordan vidste du det? Men der er en anden vej. Den gamle mine går lige igennem
+      bjerget, og minevognene kører stadig.
+  - id: lygte
+    speaker: morten
+    text: >-
+      I minen skal man have en lygte. Min gamle lygte kan du få for en lille klump guld.
+      Vask guld i floden, så bytter vi.

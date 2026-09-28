@@ -1,0 +1,11 @@
+# After gold panning.
+id: k5-guld-klar
+lines:
+  - id: guld
+    speaker: morten
+    text: Se lige der! Det er rigtigt guld. Her er lygten, som jeg lovede.
+    say: Se lige der! Det er rigtigt guld. Her er lygten som jeg lovede.
+  - id: bro
+    speaker: morten
+    text: >-
+      Minen ligger på den anden side af kløften. Gå over hængebroen. Og kig ikke ned!

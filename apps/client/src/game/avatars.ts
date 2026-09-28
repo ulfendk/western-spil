@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { heightAt } from './world/index.js';
 import { outline, part } from './toon.js';
 
-const HAT_COLORS = [
+export const HAT_COLORS = [
   '#8a5a2b',
   '#2f2f2f',
   '#e9dfc4',

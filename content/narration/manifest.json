@@ -14,6 +14,21 @@
     "text": "Velkommen tilbage til lejren! Her er der altid plads ved bålet.",
     "speaker": "wanbli"
   },
+  "by-promontory.velkommen": {
+    "file": "9ae02e8cc948850b.mp3",
+    "text": "Velkommen til Promontory! Her mødes øst og vest. Og cowboys fra hele landet kaster hestesko.",
+    "speaker": "fortaeller"
+  },
+  "by-soelvkloeften.velkommen": {
+    "file": "202f6dff84614368.mp3",
+    "text": "Velkommen til Sølvkløften! Her graver man efter sølv, og om aftenen kaster minearbejderne hestesko.",
+    "speaker": "fortaeller"
+  },
+  "by-soelvkloeften.koldt": {
+    "file": "9151c544a98a2179.mp3",
+    "text": "Og her er koldt. Har nogen en hestetrøje?",
+    "speaker": "kanel"
+  },
   "by-st-louis.velkommen": {
     "file": "010596f773b776db.mp3",
     "text": "Velkommen til St. Louis! Her mødes grønskollinger fra hele prærien.",
@@ -37,6 +52,36 @@
   "by-stoevby.hestesko": {
     "file": "3197954e8e91d5ff.mp3",
     "text": "Her er også en hesteskobane. Vis dem, hvad du kan.",
+    "speaker": "kanel"
+  },
+  "dagbog.k1": {
+    "file": "c73b4cccb6209262.mp3",
+    "text": "St. Louis ligger ved den store Mississippi-flod. Byen blev kaldt porten til Vesten, fordi mange rejsende startede deres tur her. Også heste. Især kloge heste.",
+    "speaker": "kanel"
+  },
+  "dagbog.k2": {
+    "file": "c4030d66f16100cd.mp3",
+    "text": "Prærien er et kæmpe græsland midt i Amerika. Engang levede der millioner af bisoner der. Nybyggerne kørte i prærievogne, og en tur kunne tage et halvt år.",
+    "speaker": "kanel"
+  },
+  "dagbog.k3": {
+    "file": "9a26c8df7d907249.mp3",
+    "text": "Med telegrafen kunne man sende beskeder med strøm gennem lange ledninger. Morsekoden består af korte og lange signaler. De hedder prikker og streger.",
+    "speaker": "kanel"
+  },
+  "dagbog.k4": {
+    "file": "4baaab3116413d3a.mp3",
+    "text": "Lakota-folket fulgte bisonerne på prærien. De brugte næsten hele dyret: kød til mad, skind til telte og tøj, og knogler til redskaber. Lakota-folket findes stadig i dag.",
+    "speaker": "kanel"
+  },
+  "dagbog.k5": {
+    "file": "180a42c273352a3e.mp3",
+    "text": "I Klippebjergene fandt man guld og sølv. Tusindvis af mennesker rejste derhen for at blive rige. De fleste fandt kun sten og sand. Og ondt i ryggen.",
+    "speaker": "kanel"
+  },
+  "dagbog.k6": {
+    "file": "df3a9f5221418bf1.mp3",
+    "text": "Den tiende maj 1869 blev de to jernbaner forbundet ved Promontory i Utah. Nu kunne man rejse fra kyst til kyst på en uge. Før tog det flere måneder.",
     "speaker": "kanel"
   },
   "fraser.hej": {
@@ -150,7 +195,7 @@
     "speaker": "kanel"
   },
   "k1-kanel.vogn": {
-    "file": "7a0fa0729e3120eb.mp3",
+    "file": "69777d9650aabf9e.mp3",
     "text": "Hvis vi skal hele vejen til Promontory, skal vognen pakkes. Det gør en hest ikke. Vi har ingen hænder.",
     "speaker": "kanel"
   },
@@ -215,7 +260,7 @@
     "speaker": "pind"
   },
   "k1-pind.promontory": {
-    "file": "2cef445f1566ee82.mp3",
+    "file": "52f67b8912787d63.mp3",
     "text": "Stedet hedder Promontory. Det ligger langt ude i Utah. Den tiende maj skal naglen være der.",
     "speaker": "pind"
   },
@@ -788,6 +833,256 @@
     "file": "74337f190cc900ae.mp3",
     "text": "Tusind tak. Min grønskolling her er dygtig, men ikke til uvejr.",
     "speaker": "kanel"
+  },
+  "k5-bro-klar.klarede": {
+    "file": "cb6b6b4d9dbf859d.mp3",
+    "text": "Du klarede det! Lidt efter kommer Kanel forsigtigt over broen. Han ser lidt flov ud.",
+    "speaker": "fortaeller"
+  },
+  "k5-bro-klar.kasse": {
+    "file": "0d40c31f8c16d101.mp3",
+    "text": "Øh. Mens du gik over broen, kom der fire mænd. De tog kassen med naglen fra min sadeltaske.",
+    "speaker": "kanel"
+  },
+  "k5-bro-klar.rolig": {
+    "file": "ce71a01abc7a1c83.mp3",
+    "text": "Men bare rolig. Det skal nok gå. Stol på mig.",
+    "speaker": "kanel"
+  },
+  "k5-bro.start": {
+    "file": "261b44c6070f1fc0.mp3",
+    "text": "Broen gynger i vinden. Hold balancen med pilene. Jeg venter her. Heste og hængebroer er ikke gode venner.",
+    "speaker": "kanel"
+  },
+  "k5-guld-klar.guld": {
+    "file": "ecbaa05e4a9278ef.mp3",
+    "text": "Se lige der! Det er rigtigt guld. Her er lygten, som jeg lovede.",
+    "speaker": "morten"
+  },
+  "k5-guld-klar.bro": {
+    "file": "dff97c3d5e1b60f1.mp3",
+    "text": "Minen ligger på den anden side af kløften. Gå over hængebroen. Og kig ikke ned!",
+    "speaker": "morten"
+  },
+  "k5-guld.start": {
+    "file": "6c69ccd6ceccc3f9.mp3",
+    "text": "Tag guldpanden. Ryst den rundt i ring, så vandet skyller sand og grus væk. Guld er tungt, så det bliver liggende i bunden. Tryk på guldkornene for at samle dem.",
+    "speaker": "morten"
+  },
+  "k5-intro.bjerge": {
+    "file": "03435a7a6c1d8bed.mp3",
+    "text": "Sporet snor sig op i Klippebjergene. Luften bliver kold, og der ligger sne på toppene.",
+    "speaker": "fortaeller"
+  },
+  "k5-intro.bakke": {
+    "file": "485a77a77e88bb69.mp3",
+    "text": "Op ad bakke. Hele tiden op ad bakke. Jeg sagde det jo.",
+    "speaker": "kanel"
+  },
+  "k5-intro.by": {
+    "file": "2b13359126c96bb7.mp3",
+    "text": "Nede i kløften ligger minebyen Sølvkløften. Røgen stiger op fra skorstenene.",
+    "speaker": "fortaeller"
+  },
+  "k5-mine-klar.ude": {
+    "file": "4a02c64485370998.mp3",
+    "text": "Vognen suser ud af bjerget på den anden side. Solen skinner, og dalen mod vest ligger åben.",
+    "speaker": "fortaeller"
+  },
+  "k5-mine-klar.endnu": {
+    "file": "ee588abfc6088d0e.mp3",
+    "text": "Ingen sne, ingen tunnel og ingen Bøvl-brødre. Endnu.",
+    "speaker": "kanel"
+  },
+  "k5-mine.start": {
+    "file": "e392e8ef3693ab56.mp3",
+    "text": "En minevogn! Hop op. Når der kommer en bjælke, så duk dig med pil ned. Ved sporskifterne skal du følge pilen på skiltet.",
+    "speaker": "kanel"
+  },
+  "k5-mine.bump": {
+    "file": "1d7623fc0783896a.mp3",
+    "text": "Av! Hovedet ned, grønskolling.",
+    "speaker": "kanel"
+  },
+  "k5-mine.blind": {
+    "file": "c8003ffbfe6b20b7.mp3",
+    "text": "Forkert spor! Vi bakker og prøver igen.",
+    "speaker": "kanel"
+  },
+  "k5-morten.hej": {
+    "file": "d1a7e14ac745e8c7.mp3",
+    "text": "Hej med jer! Jeg er Morten, formand i sølvminen her i Sølvkløften.",
+    "speaker": "morten"
+  },
+  "k5-morten.tunnel": {
+    "file": "d3fbc9da49b090cf.mp3",
+    "text": "Dårlige nyheder. Passet over bjerget er fuld af sne. Og i nat sprængte nogen indgangen til vejtunnelen.",
+    "speaker": "morten"
+  },
+  "k5-morten.gaet": {
+    "file": "3d1fa313527d09ba.mp3",
+    "text": "Fire nogen. Med fire hatte, gætter jeg.",
+    "speaker": "kanel"
+  },
+  "k5-morten.mine": {
+    "file": "982db047048db4eb.mp3",
+    "text": "Hvordan vidste du det? Men der er en anden vej. Den gamle mine går lige igennem bjerget, og minevognene kører stadig.",
+    "speaker": "morten"
+  },
+  "k5-morten.lygte": {
+    "file": "43324cca381becf7.mp3",
+    "text": "I minen skal man have en lygte. Min gamle lygte kan du få for en lille klump guld. Vask guld i floden, så bytter vi.",
+    "speaker": "morten"
+  },
+  "k5-slut.ryttere": {
+    "file": "0b03a9ea51dbf93d.mp3",
+    "text": "Nede i dalen skimter du fire ryttere, der rider mod vest. Den mindste holder kassen højt og jubler.",
+    "speaker": "fortaeller"
+  },
+  "k5-slut.juble": {
+    "file": "54ff9173218c66b2.mp3",
+    "text": "Lad dem bare juble. Vi ses i Promontory, Bøvl-brødre.",
+    "speaker": "kanel"
+  },
+  "k6-ceremoni.snude": {
+    "file": "5ea9f2b2304ce3ec.mp3",
+    "text": "To lokomotiver står snude mod snude. Det ene kommer fra øst, det andet fra vest. Alle venter på den gyldne nagle.",
+    "speaker": "fortaeller"
+  },
+  "k6-ceremoni.vi-har": {
+    "file": "f92aedd0e8a61e91.mp3",
+    "text": "Ha! Vi har naglen! Nu er det os, der skal slå den i!",
+    "speaker": "lilleboevl"
+  },
+  "k6-ceremoni.hvad": {
+    "file": "5556931d4e9ba170.mp3",
+    "text": "Ja! Øh. Hvad skal vi slå den i?",
+    "speaker": "storeboevl"
+  },
+  "k6-ceremoni.traepind": {
+    "file": "f1cc2803b938e7a5.mp3",
+    "text": "Den mindste Bøvl-bror åbner kassen. Ud falder en træpind med guldmaling på.",
+    "speaker": "fortaeller"
+  },
+  "k6-ceremoni.snydt": {
+    "file": "dbd4fb75a2aa261f.mp3",
+    "text": "En træpind?! Vi er blevet snydt!",
+    "speaker": "lilleboevl"
+  },
+  "k6-ceremoni.pind": {
+    "file": "5ba032b8a30e47f8.mp3",
+    "text": "Ganske rigtigt! Jeg lavede en falsk kasse. Den rigtige nagle syede jeg ind i Kanels sadeltæppe.",
+    "speaker": "pind"
+  },
+  "k6-ceremoni.tavs": {
+    "file": "4afe1a70da7db8c1.mp3",
+    "text": "Og jeg har ikke sagt et ord. Hele vejen. Det var meget svært.",
+    "speaker": "kanel"
+  },
+  "k6-ceremoni.loeb": {
+    "file": "3ffee85472485b99.mp3",
+    "text": "Løb, brødre!",
+    "speaker": "storeboevl"
+  },
+  "k6-done-klar.flyver": {
+    "file": "0f9523acd702cc74.mp3",
+    "text": "Beskeden flyver gennem ledningerne. I byerne ringer kirkeklokkerne!",
+    "speaker": "telegrafist"
+  },
+  "k6-done-klar.kyst": {
+    "file": "54ac8b3edb0f2043.mp3",
+    "text": "Jernbanen går nu fra kyst til kyst. En rejse, der før tog flere måneder, tager nu kun en uge.",
+    "speaker": "fortaeller"
+  },
+  "k6-intro.dato": {
+    "file": "9977b2c732b5bf12.mp3",
+    "text": "Det er den tiende maj 1869. I ørkenen i Utah skal de to jernbaner mødes ved Promontory.",
+    "speaker": "fortaeller"
+  },
+  "k6-intro.varmt": {
+    "file": "2d66f3bda1d65d77.mp3",
+    "text": "Varmt. Støvet. Og ingen havre. Men sikke en dag.",
+    "speaker": "kanel"
+  },
+  "k6-lasso-klar.fanget": {
+    "file": "335444daff5dadb9.mp3",
+    "text": "Én efter én lander Bøvl-brødrene i lassoen. Sheriffen sætter dem ind i en kvægvogn.",
+    "speaker": "fortaeller"
+  },
+  "k6-lasso-klar.mor": {
+    "file": "574ef6ca0e2d85ef.mp3",
+    "text": "Mor bliver ikke glad for det her.",
+    "speaker": "storeboevl"
+  },
+  "k6-lasso.start": {
+    "file": "5f318df4e659eea4.mp3",
+    "text": "De stikker af! Kast lassoen. Sigt, og tryk, når ringen er over en bror.",
+    "speaker": "kanel"
+  },
+  "k6-li.velkommen": {
+    "file": "2bc4632c85170e3d.mp3",
+    "text": "Velkommen! Jeg er Formand Li. Mit sjak lægger skinner for Central Pacific-jernbanen.",
+    "speaker": "li"
+  },
+  "k6-li.kina": {
+    "file": "6fe55c6095be1632.mp3",
+    "text": "Tusindvis af arbejdere fra Kina har bygget jernbanen gennem de høje bjerge. Det har været et hårdt og farligt arbejde.",
+    "speaker": "li"
+  },
+  "k6-li.hjaelp": {
+    "file": "767f39fe4b49a0e6.mp3",
+    "text": "Nu mangler vi kun det sidste stykke. Vil du hjælpe os med at lægge skinnerne?",
+    "speaker": "li"
+  },
+  "k6-li.meninger": {
+    "file": "ab5b0d9f64104a75.mp3",
+    "text": "Selvfølgelig. Grønskollingen her har stærke arme. Og jeg har stærke meninger.",
+    "speaker": "kanel"
+  },
+  "k6-nagle.dig": {
+    "file": "39934280bb49de36.mp3",
+    "text": "Så er det dig, grønskolling. Du har båret naglen hele vejen. Slå den i!",
+    "speaker": "pind"
+  },
+  "k6-nagle.slag": {
+    "file": "cebf3927381320f3.mp3",
+    "text": "Du løfter hammeren og slår den gyldne nagle i den sidste svelle. Øst og vest er nu forbundet.",
+    "speaker": "fortaeller"
+  },
+  "k6-nagle.done": {
+    "file": "af88f5ab65378ca7.mp3",
+    "text": "Nu skal hele Amerika have besked. Send ordet DONE. Det betyder færdig.",
+    "speaker": "telegrafist"
+  },
+  "k6-skinner-klar.flot": {
+    "file": "1e5a2cd1c00566fe.mp3",
+    "text": "Flot arbejde! Sporet er færdigt. Nu mangler kun den gyldne nagle.",
+    "speaker": "li"
+  },
+  "k6-skinner-klar.skynd": {
+    "file": "1c66890a556e5caa.mp3",
+    "text": "Ceremonien begynder oppe ved de to lokomotiver. Skynd dig!",
+    "speaker": "li"
+  },
+  "k6-skinner.start": {
+    "file": "177d167e41761387.mp3",
+    "text": "Først en svelle, så en skinne, og til sidst et søm. Tryk på tingene i den rækkefølge, du ser dem på tavlen. Så hurtigt du kan!",
+    "speaker": "li"
+  },
+  "k6-slut.groen": {
+    "file": "17c58373d561f85d.mp3",
+    "text": "Nå, grønskolling. Du er vist ikke så grøn mere.",
+    "speaker": "kanel"
+  },
+  "k6-slut.solen": {
+    "file": "c87e43f60e1eb04b.mp3",
+    "text": "Solen går ned i vest, og vi rider ind i den. Sådan slutter alle gode historier.",
+    "speaker": "kanel"
+  },
+  "k6-slut.anden": {
+    "file": "366286158efe5eab.mp3",
+    "text": "Og Kanel og hans ven red ud i solnedgangen. Men det er en helt anden historie.",
+    "speaker": "fortaeller"
   },
   "titel.velkommen": {
     "file": "61a87cd4c855d8b6.mp3",

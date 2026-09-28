@@ -124,3 +124,43 @@ export function thunder(distance = 1) {
   src.connect(filter).connect(g).connect(c.destination);
   src.start(t);
 }
+
+/** Play a simple melody: [note name, beats] pairs ("-" is a rest). Returns its length in seconds. */
+export function tune(notes: [string, number][], bpm = 96, volume = 0.1): number {
+  const beat = 60 / bpm;
+  let t = 0;
+  for (const [name, beats] of notes) {
+    if (name !== '-') {
+      beep(note(name), beats * beat * 0.95, volume, t, 'triangle');
+      // A soft fifth below for a harmonica-like body.
+      beep(note(name) * 0.5, beats * beat * 0.9, volume * 0.35, t, 'sine');
+    }
+    t += beats * beat;
+  }
+  return t;
+}
+
+/** The lonely-cowboy tune for the ride into the sunset (an original, slow waltz-like melody). */
+export const SUNSET_TUNE: [string, number][] = [
+  ['G4', 1],
+  ['C5', 2],
+  ['D5', 1],
+  ['E5', 2],
+  ['D5', 1],
+  ['C5', 3],
+  ['A4', 1],
+  ['G4', 2],
+  ['E4', 1],
+  ['G4', 3],
+  ['-', 1],
+  ['C5', 1],
+  ['E5', 2],
+  ['F5', 1],
+  ['G5', 2],
+  ['E5', 1],
+  ['D5', 3],
+  ['C5', 1],
+  ['D5', 2],
+  ['B4', 1],
+  ['C5', 4],
+];

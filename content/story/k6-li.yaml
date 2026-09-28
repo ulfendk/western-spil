@@ -1,0 +1,18 @@
+# Meeting Formand Li and his Central Pacific track crew.
+id: k6-li
+lines:
+  - id: velkommen
+    speaker: li
+    text: Velkommen! Jeg er Formand Li. Mit sjak lægger skinner for Central Pacific-jernbanen.
+    say: Velkommen! Jeg er Formand Li. Mit sjak lægger skinner for Central Pacific jernbanen.
+  - id: kina
+    speaker: li
+    text: >-
+      Tusindvis af arbejdere fra Kina har bygget jernbanen gennem de høje bjerge. Det har været
+      et hårdt og farligt arbejde.
+  - id: hjaelp
+    speaker: li
+    text: Nu mangler vi kun det sidste stykke. Vil du hjælpe os med at lægge skinnerne?
+  - id: meninger
+    speaker: kanel
+    text: Selvfølgelig. Grønskollingen her har stærke arme. Og jeg har stærke meninger.

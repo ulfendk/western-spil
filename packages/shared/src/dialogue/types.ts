@@ -8,7 +8,11 @@ export type SpeakerId =
   | 'sergent'
   | 'telegrafist'
   | 'wanbli'
-  | 'mato';
+  | 'mato'
+  | 'morten'
+  | 'li'
+  | 'lilleboevl'
+  | 'storeboevl';
 
 export interface Speaker {
   name: string;
@@ -57,6 +61,10 @@ export const SPEAKERS: Record<SpeakerId, Speaker> = {
   telegrafist: { name: 'Telegrafist Ruth', lengthScale: 1 },
   wanbli: { name: 'Wanbli', lengthScale: 0.95 },
   mato: { name: 'Mato', lengthScale: 1.12 },
+  morten: { name: 'Formand Morten', lengthScale: 1 },
+  li: { name: 'Formand Li', lengthScale: 1 },
+  lilleboevl: { name: 'Den mindste Bøvl-bror', lengthScale: 0.9 },
+  storeboevl: { name: 'Den største Bøvl-bror', lengthScale: 1.2 },
 };
 
 /** Every line in a script, including the ones inside choices (for rendering audio). */

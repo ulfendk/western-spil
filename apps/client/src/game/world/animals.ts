@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { mulberry32 } from '../noise.js';
 import { outline, part } from '../toon.js';
 import type { Circle } from './colliders.js';
-import { heightAt } from './terrain.js';
+import { heightAt, walkHeightAt } from './terrain.js';
 
 export interface Animated {
   update(dt: number, time: number): void;
@@ -163,7 +163,7 @@ export function buildHorse(opts: { saddle?: boolean; coat?: string } = {}): Hors
       const dist = Math.hypot(dx, dz);
       if (dist > 25) {
         // Left far behind (e.g. after a minigame): catch up instantly.
-        horse.position.set(goal.x, heightAt(goal.x, goal.z), goal.z);
+        horse.position.set(goal.x, walkHeightAt(goal.x, goal.z), goal.z);
       } else if (dist > 1.2) {
         speed = Math.min(8, dist * 1.6);
         horse.position.x += (dx / dist) * speed * dt;
@@ -173,7 +173,7 @@ export function buildHorse(opts: { saddle?: boolean; coat?: string } = {}): Hors
           Math.atan2(Math.sin(want - horse.rotation.y), Math.cos(want - horse.rotation.y)) *
           Math.min(1, dt * 5);
       }
-      horse.position.y = heightAt(horse.position.x, horse.position.z);
+      horse.position.y = walkHeightAt(horse.position.x, horse.position.z);
     }
     gait += (Math.min(speed / 6, 1) - gait) * Math.min(1, dt * 6);
     stride += dt * (3 + speed * 1.2);

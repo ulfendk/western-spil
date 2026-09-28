@@ -12,6 +12,7 @@ const Z_END = -WORLD_SIZE * 0.9;
 /** Track (ties + two rails), telegraph poles with sagging wires, and a passing steam train. */
 export function buildRailway(
   colliders: Colliders,
+  withTrain = true,
 ): THREE.Group & Animated & { trainCollider: { x: number; z: number; r: number }[] } {
   const group = new THREE.Group() as THREE.Group &
     Animated & { trainCollider: { x: number; z: number; r: number }[] };
@@ -106,7 +107,9 @@ export function buildRailway(
   const cycle = 150;
   const speed = 13;
   group.trainCollider = [];
+  train.group.visible = withTrain;
   group.update = (dt, time) => {
+    if (!withTrain) return;
     const t = time % cycle;
     const head = Z_START + 60 - t * speed;
     train.place(head);

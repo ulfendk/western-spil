@@ -1,0 +1,15 @@
+# Driving in the golden nail.
+id: k6-nagle
+lines:
+  - id: dig
+    speaker: pind
+    text: Så er det dig, grønskolling. Du har båret naglen hele vejen. Slå den i!
+  - id: slag
+    speaker: fortaeller
+    text: >-
+      Du løfter hammeren og slår den gyldne nagle i den sidste svelle. Øst og vest er nu
+      forbundet.
+  - id: done
+    speaker: telegrafist
+    text: Nu skal hele Amerika have besked. Send ordet DONE. Det betyder færdig.
+    say: Nu skal hele Amerika have besked. Send ordet dan. Det betyder færdig.

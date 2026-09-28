@@ -1,0 +1,7 @@
+# Lasso minigame: instructions.
+id: k6-lasso
+lines:
+  - id: start
+    speaker: kanel
+    text: De stikker af! Kast lassoen. Sigt, og tryk, når ringen er over en bror.
+    say: De stikker af! Kast lassoen. Sigt og tryk når ringen er over en bror.

@@ -1,0 +1,11 @@
+# Track-laying minigame: instructions.
+id: k6-skinner
+lines:
+  - id: start
+    speaker: li
+    text: >-
+      Først en svelle, så en skinne, og til sidst et søm. Tryk på tingene i den rækkefølge, du
+      ser dem på tavlen. Så hurtigt du kan!
+    say: >-
+      Først en svelle så en skinne og til sidst et søm. Tryk på tingene i den rækkefølge du ser
+      dem på tavlen. Så hurtigt du kan!

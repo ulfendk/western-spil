@@ -4,6 +4,8 @@ import { narrator } from '../audio/narrator.js';
 import { updater } from '../pwa/updater.js';
 import { store } from '../save/store.js';
 import { saveSettings, settings } from '../settings.js';
+import { HAT_COLORS } from '../game/avatars.js';
+import { script } from '../story/scripts.js';
 import { speak } from './bubble.js';
 import { h } from './dom.js';
 import { toast } from './toast.js';
@@ -17,6 +19,8 @@ export interface ScreenActions {
   /** Regions the player can travel to, and where they are now. */
   regions(): RegionId[];
   currentRegion(): RegionId;
+  /** The player put on another hat (shown to others from the next town join). */
+  hatChanged(hat: number): void;
   travel(region: RegionId): void;
 }
 
@@ -111,6 +115,10 @@ export class Screens {
     resume.onclick = () => onResume();
     const map = h('button', { class: 'btn' }, '🗺️ Rejsekort');
     map.onclick = () => this.travelMap(onResume);
+    const shop = h('button', { class: 'btn' }, '🤠 Hattebutik');
+    shop.onclick = () => this.hatShop(onResume);
+    const journal = h('button', { class: 'btn' }, '📖 Kanels dagbog');
+    journal.onclick = () => this.journal(onResume);
     const toTitle = h('button', { class: 'btn' }, 'Til titelskærmen');
     toTitle.onclick = () => this.title();
     this.show(
@@ -118,9 +126,118 @@ export class Screens {
         'div',
         { class: 'panel' },
         h('h2', {}, 'Pause'),
-        h('div', { class: 'menu' }, resume, map, toTitle),
+        h('p', { class: 'chapter-stats' }, `⭐ ${store.save.stars}   💲 ${store.save.dollars}`),
+        h('div', { class: 'menu' }, resume, map, shop, journal, toTitle),
       ),
     );
+  }
+
+  /** Buy hats with the dollars earned in minigames. Others see the new hat in the next town. */
+  hatShop(onBack: () => void) {
+    updater.setSafe(true);
+    const owned = (i: number) => i === 0 || store.save.progress.flags.includes(`hat-${i}`);
+    const wallet = h('p', { class: 'chapter-stats' });
+    const grid = h('div', { class: 'hat-grid' });
+    const render = () => {
+      wallet.textContent = `💲 ${store.save.dollars}`;
+      grid.replaceChildren(
+        ...HATS.map((hat, i) => {
+          const have = owned(i);
+          const worn = store.save.hat === i;
+          const b = h(
+            'button',
+            {
+              class: `hat-item${worn ? ' worn' : ''}`,
+              disabled: !have && store.save.dollars < hat.price,
+            },
+            hatIcon(HAT_COLORS[i]!),
+            h('span', {}, hat.name),
+            h('small', {}, worn ? 'På hovedet' : have ? 'Tag på' : `💲 ${hat.price}`),
+          );
+          b.onclick = () => {
+            if (!have) {
+              if (store.save.dollars < hat.price) return;
+              store.update({
+                dollars: store.save.dollars - hat.price,
+                progress: {
+                  ...store.save.progress,
+                  flags: [...store.save.progress.flags, `hat-${i}`],
+                },
+              });
+              toast(`Du købte ${hat.name.toLowerCase()} 🤠`);
+            }
+            store.update({ hat: i });
+            this.actions.hatChanged(i);
+            render();
+          };
+          return b;
+        }),
+      );
+    };
+    render();
+    const back = h('button', { class: 'btn btn-small' }, '← Tilbage');
+    back.onclick = () => this.pause(onBack);
+    this.show(
+      h(
+        'div',
+        { class: 'panel panel-wide' },
+        h('h2', {}, 'Hattebutik'),
+        h(
+          'p',
+          {},
+          'Køb en ny hat for dine dollars. Dine venner ser den, næste gang du kommer til en by.',
+        ),
+        wallet,
+        grid,
+        back,
+      ),
+    );
+  }
+
+  /** Kanel's journal: a true bit of history for every chapter you have finished. */
+  journal(onBack: () => void) {
+    updater.setSafe(true);
+    const entries = script('dagbog').lines;
+    let playing: HTMLElement | null = null;
+    const list = h(
+      'div',
+      { class: 'journal' },
+      ...REGIONS.map((r) => {
+        const line = entries.find((l) => l.id === `dagbog.k${r.chapter}`);
+        const open = store.save.chapter > r.chapter && line;
+        if (!open) {
+          return h(
+            'div',
+            { class: 'journal-entry locked' },
+            h('h3', {}, `🔒 Kapitel ${r.chapter}`),
+            h('p', {}, 'Klar kapitlet for at læse, hvad Kanel skrev.'),
+          );
+        }
+        const listen = h('button', { class: 'btn btn-small' }, '🔊 Hør');
+        const entry = h(
+          'div',
+          { class: 'journal-entry' },
+          h('h3', {}, `Kapitel ${r.chapter}: ${r.name}`),
+          h('p', {}, line.text),
+          listen,
+        );
+        listen.onclick = async () => {
+          narrator.stop();
+          playing?.classList.remove('playing');
+          playing = entry;
+          entry.classList.add('playing');
+          await narrator.play(line);
+          entry.classList.remove('playing');
+        };
+        return entry;
+      }),
+    );
+    const back = h('button', { class: 'btn btn-small' }, '← Tilbage');
+    back.onclick = () => {
+      narrator.stop();
+      this.pause(onBack);
+    };
+    this.show(h('div', { class: 'panel panel-wide' }, h('h2', {}, 'Kanels dagbog'), list, back));
   }
 
   /** The travel map: the journey east to west, with the stops reached so far. */
@@ -285,4 +402,27 @@ export class Screens {
       ),
     );
   }
+}
+
+const HATS = [
+  { name: 'Brun hat', price: 0 },
+  { name: 'Sort hat', price: 10 },
+  { name: 'Hvid hat', price: 15 },
+  { name: 'Rød hat', price: 20 },
+  { name: 'Blå hat', price: 20 },
+  { name: 'Grøn hat', price: 25 },
+  { name: 'Lilla hat', price: 30 },
+  { name: 'Guldhat', price: 50 },
+];
+
+/** A little cowboy-hat drawing in the given colour. */
+function hatIcon(color: string): SVGSVGElement {
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 64 40');
+  svg.setAttribute('class', 'hat-icon');
+  svg.innerHTML =
+    `<path d="M4 30 Q32 40 60 30 Q58 24 50 26 L46 8 Q40 2 32 6 Q24 2 18 8 L14 26 Q6 24 4 30 Z" fill="${color}" stroke="#2a2320" stroke-width="2.5" stroke-linejoin="round"/>` +
+    '<path d="M15 22 Q32 27 49 22 L48 18 Q32 23 16 18 Z" fill="#2a2320" opacity="0.55"/>';
+  return svg;
 }

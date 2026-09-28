@@ -1,0 +1,32 @@
+# The ceremony: the Bøvl brothers and the twist.
+id: k6-ceremoni
+lines:
+  - id: snude
+    speaker: fortaeller
+    text: >-
+      To lokomotiver står snude mod snude. Det ene kommer fra øst, det andet fra vest. Alle
+      venter på den gyldne nagle.
+  - id: vi-har
+    speaker: lilleboevl
+    text: Ha! Vi har naglen! Nu er det os, der skal slå den i!
+    say: Ha! Vi har naglen! Nu er det os der skal slå den i!
+  - id: hvad
+    speaker: storeboevl
+    text: Ja! Øh. Hvad skal vi slå den i?
+  - id: traepind
+    speaker: fortaeller
+    text: Den mindste Bøvl-bror åbner kassen. Ud falder en træpind med guldmaling på.
+  - id: snydt
+    speaker: lilleboevl
+    text: En træpind?! Vi er blevet snydt!
+  - id: pind
+    speaker: pind
+    text: >-
+      Ganske rigtigt! Jeg lavede en falsk kasse. Den rigtige nagle syede jeg ind i Kanels
+      sadeltæppe.
+  - id: tavs
+    speaker: kanel
+    text: Og jeg har ikke sagt et ord. Hele vejen. Det var meget svært.
+  - id: loeb
+    speaker: storeboevl
+    text: Løb, brødre!

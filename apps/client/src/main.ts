@@ -45,6 +45,7 @@ const screens = new Screens(ui, {
   restartChapter: () => director.restartChapter(),
   regions: () => director.unlockedRegions(),
   currentRegion: () => game.region,
+  hatChanged: (hat) => game.setHat(hat),
   travel: async (region) => {
     play();
     await director.travel(region);

@@ -6,12 +6,21 @@ import type { Fort } from './fort.js';
 import type { Mood } from './sky.js';
 import { buildFortet, FORTET_TERRAIN } from './regions/fortet.js';
 import { buildLejren, LEJREN_TERRAIN } from './regions/lejren.js';
+import { buildBjergene, BJERGENE_TERRAIN } from './regions/bjergene.js';
+import { buildPromontory, PROMONTORY_TERRAIN } from './regions/promontory.js';
 import { buildPraerien, PRAERIEN_TERRAIN } from './regions/praerien.js';
 import { buildStLouis, ST_LOUIS_TERRAIN } from './regions/stLouis.js';
 import { setTerrain } from './terrain.js';
 import type { TownSpots } from './town.js';
 
-export { heightAt, trailX, WORLD_HALF, riverWater, terrainProfile } from './terrain.js';
+export {
+  heightAt,
+  trailX,
+  WORLD_HALF,
+  riverWater,
+  terrainProfile,
+  walkHeightAt,
+} from './terrain.js';
 export { SUN_DIR, type Mood } from './sky.js';
 export type { TownSpots, TownConfig } from './town.js';
 export type { Herd, Horse } from './animals.js';
@@ -44,6 +53,12 @@ export interface World {
   setWireFixed?(fixed: boolean): void;
   /** Weather / time of day. */
   setMood(mood: Mood): void;
+  /** Stop Kanel following (e.g. while you cross the rope bridge). */
+  setKanelFollow?(on: boolean): void;
+  bridge?: THREE.Group & { setSway(amount: number): void };
+  /** The Bøvl brothers at Promontory: not there yet, at the ceremony, or caught. */
+  setBrothers?(where: 'hidden' | 'ceremony' | 'caught'): void;
+  setNail?(visible: boolean): void;
   /** Where Wanbli is: meeting the player in the storm, or at home in the camp. */
   setWanbli?(where: 'storm' | 'camp'): void;
   fort?: Fort;
@@ -58,6 +73,14 @@ export interface WorldOptions {
 
 /** Builds a region into the (empty) scene. The land's shape is switched first. */
 export function buildWorld(scene: THREE.Scene, region: RegionId, opts: WorldOptions): World {
+  if (region === 'promontory') {
+    setTerrain(PROMONTORY_TERRAIN);
+    return buildPromontory(scene, opts);
+  }
+  if (region === 'bjergene') {
+    setTerrain(BJERGENE_TERRAIN);
+    return buildBjergene(scene, opts);
+  }
   if (region === 'lejren') {
     setTerrain(LEJREN_TERRAIN);
     return buildLejren(scene, opts);

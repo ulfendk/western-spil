@@ -42,14 +42,18 @@ const STEPS: Record<Step, StepInfo> = {
     marker: { spot: 'fire', height: 2.5 },
     interact: { spot: 'fire', radius: 5, label: 'Sæt dig ved bålet' },
   },
-  done: { objective: 'Rejs videre mod vest, når du er klar. Kapitel 5 er på vej!' },
+  done: { objective: 'Rejs videre mod vest via rejsekortet i pausemenuen' },
 };
 
 /** Chapter 4 – "Lejren": lost in a storm, welcomed in a Lakota camp. */
 export class Chapter4 extends ChapterBase<Step> {
   protected introScript = 'k4-intro';
 
-  constructor(game: Game, hud: Hud) {
+  constructor(
+    game: Game,
+    hud: Hud,
+    private travelOn: () => void,
+  ) {
     super(game, hud, 'k4', STEPS, [
       'intro',
       'storm',
@@ -149,8 +153,11 @@ export class Chapter4 extends ChapterBase<Step> {
     await this.showChapterCard(
       'Kapitel 4',
       'Lejren',
-      'Tak, fordi du hjalp til i lejren. Kapitel 5 – Klippebjergene – er på vej.',
-      [{ label: 'Fortsæt', primary: true }],
+      'Tak, fordi du hjalp til i lejren. Nu venter Klippebjergene.',
+      [
+        { label: 'Rejs videre til bjergene 🐴', primary: true, action: this.travelOn },
+        { label: 'Bliv lidt i lejren' },
+      ],
     );
   }
 }

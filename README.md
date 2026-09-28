@@ -35,16 +35,19 @@ Run `npm run tts` once to copy the committed narration into the dev client. Add 
 
 The journey runs east to west. Each region has its own map, chapter and shared town:
 
-| Region    | Chapter                  | Town            | Code                                                                       |
-| --------- | ------------------------ | --------------- | -------------------------------------------------------------------------- |
-| St. Louis | 1 – Afsked ved St. Louis | St. Louis       | `game/world/regions/stLouis.ts`, `story/chapter1.ts`                       |
-| Prærien   | 2 – Prærien              | Støvby          | `game/world/regions/praerien.ts`, `story/chapter2.ts`                      |
-| Fortet    | 3 – Fortet               | Fort Kearny     | `game/world/regions/fortet.ts`, `game/world/fort.ts`, `story/chapter3.ts`  |
-| Lejren    | 4 – Lejren               | The Lakota camp | `game/world/regions/lejren.ts`, `game/world/camp4.ts`, `story/chapter4.ts` |
+| Region         | Chapter                  | Town            | Code                                                                                |
+| -------------- | ------------------------ | --------------- | ----------------------------------------------------------------------------------- |
+| St. Louis      | 1 – Afsked ved St. Louis | St. Louis       | `game/world/regions/stLouis.ts`, `story/chapter1.ts`                                |
+| Prærien        | 2 – Prærien              | Støvby          | `game/world/regions/praerien.ts`, `story/chapter2.ts`                               |
+| Fortet         | 3 – Fortet               | Fort Kearny     | `game/world/regions/fortet.ts`, `game/world/fort.ts`, `story/chapter3.ts`           |
+| Lejren         | 4 – Lejren               | The Lakota camp | `game/world/regions/lejren.ts`, `game/world/camp4.ts`, `story/chapter4.ts`          |
+| Klippebjergene | 5 – Klippebjergene       | Sølvkløften     | `game/world/regions/bjergene.ts`, `game/world/mountain.ts`, `story/chapter5.ts`     |
+| Promontory     | 6 – Promontory           | Promontory      | `game/world/regions/promontory.ts`, `game/world/promontory.ts`, `story/chapter6.ts` |
 
 - **Regions:** they are listed in `packages/shared/src/regions.ts`. Each region builder sets its own `TerrainProfile` (hills, trail, levelled towns, river) and adds its landmarks, camp and town (`TownConfig`).
 - **Chapters:** each chapter extends `story/chapterBase.ts`. It provides quest steps (saved per chapter in `progress.steps`), the objective line, the "!" marker, the "Tal med…" prompt, voiced conversations and the chapter card.
-- **Weather and time of day:** `world.setMood('day' | 'storm' | 'night')` changes the sky, light, fog, rain and lightning (with thunder).
+- **Weather and time of day:** `world.setMood('day' | 'storm' | 'night' | 'sunset')` changes the sky, light, fog, rain and lightning (with thunder), and the ambience (`audio/ambience.ts`: wind, birds, crickets, rain; it ducks under narration).
+- **Hat shop and journal:** the pause menu has 🤠 Hattebutik (hats bought with dollars, owned hats stored as `hat-N` flags) and 📖 Kanels dagbog (one voiced history fact per finished chapter, in `content/story/dagbog.yaml`).
 - **Travel:** `story/director.ts` swaps region, chapter and town. The player travels onward from a chapter card, or back and forth with the 🗺️ travel map in the pause menu.
 
 ## Multiplayer

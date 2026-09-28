@@ -6,6 +6,8 @@ export const REGIONS = [
   { id: 'praerien', name: 'Prærien', chapter: 2, townId: 'stoevby' },
   { id: 'fortet', name: 'Fortet', chapter: 3, townId: 'fortet' },
   { id: 'lejren', name: 'Lejren', chapter: 4, townId: 'lejren' },
+  { id: 'bjergene', name: 'Klippebjergene', chapter: 5, townId: 'soelvkloeften' },
+  { id: 'promontory', name: 'Promontory', chapter: 6, townId: 'promontory' },
 ] as const satisfies readonly { id: string; name: string; chapter: number; townId: TownId }[];
 
 export type RegionId = (typeof REGIONS)[number]['id'];

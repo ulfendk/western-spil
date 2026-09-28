@@ -390,3 +390,53 @@ export function buildElder(): Npc {
   };
   return npc;
 }
+
+/** A miner (Formand Morten): red shirt, braces, a leather cap with a candle lamp and a beard. */
+export function buildMiner(): Npc {
+  const skin = '#f1c9a0';
+  const npc = new THREE.Group() as Npc;
+  const body = new THREE.Group();
+  npc.add(body);
+  for (const side of [-1, 1]) {
+    body.add(part(new THREE.CapsuleGeometry(0.11, 0.6, 4, 8), '#4a4f5a', [side * 0.13, 0.45, 0]));
+    body.add(part(new THREE.BoxGeometry(0.17, 0.12, 0.3), '#2f2419', [side * 0.13, 0.06, -0.05]));
+    body.add(part(new THREE.BoxGeometry(0.05, 0.62, 0.03), '#5e3a1a', [side * 0.12, 1.33, -0.27]));
+  }
+  body.add(part(new THREE.CapsuleGeometry(0.28, 0.5, 4, 12), '#b8322a', [0, 1.33, 0]));
+  for (const side of [-1, 1]) {
+    const arm = new THREE.Group();
+    arm.position.set(side * 0.36, 1.6, 0);
+    arm.add(part(new THREE.CapsuleGeometry(0.09, 0.45, 4, 8), '#b8322a', [0, -0.27, 0]));
+    arm.add(part(new THREE.SphereGeometry(0.08, 8, 6), skin, [0, -0.57, 0]));
+    arm.rotation.z = side * 0.15;
+    body.add(arm);
+  }
+  body.add(part(new THREE.SphereGeometry(0.22, 16, 12), skin, [0, 1.95, 0]));
+  body.add(part(new THREE.SphereGeometry(0.06, 8, 6), '#e6a582', [0, 1.94, -0.22]));
+  for (const side of [-1, 1])
+    body.add(part(new THREE.SphereGeometry(0.026, 6, 4), '#1b1b1b', [side * 0.075, 2.0, -0.19]));
+  const beard = part(new THREE.SphereGeometry(0.2, 12, 8), '#6b4423', [0, 1.8, -0.1]);
+  beard.scale.set(1, 1.1, 0.8);
+  body.add(beard);
+  body.add(part(new THREE.CylinderGeometry(0.22, 0.24, 0.16, 14), '#5e3a1a', [0, 2.14, 0]));
+  body.add(part(new THREE.CylinderGeometry(0.05, 0.05, 0.12, 8), '#f3ecdc', [0, 2.2, -0.24]));
+  body.add(part(new THREE.SphereGeometry(0.035, 6, 4), '#ffcf70', [0, 2.29, -0.24]));
+  outline(body, 0.018);
+
+  let target: THREE.Vector3 | null = null;
+  npc.lookAtPlayer = (p) => (target = p);
+  npc.update = (dt, time) => {
+    body.position.y = Math.sin(time * 1.4) * 0.01;
+    let desired = 0;
+    if (target) {
+      const local = npc.worldToLocal(target.clone());
+      desired = Math.atan2(-local.x, -local.z);
+    }
+    const diff = Math.atan2(
+      Math.sin(desired - body.rotation.y),
+      Math.cos(desired - body.rotation.y),
+    );
+    body.rotation.y += diff * (1 - Math.exp(-dt * 4));
+  };
+  return npc;
+}

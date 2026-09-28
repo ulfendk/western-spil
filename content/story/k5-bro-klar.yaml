@@ -1,0 +1,14 @@
+# Across the rope bridge; the box is gone.
+id: k5-bro-klar
+lines:
+  - id: klarede
+    speaker: fortaeller
+    text: Du klarede det! Lidt efter kommer Kanel forsigtigt over broen. Han ser lidt flov ud.
+  - id: kasse
+    speaker: kanel
+    text: >-
+      Øh. Mens du gik over broen, kom der fire mænd. De tog kassen med naglen fra min
+      sadeltaske.
+  - id: rolig
+    speaker: kanel
+    text: Men bare rolig. Det skal nok gå. Stol på mig.

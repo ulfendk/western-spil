@@ -1,0 +1,15 @@
+# Mine-cart ride: instructions.
+id: k5-mine
+lines:
+  - id: start
+    speaker: kanel
+    text: >-
+      En minevogn! Hop op. Når der kommer en bjælke, så duk dig med pil ned. Ved sporskifterne
+      skal du følge pilen på skiltet.
+  - id: bump
+    speaker: kanel
+    text: Av! Hovedet ned, grønskolling.
+    say: Av! Hovedet ned grønskolling.
+  - id: blind
+    speaker: kanel
+    text: Forkert spor! Vi bakker og prøver igen.

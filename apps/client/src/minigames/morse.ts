@@ -4,10 +4,12 @@ import { h } from '../ui/dom.js';
 /** International Morse code for the letters we use. */
 const MORSE: Record<string, string> = {
   A: '.-',
+  D: '-..',
   E: '.',
   F: '..-.',
   H: '....',
   I: '..',
+  N: '-.',
   O: '---',
   R: '.-.',
   S: '...',

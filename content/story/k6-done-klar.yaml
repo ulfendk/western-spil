@@ -1,0 +1,14 @@
+# After the DONE telegram.
+id: k6-done-klar
+lines:
+  - id: flyver
+    speaker: telegrafist
+    text: Beskeden flyver gennem ledningerne. I byerne ringer kirkeklokkerne!
+  - id: kyst
+    speaker: fortaeller
+    text: >-
+      Jernbanen går nu fra kyst til kyst. En rejse, der før tog flere måneder, tager nu kun
+      en uge.
+    say: >-
+      Jernbanen går nu fra kyst til kyst. En rejse der før tog flere måneder tager nu kun en
+      uge.

@@ -1,0 +1,9 @@
+# All four brothers caught.
+id: k6-lasso-klar
+lines:
+  - id: fanget
+    speaker: fortaeller
+    text: Én efter én lander Bøvl-brødrene i lassoen. Sheriffen sætter dem ind i en kvægvogn.
+  - id: mor
+    speaker: storeboevl
+    text: Mor bliver ikke glad for det her.

@@ -1271,3 +1271,157 @@ h3 {
   opacity: 0.5;
   text-decoration: line-through;
 }
+
+/* Gold panning */
+.gold-canvas {
+  touch-action: none;
+  cursor: grab;
+}
+
+/* Rope bridge balance meter */
+.balance-meter {
+  position: absolute;
+  left: 50%;
+  bottom: max(110px, calc(env(safe-area-inset-bottom) + 110px));
+  transform: translateX(-50%);
+  width: min(420px, calc(100% - 24px));
+  height: 26px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: linear-gradient(
+    90deg,
+    #e2463a,
+    #f4c95d 30%,
+    #bfe3a0 45%,
+    #bfe3a0 55%,
+    #f4c95d 70%,
+    #e2463a
+  );
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.balance-dot {
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-radius: 50%;
+  border: 3px solid var(--ink);
+  background: var(--paper);
+}
+
+/* Chapter 6: track laying and the lasso. */
+.track-board {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  min-height: 44px;
+  padding: 8px;
+  background: #2f3a2f;
+  border: 4px solid #6b4a2e;
+  border-radius: 8px;
+}
+.track-board span {
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #f3ecdc;
+  color: #2a2320;
+  font-weight: 700;
+  opacity: 0.8;
+}
+.track-board span.next {
+  outline: 3px solid #f4c95d;
+  opacity: 1;
+}
+.track-board span.done {
+  opacity: 0.35;
+  text-decoration: line-through;
+}
+.track-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.track-canvas,
+.lasso-canvas {
+  border: 3px solid #2a2320;
+  border-radius: 8px;
+  touch-action: none;
+  display: block;
+  margin: 0 auto;
+}
+.lasso-canvas {
+  cursor: crosshair;
+}
+.pack.shake {
+  animation: pack-shake 0.25s;
+}
+@keyframes pack-shake {
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+/* Hat shop and Kanel's journal. */
+.hat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+.hat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  background: #fff8e8;
+  font: inherit;
+  cursor: pointer;
+}
+.hat-item.worn {
+  background: #f4c95d;
+}
+.hat-item:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.hat-icon {
+  width: 64px;
+  height: 40px;
+}
+.journal {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 55vh;
+  overflow-y: auto;
+  margin: 10px 0;
+  text-align: left;
+}
+.journal-entry {
+  padding: 10px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: #fff8e8;
+}
+.journal-entry h3 {
+  margin: 0 0 4px;
+}
+.journal-entry p {
+  margin: 0 0 6px;
+}
+.journal-entry.locked {
+  opacity: 0.55;
+}
+.journal-entry.playing {
+  background: #fdecc0;
+}

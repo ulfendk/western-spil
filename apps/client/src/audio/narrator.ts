@@ -100,6 +100,11 @@ class Narrator {
     }
   }
 
+  /** True while a story line is being read aloud (the ambience ducks under it). */
+  get speaking(): boolean {
+    return this.current !== null;
+  }
+
   /** The shared (tap-unlocked) audio context, also used for sound effects. */
   audioContext(): AudioContext | null {
     return this.context();

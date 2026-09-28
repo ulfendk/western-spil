@@ -1,11 +1,19 @@
 import * as THREE from 'three';
+import { ambience } from '../audio/ambience.js';
 import { PHRASES, regionInfo, type Emote, type RegionId } from '@western/shared';
 import { TownConnection } from '../net/town.js';
 import { settings } from '../settings.js';
 import { RemoteAvatar } from './avatars.js';
 import { Controls } from './controls.js';
 import { autoQuality, ComicRenderer, qualityProfile, type QualityProfile } from './render.js';
-import { buildWorld, heightAt, SUN_DIR, WORLD_HALF, type World } from './world/index.js';
+import {
+  buildWorld,
+  heightAt,
+  SUN_DIR,
+  walkHeightAt,
+  WORLD_HALF,
+  type World,
+} from './world/index.js';
 
 const EYE_HEIGHT = 1.7;
 const WALK_SPEED = 5;
@@ -41,6 +49,8 @@ export class Game {
   private bob = 0;
   /** Game time in seconds: sum of (clamped) frame deltas, so animations never jump. */
   time = 0;
+  /** Sideways camera tilt (balancing on the rope bridge). */
+  roll = 0;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -68,6 +78,7 @@ export class Game {
       vegetationDensity: this.profile.vegetationDensity,
     });
     this.world = world;
+    ambience.setRegion(region);
     this.configureShadows(this.profile.shadows);
     this.scene.add(this.marker);
     this.marker.visible = false;
@@ -95,7 +106,7 @@ export class Game {
   /** Where the player stands (ground level). */
   get playerPosition(): THREE.Vector3 {
     const p = this.camera.position;
-    return new THREE.Vector3(p.x, heightAt(p.x, p.z), p.z);
+    return new THREE.Vector3(p.x, walkHeightAt(p.x, p.z), p.z);
   }
 
   /** Horizontal direction the player is looking in. */
@@ -175,9 +186,14 @@ export class Game {
     }
   }
 
+  /** Wear another hat; other players see it from the next town join. */
+  setHat(hat: number) {
+    if (this.player) this.player.hat = hat;
+  }
+
   /** Put the player somewhere (minigames, debug) and tell the other players right away. */
   setView(x: number, z: number, yaw: number, pitch = 0) {
-    const ground = heightAt(x, z);
+    const ground = walkHeightAt(x, z);
     this.camera.position.set(x, ground + EYE_HEIGHT, z);
     this.controls.yaw = yaw;
     this.controls.pitch = pitch;
@@ -187,11 +203,18 @@ export class Game {
 
   /** Move the player every frame during a scripted sequence (network updates stay throttled). */
   placePlayer(x: number, z: number, yaw: number, pitch = 0, eyeOffset = 0) {
-    const ground = heightAt(x, z);
+    const ground = walkHeightAt(x, z);
     this.camera.position.set(x, ground + EYE_HEIGHT + eyeOffset, z);
     this.controls.yaw = yaw;
     this.controls.pitch = pitch;
     this.town?.sendMove(x, ground, z, yaw);
+  }
+
+  /** Put the camera exactly here (scripted rides), without touching the ground height. */
+  setCamera(position: THREE.Vector3, yaw: number, pitch: number) {
+    this.camera.position.copy(position);
+    this.controls.yaw = yaw;
+    this.controls.pitch = pitch;
   }
 
   /** Where a world point appears on screen: x/y in −1…1 (NDC), and whether it's in front. */
@@ -304,7 +327,8 @@ export class Game {
     if (this.running) this.hooks.onFrame?.(dt);
 
     this.world.update(dt, time);
-    this.camera.rotation.set(this.controls.pitch, this.controls.yaw, 0);
+    ambience.update(dt);
+    this.camera.rotation.set(this.controls.pitch, this.controls.yaw, this.roll);
     for (const avatar of this.remotes.values()) avatar.update(dt);
     this.followSun();
     this.renderer.render(this.scene, this.camera);
@@ -341,7 +365,7 @@ export class Game {
 
     const moving = move.lengthSq() > 0.01;
     this.bob = moving ? this.bob + dt * speed * 1.6 : 0;
-    const ground = heightAt(pos.x, pos.z);
+    const ground = walkHeightAt(pos.x, pos.z);
     pos.y = ground + EYE_HEIGHT + Math.sin(this.bob) * 0.06;
 
     this.town?.sendMove(pos.x, ground, pos.z, yaw);

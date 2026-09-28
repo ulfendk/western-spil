@@ -6,7 +6,7 @@ import { outline } from '../toon.js';
 export const SUN_DIR = new THREE.Vector3(-0.35, 0.42, -0.84).normalize();
 
 /** Weather and time of day. */
-export type Mood = 'day' | 'storm' | 'night';
+export type Mood = 'day' | 'storm' | 'night' | 'sunset';
 
 interface SkyColors {
   horizon: THREE.Color;
@@ -36,6 +36,15 @@ export const SKY_MOODS: Record<Mood, SkyColors> = {
     stars: false,
     cloud: new THREE.Color('#2a2c33'),
     cloudShade: new THREE.Color('#1c1d22'),
+  },
+  sunset: {
+    horizon: new THREE.Color(1.0, 0.5, 0.25),
+    mid: new THREE.Color(0.85, 0.42, 0.4),
+    top: new THREE.Color(0.3, 0.24, 0.5),
+    sun: 1,
+    stars: false,
+    cloud: new THREE.Color('#b0604a'),
+    cloudShade: new THREE.Color('#6a3a4a'),
   },
   night: {
     horizon: new THREE.Color(0.16, 0.2, 0.36),
@@ -176,8 +185,9 @@ export function buildSky(): Sky {
       stars.visible = moon.visible = m.stars;
       cloudMat.emissive.copy(m.cloud);
       shadeMat.emissive.copy(m.cloudShade);
-      cloudMat.color.set(mood === 'day' ? '#ffffff' : '#555a66');
-      shadeMat.color.set(mood === 'day' ? '#d9d4e8' : '#3a3d48');
+      const bright = mood === 'day' || mood === 'sunset';
+      cloudMat.color.set(bright ? '#ffffff' : '#555a66');
+      shadeMat.color.set(bright ? '#d9d4e8' : '#3a3d48');
     },
     flash(amount) {
       uniforms.flash.value = amount;

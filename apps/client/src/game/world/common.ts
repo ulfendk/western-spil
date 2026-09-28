@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { ambience } from '../../audio/ambience.js';
 import { buildTumbleweeds, buildVultures, type Animated } from './animals.js';
 import { Colliders, type Circle } from './colliders.js';
 import { buildRailway } from './railway.js';
@@ -37,9 +38,10 @@ const LIGHT: Record<Mood, { hemi: number; sun: number; fog: string; near: number
   day: { hemi: 1.05, sun: 1.9, fog: '#f5d49a', near: 140, far: 900 },
   storm: { hemi: 0.55, sun: 0.25, fog: '#565b66', near: 25, far: 260 },
   night: { hemi: 0.28, sun: 0.12, fog: '#141a33', near: 60, far: 420 },
+  sunset: { hemi: 0.8, sun: 1.7, fog: '#e8a070', near: 120, far: 800 },
 };
 
-export function buildCommon(scene: THREE.Scene): Common {
+export function buildCommon(scene: THREE.Scene, opts: { train?: boolean } = {}): Common {
   const colliders = new Colliders();
   const animated: Animated[] = [];
   const sky = buildSky();
@@ -47,7 +49,7 @@ export function buildCommon(scene: THREE.Scene): Common {
   scene.add(buildTerrain());
   scene.add(buildTrail());
 
-  const railway = buildRailway(colliders);
+  const railway = buildRailway(colliders, opts.train !== false);
   scene.add(railway);
   animated.push(railway);
 
@@ -94,12 +96,21 @@ export function buildCommon(scene: THREE.Scene): Common {
   let flash = 0;
   const setMood = (m: Mood) => {
     mood = m;
+    ambience.setMood(m);
     const l = LIGHT[m];
     sky.setMood(m);
     hemi.intensity = l.hemi;
     sun.intensity = l.sun;
-    hemi.color.set(m === 'night' ? '#8fa0d8' : m === 'storm' ? '#c0c8d8' : '#fff3d6');
-    sun.color.set(m === 'night' ? '#9fb0e8' : '#fff0c8');
+    hemi.color.set(
+      m === 'night'
+        ? '#8fa0d8'
+        : m === 'storm'
+          ? '#c0c8d8'
+          : m === 'sunset'
+            ? '#ffc090'
+            : '#fff3d6',
+    );
+    sun.color.set(m === 'night' ? '#9fb0e8' : m === 'sunset' ? '#ff9a5a' : '#fff0c8');
     fog.color.set(l.fog);
     fog.near = l.near;
     fog.far = l.far;

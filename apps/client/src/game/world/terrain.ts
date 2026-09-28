@@ -24,6 +24,34 @@ export interface RiverProfile {
   halfWidth: number;
 }
 
+/** A high mountain ridge running east–west across the whole map. */
+export interface RidgeProfile {
+  /** The steep eastern face (the side travellers arrive at). */
+  faceZ: number;
+  /** Where the ridge falls away again into the valley beyond. */
+  backZ: number;
+  height: number;
+}
+
+/** A deep, narrow gorge along a straight line (x0,z0)→(x1,z1). */
+export interface GorgeProfile {
+  x0: number;
+  z0: number;
+  x1: number;
+  z1: number;
+  halfWidth: number;
+  depth: number;
+}
+
+/** A walkable deck (rope bridge) over the terrain. */
+export interface Deck {
+  x0: number;
+  x1: number;
+  z: number;
+  halfWidth: number;
+  y: number;
+}
+
 /** Shape of one region's land. Only one region is active at a time. */
 export interface TerrainProfile {
   /** Height of the big rolling hills in metres. */
@@ -34,6 +62,16 @@ export interface TerrainProfile {
   trail(z: number): number;
   flatZones: FlatZone[];
   river?: RiverProfile;
+  ridge?: RidgeProfile;
+  gorges?: GorgeProfile[];
+  /** Ground above this height turns snowy. */
+  snowline?: number;
+  /** z-ranges where the drawn trail is left out (e.g. through a blocked tunnel). */
+  trailGaps?: [number, number][];
+  /** Bridges people can walk on (see walkHeightAt). */
+  decks?: Deck[];
+  /** Colours of the land. */
+  palette?: 'prairie' | 'desert';
 }
 
 let active: TerrainProfile = {
@@ -107,10 +145,65 @@ export function heightAt(x: number, z: number): number {
     const inRiver = 1 - THREE.MathUtils.smoothstep(d, r.halfWidth - 2, r.halfWidth + 7);
     if (inRiver > 0) h = THREE.MathUtils.lerp(h, riverBed(x), inRiver);
   }
+  // A mountain ridge: steep face, snowy top, falling away into the valley beyond.
+  const ridge = active.ridge;
+  if (ridge) {
+    const up = THREE.MathUtils.smoothstep(-z, -ridge.faceZ, -ridge.faceZ + 14);
+    const down = 1 - THREE.MathUtils.smoothstep(-z, -ridge.backZ, -ridge.backZ + 22);
+    const bumps = (fbm(x * 0.03, z * 0.03, 3, 51) - 0.5) * 8;
+    h += (ridge.height + bumps) * up * down;
+  }
+  // Gorges: steep walls down to a creek.
+  for (const g of active.gorges ?? []) {
+    const d = distanceToSegment(x, z, g.x0, g.z0, g.x1, g.z1);
+    const cut = 1 - THREE.MathUtils.smoothstep(d, g.halfWidth - 2, g.halfWidth + 2.5);
+    if (cut > 0) h = THREE.MathUtils.lerp(h, gorgeBed(g, h), cut);
+  }
   // Blend into the railway embankment.
   const rail = 1 - THREE.MathUtils.smoothstep(Math.abs(x - RAIL_X), 3.5, 16);
   return THREE.MathUtils.lerp(h, railHeight(z), rail);
 }
+
+function gorgeBed(g: GorgeProfile, rim: number): number {
+  return Math.min(rim, (fbm(g.x0 * 0.01, g.z0 * 0.01, 2, 5) - 0.5) * 4) - g.depth;
+}
+
+function distanceToSegment(
+  x: number,
+  z: number,
+  x0: number,
+  z0: number,
+  x1: number,
+  z1: number,
+): number {
+  const dx = x1 - x0;
+  const dz = z1 - z0;
+  const t = THREE.MathUtils.clamp(((x - x0) * dx + (z - z0) * dz) / (dx * dx + dz * dz), 0, 1);
+  return Math.hypot(x - (x0 + dx * t), z - (z0 + dz * t));
+}
+
+/** Height a person stands at: the ground, or a bridge deck when on one. */
+export function walkHeightAt(x: number, z: number): number {
+  const ground = heightAt(x, z);
+  for (const d of active.decks ?? []) {
+    if (
+      x >= Math.min(d.x0, d.x1) &&
+      x <= Math.max(d.x0, d.x1) &&
+      Math.abs(z - d.z) <= d.halfWidth
+    ) {
+      return Math.max(ground, d.y);
+    }
+  }
+  return ground;
+}
+
+const SNOW = new THREE.Color('#f4f6fb');
+const DESERT = {
+  low: new THREE.Color('#c9a26a'),
+  mid: new THREE.Color('#d8b57a'),
+  high: new THREE.Color('#e6cc96'),
+  scrub: new THREE.Color('#9a9a5a'),
+};
 
 const PAL = {
   grassDark: new THREE.Color('#6f8a3a'),
@@ -172,10 +265,31 @@ export function buildTerrain(): THREE.Mesh {
     const y = pos.getY(i);
     // Large patches of green, olive and gold prairie.
     const patch = fbm(x * 0.018, z * 0.018, 3, 11);
+    if (active.palette === 'desert') {
+      c.copy(DESERT.low)
+        .lerp(DESERT.mid, patch)
+        .lerp(DESERT.high, THREE.MathUtils.smoothstep(patch, 0.55, 0.75));
+      c.lerp(
+        DESERT.scrub,
+        THREE.MathUtils.smoothstep(fbm(x * 0.05, z * 0.05, 2, 17), 0.62, 0.8) * 0.5,
+      );
+      c.lerp(PAL.gravel, 1 - THREE.MathUtils.smoothstep(Math.abs(x - RAIL_X), 2.5, 4.5));
+      c.offsetHSL(0, 0, (valueNoise(x * 0.7, z * 0.7, 5) - 0.5) * 0.05);
+      colors.set([c.r, c.g, c.b], i * 3);
+      continue;
+    }
     if (patch < 0.5)
       c.copy(PAL.grassDark).lerp(PAL.grassMid, THREE.MathUtils.smoothstep(patch, 0.3, 0.5));
     else c.copy(PAL.grassMid).lerp(PAL.grassLight, THREE.MathUtils.smoothstep(patch, 0.5, 0.68));
     c.lerp(PAL.gold, THREE.MathUtils.smoothstep(y, 2, 10) * 0.6);
+    if (active.snowline !== undefined) {
+      const snow = THREE.MathUtils.smoothstep(
+        y + (valueNoise(x * 0.2, z * 0.2, 9) - 0.5) * 3,
+        active.snowline,
+        active.snowline + 4,
+      );
+      c.lerp(SNOW, snow);
+    }
     const slope = 1 - normals.getY(i);
     c.lerp(PAL.rock, THREE.MathUtils.smoothstep(slope, 0.08, 0.2));
     c.lerp(PAL.gravel, 1 - THREE.MathUtils.smoothstep(Math.abs(x - RAIL_X), 2.5, 4.5));
@@ -245,6 +359,10 @@ export function buildTrail(): THREE.Mesh {
   const positions: number[] = [];
   const uvs: number[] = [];
   const indices: number[] = [];
+  const gaps = active.trailGaps ?? [];
+  const kept = zs.filter((z) => !gaps.some(([a, b]) => z <= Math.max(a, b) && z >= Math.min(a, b)));
+  zs.length = 0;
+  zs.push(...kept);
   zs.forEach((z, row) => {
     const cx = trailX(z);
     for (let j = 0; j <= across; j++) {
@@ -252,7 +370,8 @@ export function buildTrail(): THREE.Mesh {
       const x = cx + (u - 0.5) * width;
       positions.push(x, heightAt(x, z) + 0.05, z);
       uvs.push(u, (row * 1.5) / 28);
-      if (row > 0 && j < across) {
+      // Don't join rows across a gap in the trail.
+      if (row > 0 && j < across && zs[row - 1]! - z < 2) {
         const a = (row - 1) * (across + 1) + j;
         const b = a + across + 1;
         indices.push(a, a + 1, b, b, a + 1, b + 1);

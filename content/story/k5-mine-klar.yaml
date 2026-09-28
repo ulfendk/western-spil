@@ -1,0 +1,11 @@
+# Out of the mine on the western side.
+id: k5-mine-klar
+lines:
+  - id: ude
+    speaker: fortaeller
+    text: >-
+      Vognen suser ud af bjerget på den anden side. Solen skinner, og dalen mod vest ligger
+      åben.
+  - id: endnu
+    speaker: kanel
+    text: Ingen sne, ingen tunnel og ingen Bøvl-brødre. Endnu.

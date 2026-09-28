@@ -1,0 +1,11 @@
+# First time the player walks into Sølvkløften.
+id: by-soelvkloeften
+lines:
+  - id: velkommen
+    speaker: fortaeller
+    text: >-
+      Velkommen til Sølvkløften! Her graver man efter sølv, og om aftenen kaster
+      minearbejderne hestesko.
+  - id: koldt
+    speaker: kanel
+    text: Og her er koldt. Har nogen en hestetrøje?
