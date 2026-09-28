@@ -116,3 +116,98 @@ export function buildPind(): Npc {
   };
   return npc;
 }
+
+interface PersonOptions {
+  /** Overall size (1 = adult, ~0.72 = child). */
+  scale: number;
+  dress: string;
+  apron?: string;
+  hair: string;
+  braids?: boolean;
+  bonnet?: string;
+}
+
+/** A pioneer in a long dress: used for Mor Jensen and Sofie. */
+export function buildPerson(o: PersonOptions): Npc {
+  const skin = '#f1c9a0';
+  const npc = new THREE.Group() as Npc;
+  const body = new THREE.Group();
+  npc.add(body);
+  // Long dress down to the boots, with an apron and a waist sash.
+  body.add(part(new THREE.CylinderGeometry(0.22, 0.42, 1.15, 16), o.dress, [0, 0.6, 0]));
+  body.add(part(new THREE.CapsuleGeometry(0.23, 0.35, 4, 12), o.dress, [0, 1.35, 0]));
+  if (o.apron)
+    body.add(part(new THREE.BoxGeometry(0.42, 0.85, 0.05), o.apron, [0, 0.75, -0.3], [0.2, 0, 0]));
+  body.add(
+    part(new THREE.CylinderGeometry(0.235, 0.235, 0.08, 14), o.apron ?? '#f3ecdc', [0, 1.16, 0]),
+  );
+  for (const side of [-1, 1]) {
+    body.add(part(new THREE.BoxGeometry(0.12, 0.08, 0.22), '#3a2615', [side * 0.1, 0.04, -0.08]));
+    const arm = new THREE.Group();
+    arm.position.set(side * 0.3, 1.52, 0);
+    arm.add(part(new THREE.CapsuleGeometry(0.07, 0.42, 4, 8), o.dress, [0, -0.25, 0]));
+    arm.add(part(new THREE.SphereGeometry(0.065, 8, 6), skin, [0, -0.52, 0]));
+    arm.rotation.z = side * 0.15;
+    body.add(arm);
+  }
+  // Head, face and hair.
+  body.add(part(new THREE.SphereGeometry(0.21, 16, 12), skin, [0, 1.84, 0]));
+  body.add(part(new THREE.SphereGeometry(0.035, 6, 4), '#e8b088', [0, 1.82, -0.21]));
+  for (const side of [-1, 1])
+    body.add(part(new THREE.SphereGeometry(0.026, 6, 4), '#1b1b1b', [side * 0.07, 1.87, -0.185]));
+  const hair = part(
+    new THREE.SphereGeometry(0.225, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.55),
+    o.hair,
+    [0, 1.87, 0.02],
+  );
+  body.add(hair);
+  if (o.braids) {
+    for (const side of [-1, 1]) {
+      body.add(
+        part(
+          new THREE.CapsuleGeometry(0.05, 0.35, 4, 6),
+          o.hair,
+          [side * 0.2, 1.62, 0.05],
+          [0.1, 0, side * 0.15],
+        ),
+      );
+      body.add(part(new THREE.SphereGeometry(0.05, 6, 4), '#c8553d', [side * 0.23, 1.42, 0.06]));
+    }
+  }
+  if (o.bonnet) {
+    // Prairie bonnet with a wide brim shading the face.
+    body.add(
+      part(
+        new THREE.SphereGeometry(0.25, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.6),
+        o.bonnet,
+        [0, 1.9, 0.04],
+      ),
+    );
+    const brim = part(
+      new THREE.CylinderGeometry(0.27, 0.3, 0.2, 16, 1, true, -Math.PI / 2, Math.PI),
+      o.bonnet,
+      [0, 1.86, -0.1],
+      [Math.PI / 2 - 0.3, 0, 0],
+    );
+    body.add(brim);
+  }
+  body.scale.setScalar(o.scale);
+  outline(body, 0.018);
+
+  let target: THREE.Vector3 | null = null;
+  npc.lookAtPlayer = (p) => (target = p);
+  npc.update = (dt, time) => {
+    body.position.y = Math.sin(time * 1.5) * 0.01;
+    let desired = 0;
+    if (target) {
+      const local = npc.worldToLocal(target.clone());
+      desired = Math.atan2(-local.x, -local.z);
+    }
+    const diff = Math.atan2(
+      Math.sin(desired - body.rotation.y),
+      Math.cos(desired - body.rotation.y),
+    );
+    body.rotation.y += diff * (1 - Math.exp(-dt * 4));
+  };
+  return npc;
+}

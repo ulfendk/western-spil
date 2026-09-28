@@ -1,28 +1,16 @@
-import * as THREE from 'three';
+import type * as THREE from 'three';
 import type { SpeakerId } from '@western/shared';
 import type { Game } from '../game/game.js';
 import { drawWantedPoster } from '../game/world/camp.js';
 import { playPacking } from '../minigames/packing.js';
-import { updater } from '../pwa/updater.js';
 import { store } from '../save/store.js';
 import type { Hud } from '../ui/hud.js';
 import { h } from '../ui/dom.js';
 import { toast } from '../ui/toast.js';
-import { DialogueRunner } from './dialogue.js';
-import { script } from './scripts.js';
+import { ChapterBase, type StepInfo } from './chapterBase.js';
 
-/** Quest steps in chapter 1, in order. Stored in the save as progress.step. */
+/** Quest steps in chapter 1, in order. */
 type Step = 'intro' | 'find-pind' | 'find-kanel' | 'pack' | 'poster' | 'depart' | 'done';
-
-interface StepInfo {
-  objective: string;
-  /** Where the "!" marker hovers (height above the ground spot). */
-  marker?: { spot: keyof Game['world']['spots']; height: number };
-  /** Walk up to this spot and press E / tap the prompt. */
-  interact?: { spot: keyof Game['world']['spots']; radius: number; label: string };
-  /** Reaching this spot triggers the step automatically. */
-  reach?: { spot: keyof Game['world']['spots']; radius: number };
-}
 
 const STEPS: Record<Step, StepInfo> = {
   intro: { objective: '' },
@@ -51,105 +39,41 @@ const STEPS: Record<Step, StepInfo> = {
     marker: { spot: 'trailWest', height: 3 },
     reach: { spot: 'trailWest', radius: 8 },
   },
-  done: { objective: 'Kapitel 2 kommer snart. Udforsk prærien imens!' },
+  done: { objective: 'Rejs videre mod vest via rejsekortet i pausemenuen' },
 };
 
-/** Chapter 1 – "Afsked ved St. Louis". Drives objectives, conversations and rewards. */
-export class Chapter1 {
-  private dialogue = new DialogueRunner();
-  private busy = false;
-  private lookHintShown = false;
-  private prompt: HTMLButtonElement;
-  private promptFor: Step | null = null;
+/** Chapter 1 – "Afsked ved St. Louis". */
+export class Chapter1 extends ChapterBase<Step> {
+  protected introScript = 'k1-intro';
 
   constructor(
-    private game: Game,
-    private hud: Hud,
+    game: Game,
+    hud: Hud,
+    private travelOn: () => void,
   ) {
-    this.prompt = h('button', { class: 'interact-prompt', hidden: true });
-    this.prompt.onclick = () => void this.interact();
-    document.body.append(this.prompt);
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'KeyE' && !this.prompt.hidden && !this.dialogue.active) void this.interact();
-    });
+    super(game, hud, 'k1', STEPS, [
+      'intro',
+      'find-pind',
+      'find-kanel',
+      'pack',
+      'poster',
+      'depart',
+      'done',
+    ]);
   }
 
-  /** True while a conversation or the packing puzzle is on screen. */
-  get isBusy(): boolean {
-    return this.busy;
+  protected override onStart() {
+    this.game.world.setPosterVisible?.(this.reached('poster'));
   }
 
-  private get step(): Step {
-    const s = store.save.progress.step as Step;
-    return s in STEPS ? s : 'intro';
+  protected speakerPosition(speaker: SpeakerId): THREE.Vector3 | null {
+    if (speaker === 'pind') return this.game.world.spots.pind ?? null;
+    if (speaker === 'kanel') return this.game.world.kanelPosition();
+    return null;
   }
 
-  /** Called when play starts or resumes. */
-  start() {
-    this.game.world.setPosterVisible(this.reached('poster'));
-    this.applyStep();
-    if (this.step === 'intro' && !this.busy) void this.runIntro();
-  }
-
-  /** Called every frame while playing. */
-  update() {
-    if (this.busy) return;
-    const info = STEPS[this.step];
-    const player = this.game.playerPosition;
-    if (info.reach) {
-      const spot = this.game.world.spots[info.reach.spot];
-      if (player.distanceTo(spot) < info.reach.radius) void this.finishChapter();
-    }
-    let show = false;
-    if (info.interact) {
-      const spot = this.game.world.spots[info.interact.spot];
-      show = player.distanceTo(spot) < info.interact.radius;
-    }
-    if (show !== !this.prompt.hidden || this.promptFor !== this.step) {
-      this.prompt.hidden = !show;
-      this.promptFor = this.step;
-      const touch = matchMedia('(pointer: coarse)').matches;
-      this.prompt.textContent = `💬 ${info.interact?.label ?? ''}${touch ? '' : '  [E]'}`;
-    }
-  }
-
-  private hasFlag(flag: string): boolean {
-    return store.save.progress.flags.includes(flag);
-  }
-
-  /** Start the chapter over (keeps money, stars and earlier choices). */
-  restart() {
-    store.update({ progress: { ...store.save.progress, step: 'intro' } });
-  }
-
-  private reached(step: Step): boolean {
-    const order = Object.keys(STEPS) as Step[];
-    return order.indexOf(this.step) >= order.indexOf(step);
-  }
-
-  private setStep(step: Step, flags: string[] = []) {
-    const progress = store.save.progress;
-    store.update({ progress: { step, flags: [...new Set([...progress.flags, ...flags])] } });
-    this.applyStep();
-  }
-
-  private applyStep() {
-    const info = STEPS[this.step];
-    this.hud.setObjective(info.objective || null);
-    const marker = info.marker;
-    if (marker) {
-      const spot = this.game.world.spots[marker.spot];
-      this.game.setMarker(new THREE.Vector3(spot.x, spot.y + marker.height, spot.z));
-    } else {
-      this.game.setMarker(null);
-    }
-    this.prompt.hidden = true;
-    this.promptFor = null;
-  }
-
-  private async interact() {
-    if (this.busy) return;
-    switch (this.step) {
+  protected async onInteract(step: Step) {
+    switch (step) {
       case 'find-pind': {
         const flags = await this.talk('k1-pind');
         toast('📦 Du fik kassen med den gyldne nagle');
@@ -176,48 +100,13 @@ export class Chapter1 {
     }
   }
 
-  private async runIntro() {
-    await this.talk('k1-intro');
-    this.setStep('find-pind');
-  }
-
-  /** Plays a conversation with input frozen and the camera turned to whoever speaks. */
-  private async talk(id: string): Promise<string[]> {
-    this.busy = true;
-    this.prompt.hidden = true;
-    this.game.setMarker(null);
-    this.game.lockInput(true);
-    this.hud.setTalking(true);
-    try {
-      return await this.dialogue.run(script(id), { onSpeaker: (s) => this.lookAt(s) });
-    } finally {
-      this.game.lockInput(false);
-      this.hud.setTalking(false);
-      this.busy = false;
-      this.applyStep();
-      if (!this.lookHintShown && matchMedia('(pointer: fine)').matches) {
-        this.lookHintShown = true;
-        toast('Klik for at se dig omkring igen');
-      }
-    }
-  }
-
-  private lookAt(speaker: SpeakerId) {
-    const spots = this.game.world.spots;
-    const at = speaker === 'pind' ? spots.pind : speaker === 'kanel' ? spots.kanel : null;
-    this.game.faceTowards(
-      at ? new THREE.Vector3(at.x, at.y + (speaker === 'kanel' ? 2.1 : 1.8), at.z) : null,
-    );
+  protected override async onReach(step: Step) {
+    if (step === 'depart') await this.finishChapter();
   }
 
   private async pack() {
-    this.busy = true;
-    this.prompt.hidden = true;
-    this.game.setMarker(null);
-    this.game.lockInput(true);
-    this.hud.setTalking(true);
-    try {
-      await this.dialogue.run(script('k1-pak'), { onSpeaker: (s) => this.lookAt(s) });
+    await this.busyWhile(async () => {
+      await this.talk('k1-pak');
       const { seconds } = await playPacking();
       const fast = seconds < 90;
       // Rewards only the first time; replaying the chapter is just for fun.
@@ -232,14 +121,10 @@ export class Chapter1 {
       } else {
         toast(`Pakket på ${Math.round(seconds)} sekunder!`);
       }
-      await this.dialogue.run(script('k1-pakket'), { onSpeaker: (s) => this.lookAt(s) });
-      this.game.world.setPosterVisible(true);
+      await this.talk('k1-pakket');
+      this.game.world.setPosterVisible?.(true);
       this.setStep('poster', fast ? ['k1-pakket', 'pakket-hurtigt'] : ['k1-pakket']);
-    } finally {
-      this.game.lockInput(false);
-      this.hud.setTalking(false);
-      this.busy = false;
-    }
+    });
   }
 
   private async finishChapter() {
@@ -250,35 +135,9 @@ export class Chapter1 {
       stars: store.save.stars + (first ? 1 : 0),
     });
     this.setStep('done', ['k1-klaret']);
-    await this.showChapterCard();
-  }
-
-  /** "Kapitel 1 klaret!" card: a natural pause, so it's also a safe point for updates. */
-  private showChapterCard(): Promise<void> {
-    return new Promise((resolve) => {
-      this.game.lockInput(true);
-      updater.setSafe(true);
-      const ok = h('button', { class: 'btn btn-big' }, 'Fortsæt');
-      const card = h(
-        'div',
-        { class: 'chapter-card' },
-        h(
-          'div',
-          { class: 'panel' },
-          h('p', { class: 'chapter-kicker' }, 'Kapitel 1'),
-          h('h2', {}, 'Afsked ved St. Louis'),
-          h('p', { class: 'chapter-stats' }, `⭐ ${store.save.stars}   💲 ${store.save.dollars}`),
-          h('p', {}, 'Godt klaret, grønskolling! Kapitel 2 – Prærien – er på vej.'),
-          ok,
-        ),
-      );
-      document.body.append(card);
-      ok.onclick = () => {
-        card.remove();
-        updater.setSafe(false);
-        this.game.lockInput(false);
-        resolve();
-      };
-    });
+    await this.showChapterCard('Kapitel 1', 'Afsked ved St. Louis', 'Godt klaret, grønskolling!', [
+      { label: 'Rejs videre til prærien 🐴', primary: true, action: this.travelOn },
+      { label: 'Bliv lidt i St. Louis' },
+    ]);
   }
 }

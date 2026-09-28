@@ -1,0 +1,41 @@
+# Meeting the Jensen family, Danish emigrants on their way to Dannebrog, Nebraska.
+id: k2-jensen
+lines:
+  - id: goddag
+    speaker: jensen
+    text: Goddag! Vi er familien Jensen. Vi er rejst hele vejen fra Danmark.
+  - id: dannebrog
+    speaker: sofie
+    text: Vi skal til et sted, der hedder Dannebrog. Det ligger her i Nebraska!
+  - id: danskere
+    speaker: fortaeller
+    text: >-
+      Mange danskere rejste til Amerika dengang. Nogle af dem grundlagde byen Dannebrog i
+      Nebraska.
+  - id: hjul
+    speaker: jensen
+    text: >-
+      Men nu kan vi ikke komme videre. Et hjul er gået løs på vores vogn. I nat var der nogen
+      ved vognene.
+  - id: spor
+    speaker: kanel
+    text: >-
+      Se her i sandet. Fire par støvlespor. Et lille, et mellemstort, et stort og et
+      kæmpestort. Hvem tror du, det var?
+    choices:
+      - text: Bøvl-brødrene!
+        flag: gaettede-boevl
+        say: Tryk på nummer et hvis du tror det var Bøvl-brødrene.
+        lines:
+          - id: praecis
+            speaker: kanel
+            text: Præcis. De leder efter naglen. Men den har vi godt gemt.
+      - text: En bjørn med støvler?
+        say: Tryk på nummer to hvis du tror det var en bjørn med støvler.
+        lines:
+          - id: bjoern
+            speaker: kanel
+            text: Ha! Bjørne går ikke i støvler. Det var Bøvl-brødrene. De leder efter naglen.
+  - id: hjaelp
+    speaker: jensen
+    text: Kan du hjælpe os med at slå hjulet på plads igen? Hammeren ligger ved vognen.

@@ -153,6 +153,8 @@ export function buildWagon(): THREE.Group {
     for (const side of [-1, 1]) {
       const w = wheel(radius);
       w.position.set(side * (width / 2 + 0.22), radius, z);
+      // Tagged so a region can take a wheel off (the Bøvl brothers' sabotage).
+      w.userData.wheel = `${z > 0 ? 'rear' : 'front'}-${side < 0 ? 'left' : 'right'}`;
       wagon.add(w);
     }
   }

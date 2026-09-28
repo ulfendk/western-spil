@@ -1,0 +1,9 @@
+# First time the player walks into Støvby.
+id: by-stoevby
+lines:
+  - id: velkommen
+    speaker: fortaeller
+    text: Velkommen til Støvby! Her er der kvæg, cowboys og en masse støv.
+  - id: hestesko
+    speaker: kanel
+    text: Her er også en hesteskobane. Vis dem, hvad du kan.

@@ -1,0 +1,15 @@
+# End of chapter 2, arriving in Støvby.
+id: k2-slut
+lines:
+  - id: farvel
+    speaker: sofie
+    text: Farvel! Vi kører nordpå mod Dannebrog. Pas godt på naglen!
+  - id: stoevsky
+    speaker: fortaeller
+    text: >-
+      Langt ude på prærien hvirvler en støvsky op. Under den kan man skimte fire hatte. En
+      lille, en mellemstor, en stor og en kæmpestor.
+  - id: hurtig
+    speaker: kanel
+    text: Bøvl-brødrene. De er stadig efter os. Godt, at jeg er en hurtig hest.
+    say: Bøvl-brødrene. De er stadig efter os. Godt at jeg er en hurtig hest.

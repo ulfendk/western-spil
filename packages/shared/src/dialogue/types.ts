@@ -1,4 +1,4 @@
-export type SpeakerId = 'fortaeller' | 'kanel' | 'pind' | 'spiller';
+export type SpeakerId = 'fortaeller' | 'kanel' | 'pind' | 'spiller' | 'jensen' | 'sofie';
 
 export interface Speaker {
   name: string;
@@ -41,6 +41,8 @@ export const SPEAKERS: Record<SpeakerId, Speaker> = {
   kanel: { name: 'Kanel', lengthScale: 0.95 },
   pind: { name: 'Postmester Pind', lengthScale: 1.15 },
   spiller: { name: 'Dig' },
+  jensen: { name: 'Mor Jensen', lengthScale: 1.05 },
+  sofie: { name: 'Sofie', lengthScale: 0.95 },
 };
 
 /** Every line in a script, including the ones inside choices (for rendering audio). */

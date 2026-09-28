@@ -1,0 +1,14 @@
+# Kapitel 2 – Prærien. Plays when the player arrives on the prairie.
+id: k2-intro
+lines:
+  - id: praerie
+    speaker: fortaeller
+    text: >-
+      Kanel og du følger sporet ud over den store prærie. Græsset bølger som et hav, og himlen
+      er endnu større.
+  - id: lejr
+    speaker: fortaeller
+    text: Et stykke fremme holder et vogntog. Vognene står i en rundkreds ved sporet.
+  - id: kanel
+    speaker: kanel
+    text: Vogne i en rundkreds. Det betyder mad. Eller problemer. Eller begge dele.

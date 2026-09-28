@@ -78,6 +78,10 @@ function grassClumpGeometry(): THREE.BufferGeometry {
 
 export interface VegetationOptions {
   density: number;
+  /** Desert props (saguaros, prickly pears). Off on the Nebraska prairie. */
+  cacti?: boolean;
+  /** Extra grass for lush prairie regions. */
+  grassBoost?: number;
   keepOut: { x: number; z: number; r: number }[];
   colliders: Colliders;
 }
@@ -101,7 +105,7 @@ export function buildVegetation(opts: VegetationOptions): THREE.Group {
     new THREE.MeshToonMaterial({ vertexColors: true, gradientMap, side: THREE.DoubleSide }),
     0.28,
   );
-  const grassCount = Math.floor(70000 * opts.density);
+  const grassCount = Math.floor(70000 * opts.density * (opts.grassBoost ?? 1));
   const grass = new THREE.InstancedMesh(grassClumpGeometry(), grassMat, grassCount);
   grass.receiveShadow = true;
   // Grass stays out of the depth buffer so the ink-line pass doesn't outline every blade.
@@ -178,7 +182,7 @@ export function buildVegetation(opts: VegetationOptions): THREE.Group {
     const x = (rand() - 0.5) * 2 * half;
     const z = (rand() - 0.5) * 2 * half;
     if (!isClear(x, z, opts.keepOut)) continue;
-    const kind = rand();
+    const kind = opts.cacti === false ? 0.7 + rand() * 0.3 : rand();
     let prop: THREE.Object3D;
     let radius: number;
     if (kind < 0.4) {

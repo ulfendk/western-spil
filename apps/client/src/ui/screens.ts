@@ -1,4 +1,4 @@
-import { parseDialogue, randomNickname } from '@western/shared';
+import { parseDialogue, randomNickname, REGIONS, type RegionId } from '@western/shared';
 import titleScript from '../../../../content/story/titel.yaml?raw';
 import { narrator } from '../audio/narrator.js';
 import { updater } from '../pwa/updater.js';
@@ -12,8 +12,12 @@ const title = parseDialogue(titleScript);
 
 export interface ScreenActions {
   play(): void;
-  /** Start chapter 1 over. */
+  /** Start the current chapter over. */
   restartChapter(): void;
+  /** Regions the player can travel to, and where they are now. */
+  regions(): RegionId[];
+  currentRegion(): RegionId;
+  travel(region: RegionId): void;
 }
 
 export class Screens {
@@ -105,6 +109,8 @@ export class Screens {
     updater.setSafe(true);
     const resume = h('button', { class: 'btn btn-big' }, 'Fortsæt');
     resume.onclick = () => onResume();
+    const map = h('button', { class: 'btn' }, '🗺️ Rejsekort');
+    map.onclick = () => this.travelMap(onResume);
     const toTitle = h('button', { class: 'btn' }, 'Til titelskærmen');
     toTitle.onclick = () => this.title();
     this.show(
@@ -112,7 +118,37 @@ export class Screens {
         'div',
         { class: 'panel' },
         h('h2', {}, 'Pause'),
-        h('div', { class: 'menu' }, resume, toTitle),
+        h('div', { class: 'menu' }, resume, map, toTitle),
+      ),
+    );
+  }
+
+  /** The travel map: the journey east to west, with the stops reached so far. */
+  travelMap(onBack: () => void) {
+    updater.setSafe(true);
+    const unlocked = new Set(this.actions.regions());
+    const here = this.actions.currentRegion();
+    const stops = REGIONS.map((r) => {
+      const open = unlocked.has(r.id);
+      const b = h(
+        'button',
+        { class: `map-stop${r.id === here ? ' here' : ''}`, disabled: !open || r.id === here },
+        h('span', { class: 'map-dot' }, r.id === here ? '🐴' : open ? '⭐' : '🔒'),
+        h('span', {}, `Kapitel ${r.chapter}: ${r.name}`),
+      );
+      b.onclick = () => this.actions.travel(r.id);
+      return b;
+    });
+    const back = h('button', { class: 'btn btn-small' }, '← Tilbage');
+    back.onclick = () => this.pause(onBack);
+    this.show(
+      h(
+        'div',
+        { class: 'panel panel-wide' },
+        h('h2', {}, 'Rejsekort'),
+        h('p', {}, 'Fra øst mod vest. Rejs tilbage for at møde venner i de andre byer.'),
+        h('div', { class: 'map-route' }, ...stops),
+        back,
       ),
     );
   }
@@ -228,10 +264,10 @@ export class Screens {
       toast('Grafikken skifter, når spillet genstarter');
       setTimeout(() => window.location.reload(), 1200);
     };
-    const replay = h('button', { class: 'btn btn-small' }, '↺ Spil kapitel 1 igen');
+    const replay = h('button', { class: 'btn btn-small' }, '↺ Spil kapitlet igen');
     replay.onclick = () => {
       this.actions.restartChapter();
-      toast('Kapitel 1 starter forfra næste gang du spiller');
+      toast('Kapitlet starter forfra næste gang du spiller');
     };
     const back = h('button', { class: 'btn btn-small' }, '← Tilbage');
     back.onclick = () => this.title();

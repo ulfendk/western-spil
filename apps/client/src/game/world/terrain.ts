@@ -7,13 +7,53 @@ export const WORLD_HALF = WORLD_SIZE / 2 - 10;
 /** The railway runs north–south (along z), parallel to the trail. */
 export const RAIL_X = 64;
 
-/** The wagon trail winds westward (−z) across the prairie. */
+/** A levelled stretch along the trail (a town), blended smoothly into the land around it. */
+export interface FlatZone {
+  z0: number;
+  z1: number;
+}
+
+/** A shallow river crossing the land roughly east–west. */
+export interface RiverProfile {
+  /** Centre line of the river: z for a given x. */
+  z(x: number): number;
+  halfWidth: number;
+}
+
+/** Shape of one region's land. Only one region is active at a time. */
+export interface TerrainProfile {
+  /** Height of the big rolling hills in metres. */
+  hills: number;
+  /** Noise seed, so every region looks different. */
+  seed: number;
+  /** The wagon trail winds westward (−z): its x for a given z. */
+  trail(z: number): number;
+  flatZones: FlatZone[];
+  river?: RiverProfile;
+}
+
+let active: TerrainProfile = {
+  hills: 26,
+  seed: 7,
+  trail: (z) => Math.sin(z * 0.012) * 30 + Math.sin(z * 0.031) * 8,
+  flatZones: [{ z0: 100, z1: 178 }],
+};
+
+/** Switches the land to another region's shape (call before building that region). */
+export function setTerrain(profile: TerrainProfile) {
+  active = profile;
+}
+
+export function terrainProfile(): TerrainProfile {
+  return active;
+}
+
 export function trailX(z: number): number {
-  return Math.sin(z * 0.012) * 30 + Math.sin(z * 0.031) * 8;
+  return active.trail(z);
 }
 
 function rawHeight(x: number, z: number): number {
-  const hills = (fbm(x * 0.008, z * 0.008, 4, 7) - 0.5) * 26;
+  const hills = (fbm(x * 0.008, z * 0.008, 4, active.seed) - 0.5) * active.hills;
   const bumps = (fbm(x * 0.05, z * 0.05, 2, 3) - 0.5) * 1.6;
   return hills + bumps;
 }
@@ -23,25 +63,44 @@ export function railHeight(z: number): number {
   return (fbm(RAIL_X * 0.008, z * 0.006, 2, 7) - 0.5) * 8 + 0.5;
 }
 
-/** Z range of the town, whose ground is levelled so buildings stand straight. */
-const TOWN_Z = [100, 178] as const;
-
-/** Gentle ground level along the town's main street. */
-function townHeight(z: number): number {
-  const zc = THREE.MathUtils.clamp(z, TOWN_Z[0], TOWN_Z[1]);
+/** Gentle ground level along a flat zone's main street. */
+function zoneHeight(zone: FlatZone, z: number): number {
+  const zc = THREE.MathUtils.clamp(z, zone.z0, zone.z1);
   return rawHeight(trailX(zc), zc) * 0.2;
+}
+
+/** River bed level at a point along the river (the water sits a little above it). */
+export function riverBed(x: number): number {
+  const r = active.river;
+  if (!r) return 0;
+  return rawHeight(x, r.z(x)) * 0.25 - 0.8;
+}
+
+/** Water surface height of the river at x. */
+export function riverWater(x: number): number {
+  return riverBed(x) + 0.55;
 }
 
 export function heightAt(x: number, z: number): number {
   let h = rawHeight(x, z);
   // Flatten the trail so wagons (and kids) can follow it.
   h *= 0.25 + 0.75 * THREE.MathUtils.smoothstep(Math.abs(x - trailX(z)), 4, 18);
-  // Level the town and blend it smoothly into the prairie around it.
-  const inTownZ =
-    THREE.MathUtils.smoothstep(z, TOWN_Z[0] - 18, TOWN_Z[0] - 4) *
-    (1 - THREE.MathUtils.smoothstep(z, TOWN_Z[1] + 4, TOWN_Z[1] + 18));
-  const inTownX = 1 - THREE.MathUtils.smoothstep(Math.abs(x - trailX(z)), 26, 42);
-  h = THREE.MathUtils.lerp(h, townHeight(z), inTownZ * inTownX);
+  // Level towns and blend them smoothly into the land around them.
+  for (const zone of active.flatZones) {
+    const inZ =
+      THREE.MathUtils.smoothstep(z, zone.z0 - 18, zone.z0 - 4) *
+      (1 - THREE.MathUtils.smoothstep(z, zone.z1 + 4, zone.z1 + 18));
+    if (inZ <= 0) continue;
+    const inX = 1 - THREE.MathUtils.smoothstep(Math.abs(x - trailX(z)), 26, 42);
+    h = THREE.MathUtils.lerp(h, zoneHeight(zone, z), inZ * inX);
+  }
+  // Carve a shallow river with gently sloping banks.
+  const r = active.river;
+  if (r) {
+    const d = Math.abs(z - r.z(x));
+    const inRiver = 1 - THREE.MathUtils.smoothstep(d, r.halfWidth - 2, r.halfWidth + 7);
+    if (inRiver > 0) h = THREE.MathUtils.lerp(h, riverBed(x), inRiver);
+  }
   // Blend into the railway embankment.
   const rail = 1 - THREE.MathUtils.smoothstep(Math.abs(x - RAIL_X), 3.5, 16);
   return THREE.MathUtils.lerp(h, railHeight(z), rail);

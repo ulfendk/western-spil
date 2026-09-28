@@ -1,189 +1,56 @@
 import * as THREE from 'three';
-import {
-  buildBisonHerd,
-  buildHorse,
-  buildTumbleweeds,
-  buildVultures,
-  type Animated,
-} from './animals.js';
-import { buildCampfire, buildCampProps, buildFence, buildSign, buildWantedPoster } from './camp.js';
-import { buildPind } from './npc.js';
-import { Colliders, type Circle } from './colliders.js';
-import { buildMesas, buildMountains } from './landscape.js';
-import { buildRailway } from './railway.js';
-import { buildSky, SUN_DIR } from './sky.js';
-import { buildTerrain, buildTrail, heightAt, trailX } from './terrain.js';
-import { buildVegetation, wind } from './vegetation.js';
-import { buildTown, TOWN, type TownSpots } from './town.js';
-import { buildWagon } from './wagon.js';
+import type { RegionId } from '@western/shared';
+import type { Herd, Horse } from './animals.js';
+import type { Circle, Colliders } from './colliders.js';
+import { buildPraerien, PRAERIEN_TERRAIN } from './regions/praerien.js';
+import { buildStLouis, ST_LOUIS_TERRAIN } from './regions/stLouis.js';
+import { setTerrain } from './terrain.js';
+import type { TownSpots } from './town.js';
 
-export { heightAt, trailX, WORLD_HALF } from './terrain.js';
+export { heightAt, trailX, WORLD_HALF, riverWater, terrainProfile } from './terrain.js';
 export { SUN_DIR } from './sky.js';
-export { TOWN, type TownSpots } from './town.js';
+export type { TownSpots, TownConfig } from './town.js';
+export type { Herd, Horse } from './animals.js';
 
-/** Named places the story refers to (ground positions). */
-export interface Spots {
-  pind: THREE.Vector3;
-  kanel: THREE.Vector3;
-  wagon: THREE.Vector3;
-  sign: THREE.Vector3;
-  /** Far along the trail to the west: reaching it ends chapter 1. */
-  trailWest: THREE.Vector3;
+/** The river crossing on the prairie: banks on each side of the trail. */
+export interface RiverCrossing {
+  east: THREE.Vector3;
+  west: THREE.Vector3;
 }
 
 export interface World {
+  region: RegionId;
   colliders: Colliders;
-  spots: Spots;
+  /** Named places the story refers to (ground positions). */
+  spots: Record<string, THREE.Vector3>;
   town: TownSpots;
-  /** Show or hide the Bøvl brothers' wanted poster on the signpost. */
-  setPosterVisible(visible: boolean): void;
-  /** Let NPCs turn towards the player when close. */
-  setPlayerPosition(p: THREE.Vector3): void;
   sun: THREE.DirectionalLight;
-  /** Moving obstacles (the train) as circles, refreshed every frame. */
+  spawn: THREE.Vector3;
+  /** Moving obstacles (the train, bison) as circles, refreshed every frame. */
   dynamicColliders(): readonly Circle[];
   update(dt: number, time: number): void;
-  spawn: THREE.Vector3;
+  /** Let NPCs turn towards the player, and Kanel follow them. */
+  setPlayerPosition(p: THREE.Vector3, heading: number): void;
+  /** Where Kanel is right now (he follows the player on the prairie). */
+  kanelPosition(): THREE.Vector3;
+  // Region-specific extras.
+  setPosterVisible?(visible: boolean): void;
+  setWheelFixed?(fixed: boolean): void;
+  herd?: Herd;
+  kanel?: Horse;
+  river?: RiverCrossing;
 }
 
 export interface WorldOptions {
   vegetationDensity: number;
 }
 
-function place<T extends THREE.Object3D>(obj: T, x: number, z: number, rotY = 0, sink = 0): T {
-  obj.position.set(x, heightAt(x, z) - sink, z);
-  obj.rotation.y = rotY;
-  return obj;
-}
-
-export function buildWorld(scene: THREE.Scene, opts: WorldOptions): World {
-  const colliders = new Colliders();
-  const animated: Animated[] = [];
-
-  scene.add(buildSky());
-  scene.add(buildTerrain());
-  scene.add(buildTrail());
-  scene.add(buildMesas());
-  scene.add(buildMountains());
-
-  // The camp by the trail where the journey begins.
-  const campZ = 18;
-  const camp = new THREE.Vector2(trailX(campZ) + 11, campZ);
-
-  const wagon = place(buildWagon(), camp.x - 1.5, camp.y - 6, 0.15);
-  scene.add(wagon);
-  for (const dz of [-1.6, 0, 1.6])
-    colliders.add(wagon.position.x + Math.sin(0.15) * dz, wagon.position.z + dz, 1.3);
-  colliders.add(wagon.position.x - Math.sin(0.15) * 3.3, wagon.position.z - 3.3, 0.5); // tongue
-
-  const kanel = place(buildHorse(), camp.x - 4.5, camp.y + 2.5, Math.PI / 2 + 0.3);
-  scene.add(kanel);
-  animated.push(kanel);
-  colliders.add(kanel.position.x, kanel.position.z, 1.1);
-
-  const fire = place(buildCampfire(), camp.x + 2, camp.y + 2);
-  scene.add(fire);
-  animated.push(fire);
-  colliders.add(fire.position.x, fire.position.z, 1.0);
-  scene.add(place(buildCampProps(), camp.x + 2, camp.y + 2));
-  // Log seats and bedroll around the fire (offsets match buildCampProps).
-  for (const [dx, dz, r] of [
-    [-0.5, 1.9, 0.4],
-    [0.5, 1.9, 0.4],
-    [-1.8, -0.3, 0.4],
-    [-1.6, 0.7, 0.4],
-    [1.9, -0.9, 0.6],
-  ] as const) {
-    colliders.add(camp.x + 2 + dx, camp.y + 2 + dz, r);
+/** Builds a region into the (empty) scene. The land's shape is switched first. */
+export function buildWorld(scene: THREE.Scene, region: RegionId, opts: WorldOptions): World {
+  if (region === 'praerien') {
+    setTerrain(PRAERIEN_TERRAIN);
+    return buildPraerien(scene, opts);
   }
-
-  const fence = place(buildFence(24), camp.x + 8, camp.y - 12);
-  scene.add(fence);
-  for (let i = 0; i <= 10; i++) colliders.add(fence.position.x, fence.position.z + i * 2.4, 0.6);
-
-  const signZ = 32;
-  const sign = place(buildSign('VESTPÅ'), trailX(signZ) - 4.5, signZ, Math.PI / 2);
-  scene.add(sign);
-  colliders.add(sign.position.x, sign.position.z, 0.35);
-  // The poster hangs on the trail-facing side of the post, below the arrow.
-  const poster = buildWantedPoster();
-  poster.position.set(0, 1.35, 0.13);
-  poster.visible = false;
-  sign.add(poster);
-
-  // Postmester Pind waits by the campfire.
-  const pind = place(buildPind(), camp.x - 0.5, camp.y + 4.2, Math.PI * 0.9);
-  scene.add(pind);
-  animated.push(pind);
-  colliders.add(pind.position.x, pind.position.z, 0.45);
-
-  const town = buildTown(scene, colliders);
-  // Keep cacti and bushes off the main street and the square.
-  const townKeepOut = [];
-  for (let z = TOWN.zStart - 8; z <= TOWN.zEnd + 4; z += 10) {
-    townKeepOut.push({ x: trailX(z), z, r: 21 });
-  }
-
-  scene.add(
-    buildVegetation({
-      density: opts.vegetationDensity,
-      colliders,
-      keepOut: [
-        { x: camp.x, z: camp.y, r: 13 },
-        { x: sign.position.x, z: sign.position.z, r: 2 },
-        ...townKeepOut,
-      ],
-    }),
-  );
-
-  const railway = buildRailway(colliders);
-  scene.add(railway);
-  animated.push(railway);
-
-  const herd = buildBisonHerd(new THREE.Vector2(-95, -70), 11);
-  scene.add(herd);
-  animated.push(herd);
-
-  const vultures = buildVultures(new THREE.Vector3(-40, 45, -130));
-  scene.add(vultures);
-  animated.push(vultures);
-
-  const tumbleweeds = buildTumbleweeds();
-  scene.add(tumbleweeds);
-  animated.push(tumbleweeds);
-
-  // Warm afternoon light: sky/ground hemisphere + a low sun that casts shadows.
-  scene.add(new THREE.HemisphereLight('#fff3d6', '#9c6a44', 1.05));
-  const sun = new THREE.DirectionalLight('#fff0c8', 1.9);
-  sun.position.copy(SUN_DIR).multiplyScalar(100);
-  scene.add(sun, sun.target);
-  scene.fog = new THREE.Fog('#f5d49a', 140, 900);
-
-  const moving: Circle[] = [];
-  const spawnZ = 44;
-  const westZ = -70;
-  return {
-    colliders,
-    spots: {
-      pind: pind.position.clone(),
-      kanel: kanel.position.clone(),
-      wagon: wagon.position.clone(),
-      sign: sign.position.clone(),
-      trailWest: new THREE.Vector3(trailX(westZ), heightAt(trailX(westZ), westZ), westZ),
-    },
-    town,
-    setPosterVisible: (visible) => (poster.visible = visible),
-    setPlayerPosition: (p) => pind.lookAtPlayer(p.distanceTo(pind.position) < 9 ? p : null),
-    sun,
-    dynamicColliders: () => {
-      moving.length = 0;
-      moving.push(...railway.trainCollider, ...herd.colliders);
-      return moving;
-    },
-    spawn: new THREE.Vector3(trailX(spawnZ), heightAt(trailX(spawnZ), spawnZ), spawnZ),
-    update(dt, time) {
-      wind.value = time;
-      for (const a of animated) a.update(dt, time);
-    },
-  };
+  setTerrain(ST_LOUIS_TERRAIN);
+  return buildStLouis(scene, opts);
 }

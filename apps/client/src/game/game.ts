@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import { PHRASES, type Emote } from '@western/shared';
+import { PHRASES, regionInfo, type Emote, type RegionId } from '@western/shared';
 import { TownConnection } from '../net/town.js';
 import { settings } from '../settings.js';
 import { RemoteAvatar } from './avatars.js';
 import { Controls } from './controls.js';
-import { autoQuality, ComicRenderer, qualityProfile } from './render.js';
+import { autoQuality, ComicRenderer, qualityProfile, type QualityProfile } from './render.js';
 import { buildWorld, heightAt, SUN_DIR, WORLD_HALF, type World } from './world/index.js';
 
 const EYE_HEIGHT = 1.7;
@@ -29,7 +29,9 @@ export class Game {
   private camera = new THREE.PerspectiveCamera(70, 1, 0.1, 2500);
   private timer = new THREE.Timer();
   private controls: Controls;
-  readonly world: World;
+  private profile: QualityProfile;
+  world: World;
+  private player: { nickname: string; hat: number } | null = null;
   private inputLocked = false;
   private lookTarget: THREE.Vector3 | null = null;
   private marker: THREE.Sprite;
@@ -43,24 +45,51 @@ export class Game {
   constructor(
     canvas: HTMLCanvasElement,
     private hooks: GameHooks,
+    region: RegionId,
   ) {
-    const profile = qualityProfile(settings.quality === 'auto' ? autoQuality() : settings.quality);
-    this.renderer = new ComicRenderer(canvas, profile);
-    this.world = buildWorld(this.scene, { vegetationDensity: profile.vegetationDensity });
-    this.configureShadows(profile.shadows);
-
-    this.camera.position.copy(this.world.spawn).y += EYE_HEIGHT;
+    this.profile = qualityProfile(settings.quality === 'auto' ? autoQuality() : settings.quality);
+    this.renderer = new ComicRenderer(canvas, this.profile);
     this.camera.rotation.order = 'YXZ';
     this.controls = new Controls(canvas, () => hooks.onPause());
-    // Start by looking along the trail towards the camp and the west.
-    this.controls.yaw = 0.25;
-
     this.marker = buildMarker();
-    this.scene.add(this.marker);
+    this.world = this.buildRegion(region);
 
     window.addEventListener('resize', () => this.resize());
     this.resize();
     this.renderer.renderer.setAnimationLoop(() => this.frame());
+  }
+
+  get region(): RegionId {
+    return this.world.region;
+  }
+
+  private buildRegion(region: RegionId): World {
+    const world = buildWorld(this.scene, region, {
+      vegetationDensity: this.profile.vegetationDensity,
+    });
+    this.world = world;
+    this.configureShadows(this.profile.shadows);
+    this.scene.add(this.marker);
+    this.marker.visible = false;
+    this.camera.position.copy(world.spawn).y += EYE_HEIGHT;
+    // Look west along the trail.
+    this.controls.yaw = region === 'st-louis' ? 0.25 : 0;
+    this.controls.pitch = 0;
+    this.lookTarget = null;
+    return world;
+  }
+
+  /**
+   * Travel to another region: tear down the current scene (freeing GPU memory),
+   * build the new one and move to that region's shared town room.
+   */
+  loadRegion(region: RegionId) {
+    this.leaveTown();
+    const old = this.scene;
+    this.scene = new THREE.Scene();
+    disposeScene(old);
+    this.buildRegion(region);
+    if (this.running) this.joinTown();
   }
 
   /** Where the player stands (ground level). */
@@ -96,7 +125,22 @@ export class Game {
   start(nickname: string, hat: number) {
     this.running = true;
     this.controls.setEnabled(!this.inputLocked);
-    if (!this.town) {
+    this.player = { nickname, hat };
+    if (!this.town) this.joinTown();
+  }
+
+  private leaveTown() {
+    this.town?.leave();
+    this.town = null;
+    for (const avatar of this.remotes.values()) avatar.dispose();
+    this.remotes.clear();
+    this.hooks.onPlayers(0, false);
+  }
+
+  /** Join the shared town room of the current region. */
+  private joinTown() {
+    if (!this.player) return;
+    {
       this.town = new TownConnection({
         onJoin: (id, p) => {
           const avatar = new RemoteAvatar(p.nickname, p.hat);
@@ -123,8 +167,11 @@ export class Game {
           this.hooks.onSaid?.(phrase, avatar.root.position.distanceTo(this.camera.position));
         },
       });
-      // M0: the prairie playground stands in for the St. Louis town hub.
-      void this.town.join('st-louis', nickname, hat);
+      void this.town.join(
+        regionInfo(this.world.region).townId,
+        this.player.nickname,
+        this.player.hat,
+      );
     }
   }
 
@@ -136,6 +183,35 @@ export class Game {
     this.controls.pitch = pitch;
     this.lookTarget = null;
     this.town?.sendMove(x, ground, z, yaw, true);
+  }
+
+  /** Move the player every frame during a scripted sequence (network updates stay throttled). */
+  placePlayer(x: number, z: number, yaw: number, pitch = 0, eyeOffset = 0) {
+    const ground = heightAt(x, z);
+    this.camera.position.set(x, ground + EYE_HEIGHT + eyeOffset, z);
+    this.controls.yaw = yaw;
+    this.controls.pitch = pitch;
+    this.town?.sendMove(x, ground, z, yaw);
+  }
+
+  /** Where a world point appears on screen: x/y in −1…1 (NDC), and whether it's in front. */
+  project(point: THREE.Vector3): { x: number; y: number; inFront: boolean; distance: number } {
+    const v = point.clone().project(this.camera);
+    const toPoint = point.clone().sub(this.camera.position);
+    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
+    return { x: v.x, y: v.y, inFront: toPoint.dot(forward) > 0, distance: toPoint.length() };
+  }
+
+  /** A small JPEG of the current view (for the photo album). */
+  snapshot(width = 320): string {
+    this.camera.rotation.set(this.controls.pitch, this.controls.yaw, 0);
+    this.renderer.render(this.scene, this.camera);
+    const src = this.renderer.renderer.domElement;
+    const c = document.createElement('canvas');
+    c.width = width;
+    c.height = Math.round((width * src.height) / src.width);
+    c.getContext('2d')!.drawImage(src, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', 0.72);
   }
 
   /** Turn the view (e.g. aiming in a minigame) without moving. */
@@ -220,7 +296,7 @@ export class Game {
     if (this.running && !this.inputLocked) this.updatePlayer(dt);
     else if (!this.running) this.controls.yaw += dt * 0.03;
     if (this.lookTarget) this.turnTowards(this.lookTarget, dt);
-    this.world.setPlayerPosition(this.playerPosition);
+    this.world.setPlayerPosition(this.playerPosition, this.controls.yaw);
     if (this.marker.visible) {
       const base = this.marker.userData.base as THREE.Vector3;
       this.marker.position.set(base.x, base.y + Math.abs(Math.sin(time * 3)) * 0.35, base.z);
@@ -296,4 +372,22 @@ function buildMarker(): THREE.Sprite {
   sprite.renderOrder = 10;
   sprite.visible = false;
   return sprite;
+}
+
+/** Frees the GPU resources (geometries, materials, textures) of a scene we're leaving. */
+function disposeScene(scene: THREE.Scene) {
+  const materials = new Set<THREE.Material>();
+  scene.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (mesh.geometry) mesh.geometry.dispose();
+    const m = mesh.material;
+    if (Array.isArray(m)) m.forEach((x) => materials.add(x));
+    else if (m) materials.add(m);
+  });
+  for (const m of materials) {
+    for (const value of Object.values(m)) {
+      if (value instanceof THREE.Texture) value.dispose();
+    }
+    m.dispose();
+  }
 }

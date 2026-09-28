@@ -4,10 +4,49 @@ import { outline, part } from '../toon.js';
 import type { Colliders } from './colliders.js';
 import { heightAt, trailX } from './terrain.js';
 
-/** Where the town's main street starts and ends (along the trail, east of the camp). */
-export const TOWN = { zStart: 100, zEnd: 178, name: 'ST. LOUIS' };
+/** Layout of a frontier town along the trail. */
+export interface TownConfig {
+  name: string;
+  /** Main street runs along the trail from zStart to zEnd. */
+  zStart: number;
+  zEnd: number;
+  /** The welcome arch stands at this end of the street (where travellers arrive). */
+  arch: 'start' | 'end';
+  /** [sign, z, floors] for buildings on the west and east side of the street. */
+  west: [string, number, 1 | 2][];
+  east: [string, number, 1 | 2][];
+  /** z of the open square (west side) with the horseshoe pit. */
+  squareZ: number;
+  church?: number;
+  waterTowerZ: number;
+  seed: number;
+}
+
+export const ST_LOUIS_TOWN: TownConfig = {
+  name: 'ST. LOUIS',
+  zStart: 100,
+  zEnd: 178,
+  arch: 'start',
+  west: [
+    ['SALOON', 110, 2],
+    ['KØBMAND', 123, 1],
+    ['SHERIFF', 160, 1],
+  ],
+  east: [
+    ['HOTEL', 108, 2],
+    ['POSTHUS', 121, 1],
+    ['BANK', 133, 1],
+    ['SMED', 145, 1],
+    ['STALD', 157, 1],
+  ],
+  squareZ: 143,
+  church: 171,
+  waterTowerZ: 140,
+  seed: 2024,
+};
 
 export interface TownSpots {
+  config: TownConfig;
   /** Middle of the main street. */
   center: THREE.Vector3;
   /** Horseshoe pit: throw line, stake and throwing direction (unit vector). */
@@ -196,8 +235,8 @@ function gableRoof(w: number, d: number, h: number, color: string, rise = 1.3): 
 const FACE_EAST = Math.PI / 2;
 const FACE_WEST = -Math.PI / 2;
 
-export function buildTown(scene: THREE.Scene, colliders: Colliders): TownSpots {
-  const rand = mulberry32(2024);
+export function buildTown(scene: THREE.Scene, colliders: Colliders, cfg: TownConfig): TownSpots {
+  const rand = mulberry32(cfg.seed);
   const street = (z: number) => trailX(z);
   /** Front line of the buildings, measured from the middle of the street. */
   const FRONT = 8.5;
@@ -221,19 +260,7 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders): TownSpots {
     ['#b07a42', '#f3e2b3'],
     ['#a15c7a', '#f3e2b3'],
   ];
-  const west: [string, number, 1 | 2][] = [
-    ['SALOON', 110, 2],
-    ['KØBMAND', 123, 1],
-    // 134–152: the square with the horseshoe pit.
-    ['SHERIFF', 160, 1],
-  ];
-  const east: [string, number, 1 | 2][] = [
-    ['HOTEL', 108, 2],
-    ['POSTHUS', 121, 1],
-    ['BANK', 133, 1],
-    ['SMED', 145, 1],
-    ['STALD', 157, 1],
-  ];
+  const { west, east } = cfg;
   let i = 0;
   for (const [side, list] of [
     [-1, west],
@@ -255,21 +282,20 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders): TownSpots {
       place(b, side, z, depth, width);
     }
   }
-  const ch = church();
-  place(ch, -1, 171, 10, 6.4);
+  if (cfg.church !== undefined) place(church(), -1, cfg.church, 10, 6.4);
 
-  // Welcome arch over the street at the edge of town.
-  const archZ = TOWN.zStart - 5;
+  // Welcome arch over the street at the edge of town, facing arriving travellers.
+  const archZ = cfg.arch === 'start' ? cfg.zStart - 5 : cfg.zEnd + 5;
   const arch = new THREE.Group();
   for (const side of [-1, 1])
     arch.add(part(new THREE.BoxGeometry(0.4, 6, 0.4), '#6b4a2e', [side * 5, 3, 0]));
   arch.add(part(new THREE.BoxGeometry(11, 0.3, 0.4), '#6b4a2e', [0, 5.6, 0]));
   const archSign = new THREE.Mesh(
     new THREE.BoxGeometry(6, 1.1, 0.15),
-    new THREE.MeshToonMaterial({ map: signTexture(TOWN.name, '#b07a42', '#2a1a0c') }),
+    new THREE.MeshToonMaterial({ map: signTexture(cfg.name, '#b07a42', '#2a1a0c') }),
   );
   archSign.position.set(0, 4.8, 0);
-  archSign.rotation.y = Math.PI;
+  archSign.rotation.y = cfg.arch === 'start' ? Math.PI : 0;
   arch.add(archSign);
   const ax = street(archZ);
   arch.position.set(ax, heightAt(ax, archZ), archZ);
@@ -278,13 +304,14 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders): TownSpots {
 
   // Water tower behind the east side, props along the boardwalks.
   const wt = waterTower();
-  const wx = street(140) + 24;
-  wt.position.set(wx, heightAt(wx, 140), 140);
+  const wz = cfg.waterTowerZ;
+  const wx = street(wz) + 24;
+  wt.position.set(wx, heightAt(wx, wz), wz);
   scene.add(wt);
-  colliders.add(wx, 140, 2.6);
-  for (let z = TOWN.zStart + 2; z < TOWN.zEnd; z += 6 + rand() * 6) {
+  colliders.add(wx, wz, 2.6);
+  for (let z = cfg.zStart + 2; z < cfg.zEnd; z += 6 + rand() * 6) {
     const side = rand() < 0.5 ? -1 : 1;
-    if (side < 0 && z > 132 && z < 154) continue; // keep the square open
+    if (side < 0 && Math.abs(z - cfg.squareZ) < 11) continue; // keep the square open
     const x = street(z) + side * (FRONT - 1.6);
     const prop = rand() < 0.7 ? barrel() : trough();
     prop.position.set(x, heightAt(x, z), z);
@@ -294,7 +321,7 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders): TownSpots {
   }
 
   // Horseshoe pit on the square, thrown westwards away from the street.
-  const pitZ = 143;
+  const pitZ = cfg.squareZ;
   const startX = street(pitZ) - 6;
   const pitStart = new THREE.Vector3(startX, heightAt(startX, pitZ), pitZ);
   const pitDir = new THREE.Vector3(-1, 0, 0);
@@ -302,8 +329,10 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders): TownSpots {
   pitStake.y = heightAt(pitStake.x, pitStake.z);
   scene.add(buildPit(pitStart, pitStake));
 
+  const cz = (cfg.zStart + cfg.zEnd) / 2;
   return {
-    center: new THREE.Vector3(street(140), heightAt(street(140), 140), 140),
+    config: cfg,
+    center: new THREE.Vector3(street(cz), heightAt(street(cz), cz), cz),
     pitStart,
     pitStake,
     pitDir,

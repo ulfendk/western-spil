@@ -6,6 +6,7 @@ import {
   PROTOCOL_VERSION,
   ROOM_HORSESHOE,
   type ThrowLabel,
+  type TownId,
 } from '@western/shared';
 import type { Game } from '../game/game.js';
 import { heightAt } from '../game/world/index.js';
@@ -94,7 +95,7 @@ export class HorseshoeClient {
   constructor(
     private game: Game,
     private spots: PitSpots,
-    private townId: 'st-louis',
+    private townId: TownId,
   ) {}
 
   /** Joins (or creates) the pit's lobby and resolves when the player leaves. */

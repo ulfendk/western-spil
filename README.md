@@ -31,6 +31,19 @@ npm run lint && npm run typecheck
 
 Run `npm run tts` once to copy the committed narration into the dev client. Add `?debug` to the URL to expose `window.game`, e.g. `game.debugView(x, z, yaw)` or `game.time = 29` (to see the train).
 
+## Regions and chapters
+
+The journey runs east to west. Each region has its own map, chapter and shared town:
+
+| Region    | Chapter                  | Town      | Code                                                  |
+| --------- | ------------------------ | --------- | ----------------------------------------------------- |
+| St. Louis | 1 – Afsked ved St. Louis | St. Louis | `game/world/regions/stLouis.ts`, `story/chapter1.ts`  |
+| Prærien   | 2 – Prærien              | Støvby    | `game/world/regions/praerien.ts`, `story/chapter2.ts` |
+
+- **Regions:** they are listed in `packages/shared/src/regions.ts`. Each region builder sets its own `TerrainProfile` (hills, trail, levelled towns, river) and adds its landmarks, camp and town (`TownConfig`).
+- **Chapters:** each chapter extends `story/chapterBase.ts`. It provides quest steps (saved per chapter in `progress.steps`), the objective line, the "!" marker, the "Tal med…" prompt, voiced conversations and the chapter card.
+- **Travel:** `story/director.ts` swaps region, chapter and town. The player travels onward from a chapter card, or back and forth with the 🗺️ travel map in the pause menu.
+
 ## Multiplayer
 
 - **Town:** St. Louis, east of the starting camp, is a shared town. Everyone online sees each other there.

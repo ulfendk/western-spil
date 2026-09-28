@@ -1,0 +1,9 @@
+# River crossing minigame.
+id: k2-flod
+lines:
+  - id: start
+    speaker: kanel
+    text: Styr uden om træstammerne med pilene. Og hold fødderne tørre. Mest mine.
+  - id: plask
+    speaker: kanel
+    text: Plask! Pas på stammerne.

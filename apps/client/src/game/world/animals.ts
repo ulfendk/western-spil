@@ -12,10 +12,16 @@ export interface Animated {
  * Kanel: a cinnamon-coloured horse with a white blaze and a red saddle blanket.
  * Faces −z. Idles with head nods, ear flicks and tail swishes.
  */
-export function buildHorse(): THREE.Group & Animated {
+export type Horse = THREE.Group &
+  Animated & {
+    /** Walk towards the player and keep them company (null = stand still). */
+    follow(target: THREE.Vector3 | null, heading: number): void;
+  };
+
+export function buildHorse(): Horse {
   const coat = '#b5652b';
   const dark = '#4a2a14';
-  const horse = new THREE.Group() as THREE.Group & Animated;
+  const horse = new THREE.Group() as Horse;
 
   // Barrel body with a deeper chest in front and a rounded rump behind.
   const body = new THREE.Group();
@@ -131,7 +137,54 @@ export function buildHorse(): THREE.Group & Animated {
 
   let nextSwish = 2;
   let swish = 0;
+  let followTarget: THREE.Vector3 | null = null;
+  let followHeading = 0;
+  let gait = 0;
+  let stride = 0;
+  horse.follow = (target, heading) => {
+    followTarget = target;
+    followHeading = heading;
+  };
   horse.update = (dt, time) => {
+    // Following: aim for a spot a little behind and to the left of the player.
+    let speed = 0;
+    if (followTarget) {
+      const back = new THREE.Vector3(
+        Math.sin(followHeading) * 3.5 - Math.cos(followHeading) * 2.5,
+        0,
+        Math.cos(followHeading) * 3.5 + Math.sin(followHeading) * 2.5,
+      );
+      const goal = followTarget.clone().add(back);
+      const dx = goal.x - horse.position.x;
+      const dz = goal.z - horse.position.z;
+      const dist = Math.hypot(dx, dz);
+      if (dist > 25) {
+        // Left far behind (e.g. after a minigame): catch up instantly.
+        horse.position.set(goal.x, heightAt(goal.x, goal.z), goal.z);
+      } else if (dist > 1.2) {
+        speed = Math.min(8, dist * 1.6);
+        horse.position.x += (dx / dist) * speed * dt;
+        horse.position.z += (dz / dist) * speed * dt;
+        const want = Math.atan2(-dx, -dz);
+        horse.rotation.y +=
+          Math.atan2(Math.sin(want - horse.rotation.y), Math.cos(want - horse.rotation.y)) *
+          Math.min(1, dt * 5);
+      }
+      horse.position.y = heightAt(horse.position.x, horse.position.z);
+    }
+    gait += (Math.min(speed / 6, 1) - gait) * Math.min(1, dt * 6);
+    stride += dt * (3 + speed * 1.2);
+    if (gait > 0.02) {
+      // Diagonal pairs swing together, like a trot.
+      const swing = Math.sin(stride) * 0.55 * gait;
+      legs[0]!.rotation.x = swing;
+      legs[3]!.rotation.x = swing;
+      legs[1]!.rotation.x = -swing;
+      legs[2]!.rotation.x = -swing;
+      body.position.y = 1.45 + Math.abs(Math.sin(stride)) * 0.08 * gait;
+      neck.rotation.x = Math.sin(stride * 2) * 0.05;
+      return;
+    }
     // Mostly idle, now and then lowering the head to graze.
     neck.rotation.x = Math.sin(time * 0.6) * 0.04 - Math.max(0, Math.sin(time * 0.23)) * 0.55;
     head.rotation.z = Math.sin(time * 0.9) * 0.05;
@@ -144,6 +197,8 @@ export function buildHorse(): THREE.Group & Animated {
     tail.rotation.y = Math.sin(swish * Math.PI * 4) * 0.5 * swish;
     // Breathing.
     body.scale.set(1 + Math.sin(time * 1.8) * 0.012, 1 + Math.sin(time * 1.8) * 0.015, 1);
+    body.position.y = 1.45;
+    legs[1]!.rotation.x = legs[2]!.rotation.x = legs[3]!.rotation.x = 0;
     legs[0]!.rotation.x = Math.max(0, Math.sin(time * 0.23 + 1)) * 0.2;
   };
   return horse;
@@ -189,11 +244,20 @@ function buildBison(): THREE.Group {
 }
 
 /** A slowly grazing, wandering herd. */
-export function buildBisonHerd(
-  center: THREE.Vector2,
-  count: number,
-): THREE.Group & Animated & { colliders: Circle[] } {
-  const herd = new THREE.Group() as THREE.Group & Animated & { colliders: Circle[] };
+/** A herd the photo minigame can look at and scare. */
+export interface Herd extends THREE.Group, Animated {
+  colliders: Circle[];
+  center: THREE.Vector2;
+  /** Current bison positions (ground level). */
+  positions(): THREE.Vector3[];
+  /** Everyone runs away from `from` for a few seconds, then settles again. */
+  startle(from: THREE.Vector3): void;
+}
+
+/** A slowly grazing, wandering herd. */
+export function buildBisonHerd(center: THREE.Vector2, count: number, spread = 1): Herd {
+  const herd = new THREE.Group() as Herd;
+  herd.center = center;
   // Two circles per bison (shaggy front + rump), refreshed as they wander.
   herd.colliders = [];
   const rand = mulberry32(77);
@@ -204,31 +268,53 @@ export function buildBisonHerd(
     const state = {
       obj: bison,
       scale: s,
-      x: center.x + (rand() - 0.5) * 40,
-      z: center.y + (rand() - 0.5) * 30,
+      x: center.x + (rand() - 0.5) * 40 * spread,
+      z: center.y + (rand() - 0.5) * 30 * spread,
       heading: rand() * Math.PI * 2,
       walk: 0,
       timer: rand() * 5,
+      flee: 0,
     };
     herd.add(bison);
     return state;
   });
-  herd.update = (dt) => {
+  const roam = 30 * spread;
+  herd.positions = () => members.map((m) => m.obj.position.clone());
+  herd.startle = (from) => {
     for (const m of members) {
-      m.timer -= dt;
-      if (m.timer < 0) {
-        // Alternate between grazing and ambling a few metres.
-        m.walk = m.walk > 0 ? 0 : 0.6 + Math.random() * 0.5;
-        m.heading += (Math.random() - 0.5) * 1.6;
-        // Drift back towards the herd centre.
-        const back = Math.atan2(-(center.x - m.x), -(center.y - m.z));
-        if (Math.hypot(center.x - m.x, center.y - m.z) > 30) m.heading = back;
-        m.timer = 3 + Math.random() * 6;
+      m.heading =
+        Math.atan2(-(m.x - from.x), -(m.z - from.z)) + Math.PI + (Math.random() - 0.5) * 0.6;
+      m.walk = 7 + Math.random() * 2;
+      m.flee = 3.5 + Math.random();
+    }
+  };
+  herd.update = (dt, time) => {
+    for (const m of members) {
+      if (m.flee > 0) {
+        // Stampede: run away, then calm down and graze where they stopped.
+        m.flee -= dt;
+        if (m.flee <= 0) {
+          m.walk = 0;
+          m.timer = 2 + Math.random() * 3;
+        }
+      } else {
+        m.timer -= dt;
+        if (m.timer < 0) {
+          // Alternate between grazing and ambling a few metres.
+          m.walk = m.walk > 0 ? 0 : 0.6 + Math.random() * 0.5;
+          m.heading += (Math.random() - 0.5) * 1.6;
+          // Drift back towards the herd centre.
+          const back = Math.atan2(-(center.x - m.x), -(center.y - m.z));
+          if (Math.hypot(center.x - m.x, center.y - m.z) > roam) m.heading = back;
+          m.timer = 3 + Math.random() * 6;
+        }
       }
       m.x -= Math.sin(m.heading) * m.walk * dt;
       m.z -= Math.cos(m.heading) * m.walk * dt;
       m.obj.position.set(m.x, heightAt(m.x, m.z), m.z);
       m.obj.rotation.y = m.heading;
+      // Bob a little when running.
+      if (m.flee > 0) m.obj.position.y += Math.abs(Math.sin(time * 10 + m.x)) * 0.25;
     }
     herd.colliders.length = 0;
     for (const m of members) {
@@ -241,6 +327,85 @@ export function buildBisonHerd(
     }
   };
   return herd;
+}
+
+/** Texas longhorn cow for the cattle pens in Støvby. */
+function buildCow(rand: () => number): THREE.Group {
+  const coat = ['#b5652b', '#8a4b22', '#e9dfc4', '#5b3a22'][Math.floor(rand() * 4)]!;
+  const patch = rand() < 0.5 ? '#f3ecdc' : '#3d2614';
+  const c = new THREE.Group();
+  c.add(part(new THREE.CapsuleGeometry(0.45, 1.1, 6, 12), coat, [0, 1.1, 0], [Math.PI / 2, 0, 0]));
+  c.add(part(new THREE.SphereGeometry(0.3, 10, 8), patch, [0.3, 1.25, 0.3]));
+  const head = part(new THREE.BoxGeometry(0.34, 0.36, 0.55), coat, [0, 1.2, -1.05], [0.3, 0, 0]);
+  c.add(head);
+  c.add(part(new THREE.BoxGeometry(0.3, 0.2, 0.2), '#e0b8a0', [0, 1.02, -1.32]));
+  // The famous long horns.
+  for (const side of [-1, 1]) {
+    c.add(
+      part(
+        new THREE.CylinderGeometry(0.02, 0.05, 0.75, 6),
+        '#efe6cf',
+        [side * 0.42, 1.42, -0.95],
+        [0, 0, side * -1.3],
+      ),
+    );
+  }
+  for (const [x, z] of [
+    [-0.22, -0.5],
+    [0.22, -0.5],
+    [-0.22, 0.55],
+    [0.22, 0.55],
+  ] as const) {
+    c.add(part(new THREE.CapsuleGeometry(0.08, 0.6, 4, 6), coat, [x, 0.4, z]));
+  }
+  return outline(c, 0.025);
+}
+
+/** A few longhorns mooching around inside a pen (radius r). */
+export function buildCattle(
+  center: THREE.Vector2,
+  count: number,
+  r: number,
+): THREE.Group & Animated {
+  const g = new THREE.Group() as THREE.Group & Animated;
+  const rand = mulberry32(55);
+  const cows = Array.from({ length: count }, () => {
+    const cow = buildCow(rand);
+    g.add(cow);
+    return {
+      cow,
+      x: center.x + (rand() - 0.5) * r,
+      z: center.y + (rand() - 0.5) * r,
+      h: rand() * 6,
+      t: rand() * 4,
+    };
+  });
+  g.update = (dt) => {
+    for (const c of cows) {
+      c.t -= dt;
+      if (c.t < 0) {
+        c.h += (Math.random() - 0.5) * 2;
+        c.t = 3 + Math.random() * 5;
+      }
+      const walking = c.t % 4 > 2.5;
+      if (walking) {
+        c.x -= Math.sin(c.h) * 0.5 * dt;
+        c.z -= Math.cos(c.h) * 0.5 * dt;
+      }
+      // Stay in the pen.
+      const dx = c.x - center.x;
+      const dz = c.z - center.y;
+      const d = Math.hypot(dx, dz);
+      if (d > r * 0.8) {
+        c.x = center.x + (dx / d) * r * 0.8;
+        c.z = center.y + (dz / d) * r * 0.8;
+        c.h += Math.PI;
+      }
+      c.cow.position.set(c.x, heightAt(c.x, c.z), c.z);
+      c.cow.rotation.y = c.h;
+    }
+  };
+  return g;
 }
 
 /** Vultures lazily circling high above. */

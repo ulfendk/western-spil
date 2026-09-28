@@ -1,0 +1,8 @@
+# Wheel repair minigame: instructions.
+id: k2-hjul
+lines:
+  - id: start
+    speaker: kanel
+    text: >-
+      Hjulet drejer rundt. Slå pløkken i, når det røde hul er lige under hammeren. Tryk på
+      knappen for at slå.

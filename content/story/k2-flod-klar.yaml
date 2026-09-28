@@ -1,0 +1,11 @@
+# Safely across the river.
+id: k2-flod-klar
+lines:
+  - id: over
+    speaker: kanel
+    text: Vi kom over! Og jeg er kun våd til knæene. Alle fire knæ.
+  - id: stoevby
+    speaker: fortaeller
+    text: >-
+      På den anden side af floden ligger byen Støvby. Her mødes cowboys og kvæg fra hele
+      prærien.

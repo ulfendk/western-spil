@@ -1,0 +1,17 @@
+# Photographing the bison herd.
+id: k2-foto
+lines:
+  - id: start
+    speaker: fortaeller
+    text: >-
+      Sigt med kameraet, og tryk på knappen for at tage et billede. Jo flere bisoner på
+      billedet, jo bedre.
+  - id: taet
+    speaker: kanel
+    text: For tæt på! Nu løber de. Vent lidt, så kommer de tilbage.
+  - id: ingen
+    speaker: kanel
+    text: Der er ingen bisoner på det billede. Kun græs. Meget flot græs.
+  - id: godt
+    speaker: fortaeller
+    text: Et flot billede!

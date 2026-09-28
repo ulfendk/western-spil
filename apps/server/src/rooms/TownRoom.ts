@@ -6,6 +6,7 @@ import {
   TOWN_MAX_PLAYERS,
   isValidNickname,
   isValidPhrase,
+  REGIONS,
   type TownClientMessages,
   type TownSaid,
   type TownJoinOptions,
@@ -61,6 +62,9 @@ export class TownRoom extends Room<{ state: TownState }> {
     }
     if (typeof options.nickname !== 'string' || !isValidNickname(options.nickname)) {
       throw new ServerError(400, 'Ugyldigt kaldenavn');
+    }
+    if (!REGIONS.some((r) => r.townId === options.townId)) {
+      throw new ServerError(400, 'Ukendt by');
     }
     return true;
   }

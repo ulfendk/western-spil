@@ -1,0 +1,15 @@
+# After the wheel is repaired.
+id: k2-hjul-klar
+lines:
+  - id: tak
+    speaker: jensen
+    text: Tusind tak! Nu kan vi køre videre.
+  - id: bisoner
+    speaker: sofie
+    text: Vil du se noget fantastisk? Der går en hel flok bisoner ude på prærien!
+  - id: kamera
+    speaker: sofie
+    text: Du må låne mit kamera. Tag tre gode billeder af bisonerne til mig.
+  - id: tungt
+    speaker: kanel
+    text: Gå ikke for tæt på. En bison vejer lige så meget som en lille vogn.

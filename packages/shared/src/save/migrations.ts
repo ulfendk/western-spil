@@ -1,4 +1,5 @@
 import { RENAMED_ADJECTIVES } from '../nicknames.js';
+import { isRegionId } from '../regions.js';
 import { SAVE_SCHEMA_VERSION, type SaveGame } from './types.js';
 
 type AnySave = Record<string, unknown> & { schemaVersion?: number };
@@ -15,6 +16,15 @@ const MIGRATIONS: Record<number, (save: AnySave) => AnySave> = {
     const [adj, ...rest] = String(save.nickname ?? '').split(' ');
     const renamed = adj && RENAMED_ADJECTIVES[adj];
     return renamed ? { ...save, nickname: [renamed, ...rest].join(' ') } : save;
+  },
+  // v4: progress per chapter (chapter 1's step moves to steps.k1) and the current region.
+  3: (save) => {
+    const old = (save.progress ?? {}) as { step?: string; flags?: string[] };
+    return {
+      ...save,
+      progress: { steps: old.step ? { k1: old.step } : {}, flags: old.flags ?? [] },
+      region: 'st-louis',
+    };
   },
 };
 
@@ -44,7 +54,8 @@ export function validateSave(raw: unknown): SaveGame {
     !int(save.chapter, 99) ||
     !int(save.dollars, 1_000_000) ||
     !int(save.stars, 10_000) ||
-    !validProgress(save.progress)
+    !validProgress(save.progress) ||
+    !isRegionId(save.region)
   ) {
     throw new Error('Ugyldig spilfil');
   }
@@ -55,18 +66,23 @@ export function validateSave(raw: unknown): SaveGame {
     chapter: save.chapter,
     dollars: save.dollars,
     stars: save.stars,
-    progress: { step: save.progress.step, flags: [...new Set(save.progress.flags)] },
+    progress: { steps: { ...save.progress.steps }, flags: [...new Set(save.progress.flags)] },
+    region: save.region,
   };
 }
 
 const TOKEN = /^[a-z0-9-]{1,40}$/;
 
+const CHAPTER_KEY = /^k[0-9]{1,2}$/;
+
 function validProgress(p: unknown): p is SaveGame['progress'] {
   if (typeof p !== 'object' || p === null) return false;
-  const { step, flags } = p as Record<string, unknown>;
+  const { steps, flags } = p as Record<string, unknown>;
+  if (typeof steps !== 'object' || steps === null || Array.isArray(steps)) return false;
+  const entries = Object.entries(steps);
   return (
-    typeof step === 'string' &&
-    TOKEN.test(step) &&
+    entries.length <= 20 &&
+    entries.every(([k, v]) => CHAPTER_KEY.test(k) && typeof v === 'string' && TOKEN.test(v)) &&
     Array.isArray(flags) &&
     flags.length <= 100 &&
     flags.every((f) => typeof f === 'string' && TOKEN.test(f))

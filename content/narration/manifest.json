@@ -14,6 +14,16 @@
     "text": "Pas godt på pengene i byen. Og på mig. Mest på mig.",
     "speaker": "kanel"
   },
+  "by-stoevby.velkommen": {
+    "file": "464dd828f7abc890.mp3",
+    "text": "Velkommen til Støvby! Her er der kvæg, cowboys og en masse støv.",
+    "speaker": "fortaeller"
+  },
+  "by-stoevby.hestesko": {
+    "file": "3197954e8e91d5ff.mp3",
+    "text": "Her er også en hesteskobane. Vis dem, hvad du kan.",
+    "speaker": "kanel"
+  },
   "fraser.hej": {
     "file": "8bd643ab0a2df973.mp3",
     "text": "Hej makker!",
@@ -272,6 +282,171 @@
   "k1-slut.snorker": {
     "file": "343b99d49422eab7.mp3",
     "text": "Næste stop er prærien. Og jeg håber ikke, at du snorker.",
+    "speaker": "kanel"
+  },
+  "k2-flod-klar.over": {
+    "file": "db66fef0abf2adc0.mp3",
+    "text": "Vi kom over! Og jeg er kun våd til knæene. Alle fire knæ.",
+    "speaker": "kanel"
+  },
+  "k2-flod-klar.stoevby": {
+    "file": "a8dabe038d546472.mp3",
+    "text": "På den anden side af floden ligger byen Støvby. Her mødes cowboys og kvæg fra hele prærien.",
+    "speaker": "fortaeller"
+  },
+  "k2-flod.start": {
+    "file": "03b93268966694cd.mp3",
+    "text": "Styr uden om træstammerne med pilene. Og hold fødderne tørre. Mest mine.",
+    "speaker": "kanel"
+  },
+  "k2-flod.plask": {
+    "file": "6f9534d135179a88.mp3",
+    "text": "Plask! Pas på stammerne.",
+    "speaker": "kanel"
+  },
+  "k2-foto-klar.flotte": {
+    "file": "68c94543d7b44e1f.mp3",
+    "text": "Hvor er de flotte! Tusind tak for billederne.",
+    "speaker": "sofie"
+  },
+  "k2-foto-klar.millioner": {
+    "file": "2bee73d0a52e3560.mp3",
+    "text": "Engang levede der millioner af bisoner på prærien. De oprindelige folk levede af bisonen og brugte hver en del af den.",
+    "speaker": "fortaeller"
+  },
+  "k2-foto-klar.floden": {
+    "file": "0a61e34a875fe929.mp3",
+    "text": "Nu kører vi mod floden. Den er svær at komme over med en tung vogn.",
+    "speaker": "jensen"
+  },
+  "k2-foto-klar.tomme": {
+    "file": "3f5fb480c4e2cdca.mp3",
+    "text": "Floden Platte. Man siger, den er en kilometer bred og kun en tomme dyb.",
+    "speaker": "kanel"
+  },
+  "k2-foto.start": {
+    "file": "316b85172df6909e.mp3",
+    "text": "Sigt med kameraet, og tryk på knappen for at tage et billede. Jo flere bisoner på billedet, jo bedre.",
+    "speaker": "fortaeller"
+  },
+  "k2-foto.taet": {
+    "file": "9086495a150180a5.mp3",
+    "text": "For tæt på! Nu løber de. Vent lidt, så kommer de tilbage.",
+    "speaker": "kanel"
+  },
+  "k2-foto.ingen": {
+    "file": "241d3a70463957c6.mp3",
+    "text": "Der er ingen bisoner på det billede. Kun græs. Meget flot græs.",
+    "speaker": "kanel"
+  },
+  "k2-foto.godt": {
+    "file": "c3a2e7095d7e9f45.mp3",
+    "text": "Et flot billede!",
+    "speaker": "fortaeller"
+  },
+  "k2-hjul-klar.tak": {
+    "file": "95c96d13f779d16c.mp3",
+    "text": "Tusind tak! Nu kan vi køre videre.",
+    "speaker": "jensen"
+  },
+  "k2-hjul-klar.bisoner": {
+    "file": "569df28438675fbe.mp3",
+    "text": "Vil du se noget fantastisk? Der går en hel flok bisoner ude på prærien!",
+    "speaker": "sofie"
+  },
+  "k2-hjul-klar.kamera": {
+    "file": "5d91fe095a95603d.mp3",
+    "text": "Du må låne mit kamera. Tag tre gode billeder af bisonerne til mig.",
+    "speaker": "sofie"
+  },
+  "k2-hjul-klar.tungt": {
+    "file": "5f402fef32a29be1.mp3",
+    "text": "Gå ikke for tæt på. En bison vejer lige så meget som en lille vogn.",
+    "speaker": "kanel"
+  },
+  "k2-hjul.start": {
+    "file": "2df0521ceb12fbe1.mp3",
+    "text": "Hjulet drejer rundt. Slå pløkken i, når det røde hul er lige under hammeren. Tryk på knappen for at slå.",
+    "speaker": "kanel"
+  },
+  "k2-intro.praerie": {
+    "file": "660ffa37a45314ed.mp3",
+    "text": "Kanel og du følger sporet ud over den store prærie. Græsset bølger som et hav, og himlen er endnu større.",
+    "speaker": "fortaeller"
+  },
+  "k2-intro.lejr": {
+    "file": "aec3a05ac23e9347.mp3",
+    "text": "Et stykke fremme holder et vogntog. Vognene står i en rundkreds ved sporet.",
+    "speaker": "fortaeller"
+  },
+  "k2-intro.kanel": {
+    "file": "ee40cd73d884bf25.mp3",
+    "text": "Vogne i en rundkreds. Det betyder mad. Eller problemer. Eller begge dele.",
+    "speaker": "kanel"
+  },
+  "k2-jensen.goddag": {
+    "file": "02e6c3445f1f41b6.mp3",
+    "text": "Goddag! Vi er familien Jensen. Vi er rejst hele vejen fra Danmark.",
+    "speaker": "jensen"
+  },
+  "k2-jensen.dannebrog": {
+    "file": "715dfd5c432ea4e9.mp3",
+    "text": "Vi skal til et sted, der hedder Dannebrog. Det ligger her i Nebraska!",
+    "speaker": "sofie"
+  },
+  "k2-jensen.danskere": {
+    "file": "713e2c4f2deb1bdd.mp3",
+    "text": "Mange danskere rejste til Amerika dengang. Nogle af dem grundlagde byen Dannebrog i Nebraska.",
+    "speaker": "fortaeller"
+  },
+  "k2-jensen.hjul": {
+    "file": "e3e751299b4c2437.mp3",
+    "text": "Men nu kan vi ikke komme videre. Et hjul er gået løs på vores vogn. I nat var der nogen ved vognene.",
+    "speaker": "jensen"
+  },
+  "k2-jensen.spor": {
+    "file": "f84676880d7926d4.mp3",
+    "text": "Se her i sandet. Fire par støvlespor. Et lille, et mellemstort, et stort og et kæmpestort. Hvem tror du, det var?",
+    "speaker": "kanel"
+  },
+  "k2-jensen.spor-valg1": {
+    "file": "3ab5827c35368abe.mp3",
+    "text": "Tryk på nummer et hvis du tror det var Bøvl-brødrene.",
+    "speaker": "fortaeller"
+  },
+  "k2-jensen.praecis": {
+    "file": "4e02f2b9c5a3aef5.mp3",
+    "text": "Præcis. De leder efter naglen. Men den har vi godt gemt.",
+    "speaker": "kanel"
+  },
+  "k2-jensen.spor-valg2": {
+    "file": "5a02e4009301f72b.mp3",
+    "text": "Tryk på nummer to hvis du tror det var en bjørn med støvler.",
+    "speaker": "fortaeller"
+  },
+  "k2-jensen.bjoern": {
+    "file": "9f02c1b147a6b036.mp3",
+    "text": "Ha! Bjørne går ikke i støvler. Det var Bøvl-brødrene. De leder efter naglen.",
+    "speaker": "kanel"
+  },
+  "k2-jensen.hjaelp": {
+    "file": "f8cf934c6b6901db.mp3",
+    "text": "Kan du hjælpe os med at slå hjulet på plads igen? Hammeren ligger ved vognen.",
+    "speaker": "jensen"
+  },
+  "k2-slut.farvel": {
+    "file": "4ecf6565c49f179a.mp3",
+    "text": "Farvel! Vi kører nordpå mod Dannebrog. Pas godt på naglen!",
+    "speaker": "sofie"
+  },
+  "k2-slut.stoevsky": {
+    "file": "280aa52547c5dfe9.mp3",
+    "text": "Langt ude på prærien hvirvler en støvsky op. Under den kan man skimte fire hatte. En lille, en mellemstor, en stor og en kæmpestor.",
+    "speaker": "fortaeller"
+  },
+  "k2-slut.hurtig": {
+    "file": "557135c431d98160.mp3",
+    "text": "Bøvl-brødrene. De er stadig efter os. Godt, at jeg er en hurtig hest.",
     "speaker": "kanel"
   },
   "titel.velkommen": {
