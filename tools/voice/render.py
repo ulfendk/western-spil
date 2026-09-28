@@ -60,7 +60,7 @@ def main() -> None:
     lines = []
     for f in sorted((content / "story").glob("*.yaml")):
         doc = yaml.safe_load(f.read_text())
-        for line in doc["lines"]:
+        for line in walk(doc["lines"]):
             text = " ".join(line["text"].split())
             spoken = " ".join(line.get("say", line["text"]).split())
             lines.append((f"{doc['id']}.{line['id']}", line["speaker"], text, spoken))
@@ -90,14 +90,30 @@ def main() -> None:
             model_dir, model = load_model()
         print(f"[voice] {line_id} ({speaker}): {spoken[:60]}…", flush=True)
         render_line(model, model_dir, content, voice, spoken, target, seed=int(key[:8], 16))
+        # Save progress after every line so an interrupted run loses nothing.
+        write_manifest(manifest_path, {**old, **manifest})
 
-    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+    write_manifest(manifest_path, manifest)
     used = {v["file"] for v in manifest.values()}
     for f in out_dir.glob("*.mp3"):
         if f.name not in used:
             f.unlink()
             print(f"[voice] removed stale {f.name}")
     print(f"[voice] manifest: {len(manifest)} lines")
+
+
+def write_manifest(path: Path, manifest: dict) -> None:
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+    tmp.replace(path)
+
+
+def walk(lines):
+    """Yields every line, including those inside answer choices."""
+    for line in lines:
+        yield line
+        for choice in line.get("choices", []):
+            yield from walk(choice.get("lines", []))
 
 
 def load_model():
@@ -116,10 +132,26 @@ def prompt_path(model_dir: Path, content: Path, prompt: str) -> str:
     return str(content / "voices" / prompt)
 
 
+MIN_SENTENCE = 16
+
+
 def split_sentences(text: str) -> list[str]:
-    # Chatterbox degrades on long inputs; render sentence by sentence.
-    parts = re.split(r"(?<=[.!?…])\s+", text)
-    return [p for p in (s.strip() for s in parts) if p]
+    # Chatterbox degrades on long inputs, so render sentence by sentence. Very short
+    # sentences ("Se.") crash its alignment analyser, so they're joined with the next one.
+    parts = [p.strip() for p in re.split(r"(?<=[.!?…])\s+", text) if p.strip()]
+    merged: list[str] = []
+    carry = ""
+    for part in parts:
+        carry = f"{carry} {part}".strip()
+        if len(carry) >= MIN_SENTENCE:
+            merged.append(carry)
+            carry = ""
+    if carry:
+        if merged:
+            merged[-1] = f"{merged[-1]} {carry}"
+        else:
+            merged.append(carry)
+    return merged
 
 
 def render_line(model, model_dir, content, voice, text, target: Path, seed: int) -> None:
@@ -130,14 +162,20 @@ def render_line(model, model_dir, content, voice, text, target: Path, seed: int)
     for i, sentence in enumerate(split_sentences(text)):
         wav = None
         # Retry with a new seed if the take looks truncated or runaway.
-        for attempt in range(3):
+        for attempt in range(4):
             torch.manual_seed(seed + i * 101 + attempt * 7919)
-            wav = model.generate(sentence, language_id="da", audio_prompt_path=prompt, **gen)
+            try:
+                wav = model.generate(sentence, language_id="da", audio_prompt_path=prompt, **gen)
+            except (IndexError, RuntimeError) as err:
+                print(f"[voice]   model error ({err}); retrying", flush=True)
+                continue
             secs = wav.shape[-1] / model.sr
             per_char = secs / max(len(sentence), 1)
             if 0.035 < per_char < 0.14:
                 break
             print(f"[voice]   retry ({secs:.1f}s for {len(sentence)} chars)", flush=True)
+        if wav is None:
+            raise RuntimeError(f"could not render: {sentence}")
         pieces += [wav.cpu(), silence]
     audio = torch.cat(pieces[:-1], dim=-1)
 

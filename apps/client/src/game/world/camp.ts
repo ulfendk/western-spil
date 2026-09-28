@@ -205,3 +205,58 @@ export function buildSign(text: string): THREE.Group {
   sign.add(board);
   return outline(sign, 0.025);
 }
+
+/** Draws the Bøvl brothers' wanted poster (used on the signpost and as a close-up). */
+export function drawWantedPoster(): HTMLCanvasElement {
+  const c = document.createElement('canvas');
+  c.width = 384;
+  c.height = 512;
+  const ctx = c.getContext('2d')!;
+  // Aged paper with a darker edge.
+  const g = ctx.createRadialGradient(192, 256, 80, 192, 256, 330);
+  g.addColorStop(0, '#f4e3b5');
+  g.addColorStop(1, '#c9a86a');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 384, 512);
+  ctx.fillStyle = '#2a1a0c';
+  ctx.textAlign = 'center';
+  ctx.font = '64px Rye, serif';
+  ctx.fillText('EFTERLYST', 192, 78);
+  // Four brothers, shortest to tallest, in a row.
+  const heights = [120, 160, 200, 240];
+  heights.forEach((hgt, i) => {
+    const x = 60 + i * 88;
+    const base = 380;
+    ctx.fillStyle = '#2a1a0c';
+    ctx.fillRect(x - 16, base - hgt + 44, 32, hgt - 70); // body
+    ctx.fillRect(x - 16, base - 26, 12, 26); // legs
+    ctx.fillRect(x + 4, base - 26, 12, 26);
+    ctx.beginPath();
+    ctx.arc(x, base - hgt + 30, 18, 0, Math.PI * 2); // head
+    ctx.fill();
+    ctx.fillRect(x - 28, base - hgt + 10, 56, 6); // hat brim
+    ctx.fillRect(x - 14, base - hgt - 10, 28, 22); // hat crown
+    ctx.fillStyle = '#f4e3b5';
+    ctx.fillRect(x - 12, base - hgt + 26, 24, 6); // bandit mask eyes
+    ctx.fillStyle = '#2a1a0c';
+    ctx.fillRect(x - 6, base - hgt + 27, 4, 4);
+    ctx.fillRect(x + 3, base - hgt + 27, 4, 4);
+  });
+  ctx.font = '40px Rye, serif';
+  ctx.fillText('BØVL-BRØDRENE', 192, 432);
+  ctx.font = '34px Rye, serif';
+  ctx.fillText('500 $ DUSØR', 192, 482);
+  return c;
+}
+
+/** Wanted poster of the Bøvl brothers, meant to be pinned to the signpost. */
+export function buildWantedPoster(): THREE.Mesh {
+  const tex = new THREE.CanvasTexture(drawWantedPoster());
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const poster = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.6, 0.8),
+    new THREE.MeshToonMaterial({ map: tex, side: THREE.DoubleSide }),
+  );
+  poster.castShadow = true;
+  return poster;
+}

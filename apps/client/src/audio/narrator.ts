@@ -17,27 +17,36 @@ class Narrator {
     return this.manifest;
   }
 
-  /** Resolves when the line has finished playing (or immediately if audio is unavailable). */
-  async play(line: DialogueLine): Promise<void> {
+  /**
+   * Resolves when the line has finished playing: true if audio actually played,
+   * false if narration is off or unavailable.
+   */
+  async play(line: DialogueLine): Promise<boolean> {
     this.stop();
-    if (!settings.narration) return;
+    if (!settings.narration) return false;
     const url = await this.urlFor(line);
-    if (!url) return;
+    if (!url) return false;
     try {
       // Fetch as a blob: avoids range requests that don't mix well with service-worker caches.
       const res = await fetch(url);
-      if (!res.ok) return;
+      if (!res.ok) return false;
       const src = URL.createObjectURL(await res.blob());
       const audio = new Audio(src);
       audio.volume = settings.volume;
       this.current = audio;
-      await new Promise<void>((resolve) => {
-        audio.onended = audio.onerror = audio.onpause = () => resolve();
-        audio.play().catch(() => resolve());
+      const played = await new Promise<boolean>((resolve) => {
+        audio.onended = () => resolve(true);
+        audio.onerror = () => resolve(false);
+        // Browsers fire "pause" right before "ended" at the end of the clip, so only a
+        // pause before the end (skip/stop) counts as interrupted.
+        audio.onpause = () => resolve(audio.ended);
+        audio.play().catch(() => resolve(false));
       });
       URL.revokeObjectURL(src);
+      return played;
     } catch {
-      /* narration is best-effort */
+      // Narration is best-effort.
+      return false;
     }
   }
 

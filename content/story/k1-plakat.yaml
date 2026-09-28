@@ -1,0 +1,20 @@
+# The wanted poster of the Bøvl brothers on the signpost.
+id: k1-plakat
+lines:
+  - id: raekke
+    speaker: fortaeller
+    text: >-
+      Plakaten viser fire brødre på række. Den mindste er meget lille, og den største er meget
+      stor.
+  - id: efterlyst
+    speaker: fortaeller
+    text: Der står EFTERLYST. Bøvl-brødrene. Fem hundrede dollars i dusør.
+  - id: ko
+    speaker: kanel
+    text: Bøvl-brødrene. Jeg har mødt dem én gang. De prøvede at stjæle en hest. De tog en ko.
+  - id: husk
+    speaker: kanel
+    text: Den største er den dummeste. Og den mindste er den farligste. Husk det.
+  - id: vest
+    speaker: kanel
+    text: Kom så. Følg sporet mod vest. Vi har en lang vej foran os.

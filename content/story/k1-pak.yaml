@@ -1,0 +1,6 @@
+# Wagon-packing minigame: instructions and result.
+id: k1-pak
+lines:
+  - id: start
+    speaker: kanel
+    text: Træk kasserne op i vognen, så de fylder hele bunden. Tryk på en kasse for at vende den.

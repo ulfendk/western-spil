@@ -1,4 +1,159 @@
 {
+  "k1-intro.aar": {
+    "file": "c1dd4ca75ed3ad7b.mp3",
+    "text": "Året er 1869. Amerika er stort og vildt. Tværs over prærien bygger man en jernbane fra øst til vest.",
+    "speaker": "fortaeller"
+  },
+  "k1-intro.lejr": {
+    "file": "349505253f129daa.mp3",
+    "text": "Uden for byen St. Louis står en lille lejr ved sporet. Her begynder rejsen for en ung grønskolling. Nemlig dig!",
+    "speaker": "fortaeller"
+  },
+  "k1-intro.pind": {
+    "file": "7c7267e12da649d4.mp3",
+    "text": "Postmester Pind venter ved lejrbålet. Han har en vigtig opgave til dig.",
+    "speaker": "fortaeller"
+  },
+  "k1-kanel.hoert": {
+    "file": "7a21bf713b39f1c7.mp3",
+    "text": "Så du er den nye grønskolling. Jeg har hørt om dig. Ikke meget. Men lidt.",
+    "speaker": "kanel"
+  },
+  "k1-kanel.klog": {
+    "file": "2ef554d416b67c4a.mp3",
+    "text": "Jeg er Kanel. Den klogeste hest vest for Mississippi. Og øst for den med.",
+    "speaker": "kanel"
+  },
+  "k1-kanel.vogn": {
+    "file": "7a0fa0729e3120eb.mp3",
+    "text": "Hvis vi skal hele vejen til Promontory, skal vognen pakkes. Det gør en hest ikke. Vi har ingen hænder.",
+    "speaker": "kanel"
+  },
+  "k1-kanel.tungt": {
+    "file": "738579542d6f42e3.mp3",
+    "text": "Gå hen til vognen og pak den. Tungt nederst og let øverst. Det ved selv et æsel.",
+    "speaker": "kanel"
+  },
+  "k1-kanel.lytter": {
+    "file": "077d53d1b429eab2.mp3",
+    "text": "Selvfølgelig kan heste tale. Folk lytter bare aldrig.",
+    "speaker": "kanel"
+  },
+  "k1-kanel.oeje": {
+    "file": "f42ac4b4bd3bb9a6.mp3",
+    "text": "Sådan skal det lyde. Jeg holder øje. Det er det, jeg er bedst til.",
+    "speaker": "kanel"
+  },
+  "k1-pak.start": {
+    "file": "3f68cdf3815c458d.mp3",
+    "text": "Træk kasserne op i vognen, så de fylder hele bunden. Tryk på en kasse for at vende den.",
+    "speaker": "kanel"
+  },
+  "k1-pakket.flot": {
+    "file": "26cbcdd2c0094ca3.mp3",
+    "text": "Ikke dårligt, grønskolling! Der er ikke engang en kasse, der vælter.",
+    "speaker": "kanel"
+  },
+  "k1-pakket.dollars": {
+    "file": "83047a09116c3057.mp3",
+    "text": "Her er ti dollars til rejsen. Brug dem klogt!",
+    "speaker": "pind"
+  },
+  "k1-pakket.plakat": {
+    "file": "428aaf2f0a0a0a2f.mp3",
+    "text": "Og se lige på plakaten ved skiltet, før du kører. Sheriffen hængte den op i morges.",
+    "speaker": "pind"
+  },
+  "k1-pind.hej": {
+    "file": "1c5f8682479fd49e.mp3",
+    "text": "Nå, der er du! Jeg er Postmester Pind. Jeg har bragt breve over prærien i fyrre år.",
+    "speaker": "pind"
+  },
+  "k1-pind.knae": {
+    "file": "4a6047a3d0edee10.mp3",
+    "text": "Men nu er mine knæ for gamle. Og denne opgave er den vigtigste af dem alle.",
+    "speaker": "pind"
+  },
+  "k1-pind.spiger": {
+    "file": "ffbb666f03e4f35f.mp3",
+    "text": "I denne kasse ligger den gyldne spiger. Den skal slås i den allersidste skinne, når jernbanen fra øst møder jernbanen fra vest.",
+    "speaker": "pind"
+  },
+  "k1-pind.promontory": {
+    "file": "91f25c39205180f8.mp3",
+    "text": "Stedet hedder Promontory. Det ligger langt ude i Utah. Den tiende maj skal spigeren være der.",
+    "speaker": "pind"
+  },
+  "k1-pind.kasse": {
+    "file": "e8b8ee9770e0493c.mp3",
+    "text": "Pind rækker dig en lille, tung kasse. Den er fint pakket ind og bundet med snor.",
+    "speaker": "fortaeller"
+  },
+  "k1-pind.rygter": {
+    "file": "ada70568848abddf.mp3",
+    "text": "Pas godt på den. Der går rygter om fire brødre, der gerne vil stjæle den.",
+    "speaker": "pind"
+  },
+  "k1-pind.boevl": {
+    "file": "9a28d941ca5515d3.mp3",
+    "text": "Bøvl-brødrene! De er ikke særlig kloge. Men de giver aldrig op.",
+    "speaker": "pind"
+  },
+  "k1-pind.godt": {
+    "file": "bb9440298f157008.mp3",
+    "text": "Godt svaret! Men vær nu forsigtig alligevel.",
+    "speaker": "pind"
+  },
+  "k1-pind.kanel": {
+    "file": "a911c8bb4250e412.mp3",
+    "text": "Du får min gamle hest med. Han står ved vognen. Han hedder Kanel, og han ved alt om prærien.",
+    "speaker": "pind"
+  },
+  "k1-pind.snak": {
+    "file": "400c49c2f32c4c2e.mp3",
+    "text": "Og så taler han lidt for meget. Men det finder du hurtigt ud af.",
+    "speaker": "pind"
+  },
+  "k1-plakat.raekke": {
+    "file": "1765ab39270b4017.mp3",
+    "text": "Plakaten viser fire brødre på række. Den mindste er meget lille, og den største er meget stor.",
+    "speaker": "fortaeller"
+  },
+  "k1-plakat.efterlyst": {
+    "file": "68dc159fcb246923.mp3",
+    "text": "Der står EFTERLYST. Bøvl-brødrene. Fem hundrede dollars i dusør.",
+    "speaker": "fortaeller"
+  },
+  "k1-plakat.ko": {
+    "file": "3937911e74187da2.mp3",
+    "text": "Bøvl-brødrene. Jeg har mødt dem én gang. De prøvede at stjæle en hest. De tog en ko.",
+    "speaker": "kanel"
+  },
+  "k1-plakat.husk": {
+    "file": "ff1a4c9f5e984428.mp3",
+    "text": "Den største er den dummeste. Og den mindste er den farligste. Husk det.",
+    "speaker": "kanel"
+  },
+  "k1-plakat.vest": {
+    "file": "8beb3e22d2ac3cdb.mp3",
+    "text": "Kom så. Følg sporet mod vest. Vi har en lang vej foran os.",
+    "speaker": "kanel"
+  },
+  "k1-slut.solen": {
+    "file": "3ea1a15812bb7e5c.mp3",
+    "text": "Se. Solen går ned i vest. Det er dér, vi skal hen.",
+    "speaker": "kanel"
+  },
+  "k1-slut.rejsen": {
+    "file": "283fd52f9622d054.mp3",
+    "text": "Og sådan begyndte rejsen mod vest. Med en gylden spiger, en snakkesalig hest og fire brødre i hælene.",
+    "speaker": "fortaeller"
+  },
+  "k1-slut.snorker": {
+    "file": "343b99d49422eab7.mp3",
+    "text": "Næste stop er prærien. Og jeg håber ikke, at du snorker.",
+    "speaker": "kanel"
+  },
   "titel.velkommen": {
     "file": "61a87cd4c855d8b6.mp3",
     "text": "Nå, så du er den nye grønskolling? Jeg hedder Kanel, og jeg er den klogeste hest vest for Mississippi. Sæt dig op i sadlen, makker. Vi skal hele vejen til Stillehavet, og solen venter ikke på nogen!",

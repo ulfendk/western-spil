@@ -11,7 +11,7 @@
 import { access, copyFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseDialogue, SPEAKERS, type NarrationManifest } from '@western/shared';
+import { allLines, parseDialogue, SPEAKERS, type NarrationManifest } from '@western/shared';
 import { audioHash, isPiperAvailable, piperConfigFromEnv, synthesizeMp3 } from './piper.js';
 
 interface PrerenderedEntry {
@@ -37,7 +37,7 @@ const stats = { roest: 0, piper: 0, missing: 0 };
 
 for (const file of (await readdir(contentDir)).filter((f) => f.endsWith('.yaml')).sort()) {
   const script = parseDialogue(await readFile(join(contentDir, file), 'utf8'));
-  for (const line of script.lines) {
+  for (const line of allLines(script)) {
     const pre = prerendered[line.id];
     if (
       pre &&

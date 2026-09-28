@@ -16,6 +16,8 @@ const SHADOW_RANGE = 45;
 export interface GameHooks {
   onPause(): void;
   onPlayers(count: number, online: boolean): void;
+  /** Called every frame while playing (story triggers, interaction prompts). */
+  onFrame?(dt: number): void;
 }
 
 /** The first-person prairie scene (M0 playground) with shared-town presence. */
@@ -25,7 +27,10 @@ export class Game {
   private camera = new THREE.PerspectiveCamera(70, 1, 0.1, 2500);
   private timer = new THREE.Timer();
   private controls: Controls;
-  private world: World;
+  readonly world: World;
+  private inputLocked = false;
+  private lookTarget: THREE.Vector3 | null = null;
+  private marker: THREE.Sprite;
   private remotes = new Map<string, RemoteAvatar>();
   private town: TownConnection | null = null;
   private running = false;
@@ -48,15 +53,47 @@ export class Game {
     // Start by looking along the trail towards the camp and the west.
     this.controls.yaw = 0.25;
 
+    this.marker = buildMarker();
+    this.scene.add(this.marker);
+
     window.addEventListener('resize', () => this.resize());
     this.resize();
     this.renderer.renderer.setAnimationLoop(() => this.frame());
   }
 
+  /** Where the player stands (ground level). */
+  get playerPosition(): THREE.Vector3 {
+    const p = this.camera.position;
+    return new THREE.Vector3(p.x, heightAt(p.x, p.z), p.z);
+  }
+
+  /** Horizontal direction the player is looking in. */
+  get playerForward(): THREE.Vector3 {
+    return new THREE.Vector3(-Math.sin(this.controls.yaw), 0, -Math.cos(this.controls.yaw));
+  }
+
+  /** Freeze movement and look controls (during conversations and minigames). */
+  lockInput(locked: boolean) {
+    this.inputLocked = locked;
+    this.controls.setEnabled(this.running && !locked);
+    if (!locked) this.lookTarget = null;
+  }
+
+  /** Smoothly turn the camera towards a point (e.g. whoever is talking). */
+  faceTowards(point: THREE.Vector3 | null) {
+    this.lookTarget = point?.clone() ?? null;
+  }
+
+  /** Bouncing "!" above the next objective, or hidden with null. */
+  setMarker(position: THREE.Vector3 | null) {
+    this.marker.visible = !!position;
+    if (position) this.marker.userData.base = position.clone();
+  }
+
   /** Enter first-person play and join the shared town. */
   start(nickname: string, hat: number) {
     this.running = true;
-    this.controls.setEnabled(true);
+    this.controls.setEnabled(!this.inputLocked);
     if (!this.town) {
       this.town = new TownConnection({
         onJoin: (id, p) => {
@@ -135,14 +172,33 @@ export class Game {
     const dt = Math.min(this.timer.getDelta(), 0.1);
     this.time += dt;
     const time = this.time;
-    if (this.running) this.updatePlayer(dt);
-    else this.controls.yaw += dt * 0.03;
+    if (this.running && !this.inputLocked) this.updatePlayer(dt);
+    else if (!this.running) this.controls.yaw += dt * 0.03;
+    if (this.lookTarget) this.turnTowards(this.lookTarget, dt);
+    this.world.setPlayerPosition(this.playerPosition);
+    if (this.marker.visible) {
+      const base = this.marker.userData.base as THREE.Vector3;
+      this.marker.position.set(base.x, base.y + Math.abs(Math.sin(time * 3)) * 0.35, base.z);
+    }
+    if (this.running) this.hooks.onFrame?.(dt);
 
     this.world.update(dt, time);
     this.camera.rotation.set(this.controls.pitch, this.controls.yaw, 0);
     for (const avatar of this.remotes.values()) avatar.update(dt);
     this.followSun();
     this.renderer.render(this.scene, this.camera);
+  }
+
+  private turnTowards(target: THREE.Vector3, dt: number) {
+    const p = this.camera.position;
+    const dx = target.x - p.x;
+    const dz = target.z - p.z;
+    const yaw = Math.atan2(-dx, -dz);
+    const pitch = Math.atan2(target.y - p.y, Math.hypot(dx, dz));
+    const k = 1 - Math.exp(-dt * 4);
+    this.controls.yaw +=
+      Math.atan2(Math.sin(yaw - this.controls.yaw), Math.cos(yaw - this.controls.yaw)) * k;
+    this.controls.pitch += (pitch - this.controls.pitch) * k;
   }
 
   private updatePlayer(dt: number) {
@@ -169,4 +225,30 @@ export class Game {
 
     this.town?.sendMove(pos.x, ground, pos.z, yaw);
   }
+}
+
+/** Comic-style "!" sign that bounces above the current objective. */
+function buildMarker(): THREE.Sprite {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = '#f4c95d';
+  ctx.strokeStyle = '#1b1b1b';
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.arc(64, 64, 52, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#1b1b1b';
+  ctx.font = 'bold 84px Rye, serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('!', 64, 70);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false }));
+  sprite.scale.setScalar(0.8);
+  sprite.renderOrder = 10;
+  sprite.visible = false;
+  return sprite;
 }

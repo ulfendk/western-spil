@@ -1,0 +1,29 @@
+# Meeting Kanel, the talking horse.
+id: k1-kanel
+lines:
+  - id: hoert
+    speaker: kanel
+    text: Så du er den nye grønskolling. Jeg har hørt om dig. Ikke meget. Men lidt.
+  - id: klog
+    speaker: kanel
+    text: Jeg er Kanel. Den klogeste hest vest for Mississippi. Og øst for den med.
+  - id: vogn
+    speaker: kanel
+    text: >-
+      Hvis vi skal hele vejen til Promontory, skal vognen pakkes. Det gør en hest ikke. Vi har
+      ingen hænder.
+  - id: tungt
+    speaker: kanel
+    text: Gå hen til vognen og pak den. Tungt nederst og let øverst. Det ved selv et æsel.
+    choices:
+      - text: Kan heste tale?
+        flag: spurgte-kanel-om-tale
+        lines:
+          - id: lytter
+            speaker: kanel
+            text: Selvfølgelig kan heste tale. Folk lytter bare aldrig.
+      - text: Jeg går i gang!
+        lines:
+          - id: oeje
+            speaker: kanel
+            text: Sådan skal det lyde. Jeg holder øje. Det er det, jeg er bedst til.

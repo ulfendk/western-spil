@@ -6,7 +6,10 @@ type AnySave = Record<string, unknown> & { schemaVersion?: number };
  * Forward migrations: MIGRATIONS[n] upgrades a save from version n to n+1.
  * Add an entry here whenever SaveGame changes and bump SAVE_SCHEMA_VERSION.
  */
-const MIGRATIONS: Record<number, (save: AnySave) => AnySave> = {};
+const MIGRATIONS: Record<number, (save: AnySave) => AnySave> = {
+  // v2: story progress within the chapter.
+  1: (save) => ({ ...save, progress: { step: 'intro', flags: [] } }),
+};
 
 export function migrateSave(raw: unknown): SaveGame {
   if (typeof raw !== 'object' || raw === null) throw new Error('Invalid save');
@@ -33,7 +36,8 @@ export function validateSave(raw: unknown): SaveGame {
     !int(save.hat, 255) ||
     !int(save.chapter, 99) ||
     !int(save.dollars, 1_000_000) ||
-    !int(save.stars, 10_000)
+    !int(save.stars, 10_000) ||
+    !validProgress(save.progress)
   ) {
     throw new Error('Ugyldig spilfil');
   }
@@ -44,5 +48,20 @@ export function validateSave(raw: unknown): SaveGame {
     chapter: save.chapter,
     dollars: save.dollars,
     stars: save.stars,
+    progress: { step: save.progress.step, flags: [...new Set(save.progress.flags)] },
   };
+}
+
+const TOKEN = /^[a-z0-9-]{1,40}$/;
+
+function validProgress(p: unknown): p is SaveGame['progress'] {
+  if (typeof p !== 'object' || p === null) return false;
+  const { step, flags } = p as Record<string, unknown>;
+  return (
+    typeof step === 'string' &&
+    TOKEN.test(step) &&
+    Array.isArray(flags) &&
+    flags.length <= 100 &&
+    flags.every((f) => typeof f === 'string' && TOKEN.test(f))
+  );
 }

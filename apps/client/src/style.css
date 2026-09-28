@@ -261,6 +261,7 @@ h3 {
 
 .hud-top {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
@@ -375,4 +376,279 @@ h3 {
   border: 3px solid var(--ink);
   border-radius: 10px;
   background: #fff;
+}
+
+/* Conversations */
+.dialogue {
+  position: fixed;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(760px, calc(100% - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 5;
+}
+
+.dialogue[hidden] {
+  display: none;
+}
+
+.dialogue-bubble {
+  position: relative;
+  background: #fff;
+  border: 4px solid var(--ink);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 12px 20px 10px;
+  font-size: clamp(1.2rem, 2.6vw, 1.5rem);
+  animation: pop 0.2s ease-out;
+  cursor: pointer;
+}
+
+.dialogue-bubble::before {
+  content: '';
+  position: absolute;
+  left: 48px;
+  top: -24px;
+  border: 12px solid transparent;
+  border-bottom: 14px solid var(--ink);
+}
+
+.dialogue-bubble.speaker-fortaeller {
+  background: var(--paper);
+  font-style: italic;
+}
+
+.dialogue-bubble.speaker-fortaeller::before {
+  display: none;
+}
+
+.dialogue-name {
+  font-family: 'Rye', serif;
+  font-size: 1rem;
+  color: var(--red-dark);
+}
+
+.dialogue-text {
+  margin: 4px 0 8px;
+  min-height: 2.8em;
+  line-height: 1.3;
+}
+
+.dialogue-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.dialogue-btn {
+  font: inherit;
+  font-size: 1rem;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  background: var(--sand);
+  padding: 4px 12px;
+  min-height: 40px;
+  cursor: pointer;
+}
+
+.dialogue-btn[hidden] {
+  display: none;
+}
+
+.dialogue-skip {
+  background: var(--paper);
+}
+
+.dialogue-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.dialogue-choice {
+  font-family: 'Patrick Hand', sans-serif;
+  font-size: 1.4rem;
+  animation: pop 0.2s ease-out;
+}
+
+/* Interaction prompt and objective */
+.interact-prompt {
+  position: fixed;
+  left: 50%;
+  bottom: max(90px, calc(env(safe-area-inset-bottom) + 90px));
+  transform: translateX(-50%);
+  font-family: 'Rye', serif;
+  font-size: 1.3rem;
+  padding: 12px 24px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: var(--sand);
+  box-shadow: 3px 3px 0 var(--ink);
+  cursor: pointer;
+  z-index: 4;
+  animation: pop 0.2s ease-out;
+}
+
+.interact-prompt[hidden] {
+  display: none;
+}
+
+.hud-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.hud-objective {
+  background: rgba(255, 244, 214, 0.92);
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  padding: 4px 12px;
+  font-size: 1.15rem;
+  max-width: min(420px, 60vw);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.hud-objective[hidden],
+.hud-actions[hidden],
+.hud-hint[hidden] {
+  display: none;
+}
+
+/* Wagon-packing minigame */
+.pack {
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Top-aligned so the wagon never moves when the tray below changes size. */
+  justify-content: flex-start;
+  gap: 10px;
+  padding: max(16px, env(safe-area-inset-top)) 16px 150px;
+  overflow-y: auto;
+  background: rgba(60, 30, 10, 0.55);
+  touch-action: none;
+}
+
+.pack h2 {
+  color: var(--paper);
+  text-shadow: 2px 2px 0 var(--ink);
+  margin: 0;
+}
+
+.pack-help,
+.pack-status {
+  margin: 0;
+  color: var(--paper);
+  font-size: 1.2rem;
+  text-align: center;
+  text-shadow: 1px 1px 0 var(--ink);
+}
+
+.pack-board {
+  position: relative;
+  flex: none;
+  border: 6px solid #5e3a1a;
+  border-radius: 8px;
+  background-color: #b07a42;
+  background-image:
+    linear-gradient(rgba(60, 30, 10, 0.35) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(60, 30, 10, 0.35) 2px, transparent 2px);
+  box-shadow: var(--shadow);
+  box-sizing: content-box;
+}
+
+.pack-tray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 760px;
+  min-height: 80px;
+}
+
+.pack-piece {
+  position: relative;
+  flex: none;
+  cursor: grab;
+  touch-action: none;
+  z-index: 1;
+}
+
+.pack-piece.placed {
+  position: absolute;
+}
+
+.pack-piece.lifted {
+  opacity: 0.3;
+}
+
+.pack-piece.dragging {
+  z-index: 20;
+  cursor: grabbing;
+  filter: drop-shadow(4px 6px 0 rgba(0, 0, 0, 0.35));
+}
+
+.pack-cell {
+  position: absolute;
+  box-sizing: border-box;
+  border: 3px solid var(--ink);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+}
+
+.pack.done .pack-board {
+  animation: pop 0.4s ease-out;
+}
+
+/* Chapter complete */
+.chapter-card {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(60, 20, 0, 0.45);
+}
+
+.chapter-kicker {
+  font-family: 'Rye', serif;
+  color: var(--red-dark);
+  margin: 0;
+}
+
+.chapter-stats {
+  font-size: 2rem;
+  margin: 0.2em 0;
+}
+
+.poster-closeup {
+  position: fixed;
+  left: 50%;
+  top: max(70px, env(safe-area-inset-top));
+  transform: translateX(-50%) rotate(-2deg);
+  z-index: 4;
+  animation: pop 0.25s ease-out;
+  pointer-events: none;
+}
+
+.poster-closeup canvas {
+  display: block;
+  height: min(46vh, 380px);
+  width: auto;
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow);
 }

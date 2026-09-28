@@ -12,6 +12,8 @@ const title = parseDialogue(titleScript);
 
 export interface ScreenActions {
   play(): void;
+  /** Start chapter 1 over. */
+  restartChapter(): void;
 }
 
 export class Screens {
@@ -226,6 +228,11 @@ export class Screens {
       toast('Grafikken skifter, når spillet genstarter');
       setTimeout(() => window.location.reload(), 1200);
     };
+    const replay = h('button', { class: 'btn btn-small' }, '↺ Spil kapitel 1 igen');
+    replay.onclick = () => {
+      this.actions.restartChapter();
+      toast('Kapitel 1 starter forfra næste gang du spiller');
+    };
     const back = h('button', { class: 'btn btn-small' }, '← Tilbage');
     back.onclick = () => this.title();
     this.show(
@@ -233,6 +240,7 @@ export class Screens {
         'div',
         { class: 'panel' },
         h('h2', {}, 'Indstillinger'),
+        replay,
         h('label', { class: 'setting' }, 'Grafik ', quality),
         h('label', { class: 'setting' }, narration, ' Læs teksten højt'),
         h('label', { class: 'setting' }, 'Lydstyrke ', volume),

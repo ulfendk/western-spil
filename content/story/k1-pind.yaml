@@ -1,0 +1,45 @@
+# Talking to Postmester Pind: the mission and the golden spike.
+id: k1-pind
+lines:
+  - id: hej
+    speaker: pind
+    text: Nå, der er du! Jeg er Postmester Pind. Jeg har bragt breve over prærien i fyrre år.
+  - id: knae
+    speaker: pind
+    text: Men nu er mine knæ for gamle. Og denne opgave er den vigtigste af dem alle.
+  - id: spiger
+    speaker: pind
+    text: >-
+      I denne kasse ligger den gyldne spiger. Den skal slås i den allersidste skinne, når
+      jernbanen fra øst møder jernbanen fra vest.
+  - id: promontory
+    speaker: pind
+    text: Stedet hedder Promontory. Det ligger langt ude i Utah. Den tiende maj skal spigeren være der.
+  - id: kasse
+    speaker: fortaeller
+    text: Pind rækker dig en lille, tung kasse. Den er fint pakket ind og bundet med snor.
+    say: Pind rækker dig en lille tung kasse. Den er fint pakket ind og bundet med snor.
+  - id: rygter
+    speaker: pind
+    text: Pas godt på den. Der går rygter om fire brødre, der gerne vil stjæle den.
+    choices:
+      - text: Hvem er de?
+        flag: spurgte-om-broedrene
+        lines:
+          - id: boevl
+            speaker: pind
+            text: Bøvl-brødrene! De er ikke særlig kloge. Men de giver aldrig op.
+      - text: Jeg passer på den!
+        flag: lovede-at-passe-paa
+        lines:
+          - id: godt
+            speaker: pind
+            text: Godt svaret! Men vær nu forsigtig alligevel.
+  - id: kanel
+    speaker: pind
+    text: >-
+      Du får min gamle hest med. Han står ved vognen. Han hedder Kanel, og han ved alt om
+      prærien.
+  - id: snak
+    speaker: pind
+    text: Og så taler han lidt for meget. Men det finder du hurtigt ud af.

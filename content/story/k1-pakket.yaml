@@ -1,0 +1,13 @@
+# After the wagon is packed.
+id: k1-pakket
+lines:
+  - id: flot
+    speaker: kanel
+    text: Ikke dårligt, grønskolling! Der er ikke engang en kasse, der vælter.
+    say: Ikke dårligt grønskolling! Der er ikke engang en kasse der vælter.
+  - id: dollars
+    speaker: pind
+    text: Her er ti dollars til rejsen. Brug dem klogt!
+  - id: plakat
+    speaker: pind
+    text: Og se lige på plakaten ved skiltet, før du kører. Sheriffen hængte den op i morges.

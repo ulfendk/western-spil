@@ -1,0 +1,15 @@
+# End of chapter 1, when the player follows the trail west.
+id: k1-slut
+lines:
+  - id: solen
+    speaker: kanel
+    text: Se. Solen går ned i vest. Det er dér, vi skal hen.
+    say: Se. Solen går ned i vest. Det er dér vi skal hen.
+  - id: rejsen
+    speaker: fortaeller
+    text: >-
+      Og sådan begyndte rejsen mod vest. Med en gylden spiger, en snakkesalig hest og fire
+      brødre i hælene.
+  - id: snorker
+    speaker: kanel
+    text: Næste stop er prærien. Og jeg håber ikke, at du snorker.

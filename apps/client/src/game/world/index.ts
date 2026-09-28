@@ -6,7 +6,8 @@ import {
   buildVultures,
   type Animated,
 } from './animals.js';
-import { buildCampfire, buildCampProps, buildFence, buildSign } from './camp.js';
+import { buildCampfire, buildCampProps, buildFence, buildSign, buildWantedPoster } from './camp.js';
+import { buildPind } from './npc.js';
 import { Colliders, type Circle } from './colliders.js';
 import { buildMesas, buildMountains } from './landscape.js';
 import { buildRailway } from './railway.js';
@@ -18,8 +19,23 @@ import { buildWagon } from './wagon.js';
 export { heightAt, trailX, WORLD_HALF } from './terrain.js';
 export { SUN_DIR } from './sky.js';
 
+/** Named places the story refers to (ground positions). */
+export interface Spots {
+  pind: THREE.Vector3;
+  kanel: THREE.Vector3;
+  wagon: THREE.Vector3;
+  sign: THREE.Vector3;
+  /** Far along the trail to the west: reaching it ends chapter 1. */
+  trailWest: THREE.Vector3;
+}
+
 export interface World {
   colliders: Colliders;
+  spots: Spots;
+  /** Show or hide the Bøvl brothers' wanted poster on the signpost. */
+  setPosterVisible(visible: boolean): void;
+  /** Let NPCs turn towards the player when close. */
+  setPlayerPosition(p: THREE.Vector3): void;
   sun: THREE.DirectionalLight;
   /** Moving obstacles (the train) as circles, refreshed every frame. */
   dynamicColliders(): readonly Circle[];
@@ -86,6 +102,17 @@ export function buildWorld(scene: THREE.Scene, opts: WorldOptions): World {
   const sign = place(buildSign('VESTPÅ'), trailX(signZ) - 4.5, signZ, Math.PI / 2);
   scene.add(sign);
   colliders.add(sign.position.x, sign.position.z, 0.35);
+  // The poster hangs on the trail-facing side of the post, below the arrow.
+  const poster = buildWantedPoster();
+  poster.position.set(0, 1.35, 0.13);
+  poster.visible = false;
+  sign.add(poster);
+
+  // Postmester Pind waits by the campfire.
+  const pind = place(buildPind(), camp.x - 0.5, camp.y + 4.2, Math.PI * 0.9);
+  scene.add(pind);
+  animated.push(pind);
+  colliders.add(pind.position.x, pind.position.z, 0.45);
 
   scene.add(
     buildVegetation({
@@ -123,8 +150,18 @@ export function buildWorld(scene: THREE.Scene, opts: WorldOptions): World {
 
   const moving: Circle[] = [];
   const spawnZ = 44;
+  const westZ = -70;
   return {
     colliders,
+    spots: {
+      pind: pind.position.clone(),
+      kanel: kanel.position.clone(),
+      wagon: wagon.position.clone(),
+      sign: sign.position.clone(),
+      trailWest: new THREE.Vector3(trailX(westZ), heightAt(trailX(westZ), westZ), westZ),
+    },
+    setPosterVisible: (visible) => (poster.visible = visible),
+    setPlayerPosition: (p) => pind.lookAtPlayer(p.distanceTo(pind.position) < 9 ? p : null),
     sun,
     dynamicColliders: () => {
       moving.length = 0;

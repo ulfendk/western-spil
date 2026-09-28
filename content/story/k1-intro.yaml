@@ -1,0 +1,16 @@
+# Kapitel 1 – Afsked ved St. Louis. Plays automatically the first time the game starts.
+id: k1-intro
+lines:
+  - id: aar
+    speaker: fortaeller
+    text: >-
+      Året er 1869. Amerika er stort og vildt. Tværs over prærien bygger man en jernbane
+      fra øst til vest.
+  - id: lejr
+    speaker: fortaeller
+    text: >-
+      Uden for byen St. Louis står en lille lejr ved sporet. Her begynder rejsen for en ung
+      grønskolling. Nemlig dig!
+  - id: pind
+    speaker: fortaeller
+    text: Postmester Pind venter ved lejrbålet. Han har en vigtig opgave til dig.
