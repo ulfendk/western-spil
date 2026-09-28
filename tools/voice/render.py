@@ -1,0 +1,159 @@
+"""
+Renders dialogue (content/story/*.yaml) to Danish narration with Røst-v3
+(CoRal project's Danish fine-tune of Chatterbox) and writes
+content/narration/<hash>.mp3 + manifest.json. Output is committed, so the game
+image never needs PyTorch. Lines whose text changed are re-rendered; unchanged
+lines are skipped. Voices per speaker live in content/voices.yaml.
+
+    npm run voice                       # render new/changed lines
+    npm run voice -- --only titel.      # only some lines
+    npm run voice -- --force --only kapitel1.  # re-roll takes
+"""
+import argparse
+import hashlib
+import json
+import os
+import re
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+import torch
+import torchaudio as ta
+import yaml
+from huggingface_hub import snapshot_download
+
+MODEL_ID = "CoRal-project/roest-v3-chatterbox-500m"
+MODEL_FILES = [
+    "ve.pt",
+    "s3gen.pt",
+    "t3_mtl23ls_v2.safetensors",
+    "grapheme_mtl_merged_expanded_v1.json",
+    "mtl_tokenizer.json",
+    "tokenizer.json",
+    "Cangjie5_TC.json",
+    "conds.pt",
+    "audio_samples/00_*",
+]
+BUILTIN_PROMPTS = {
+    "mic": "audio_samples/00_mic_00_t0.8_p0.95_e0.5_c0.5_m0.05_r2.0.wav",
+    "nic": "audio_samples/00_nic_00_t0.8_p0.95_e0.5_c0.5_m0.05_r2.0.wav",
+}
+GEN_KEYS = ("exaggeration", "cfg_weight", "temperature", "top_p", "min_p", "repetition_penalty")
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--content", default="/content", type=Path)
+    ap.add_argument("--only", default="", help="only render line ids starting with this")
+    ap.add_argument("--force", action="store_true", help="re-render even if unchanged")
+    args = ap.parse_args()
+
+    content: Path = args.content
+    voices = yaml.safe_load((content / "voices.yaml").read_text())
+    out_dir = content / "narration"
+    out_dir.mkdir(exist_ok=True)
+    manifest_path = out_dir / "manifest.json"
+    old = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
+
+    lines = []
+    for f in sorted((content / "story").glob("*.yaml")):
+        doc = yaml.safe_load(f.read_text())
+        for line in doc["lines"]:
+            lines.append((f"{doc['id']}.{line['id']}", line["speaker"], " ".join(line["text"].split())))
+
+    model = None
+    model_dir = None
+    manifest = {}
+    for line_id, speaker, text in lines:
+        voice = voices["speakers"][speaker]
+        key = hashlib.sha1(
+            json.dumps({"engine": voices["engine"], "voice": voice, "text": text}, sort_keys=True).encode()
+        ).hexdigest()[:16]
+        name = f"{key}.mp3"
+        manifest[line_id] = {"file": name, "text": text, "speaker": speaker}
+        target = out_dir / name
+        wanted = line_id.startswith(args.only)
+        if target.exists() and not (args.force and wanted):
+            continue
+        if not wanted:
+            # Keep the previous rendering for lines outside --only, if any.
+            if line_id in old and (out_dir / old[line_id]["file"]).exists():
+                manifest[line_id] = old[line_id]
+            else:
+                del manifest[line_id]
+            continue
+        if model is None:
+            model_dir, model = load_model()
+        print(f"[voice] {line_id} ({speaker}): {text[:60]}…", flush=True)
+        render_line(model, model_dir, content, voice, text, target, seed=int(key[:8], 16))
+
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+    used = {v["file"] for v in manifest.values()}
+    for f in out_dir.glob("*.mp3"):
+        if f.name not in used:
+            f.unlink()
+            print(f"[voice] removed stale {f.name}")
+    print(f"[voice] manifest: {len(manifest)} lines")
+
+
+def load_model():
+    from chatterbox.mtl_tts import ChatterboxMultilingualTTS
+
+    torch.set_num_threads(os.cpu_count() or 4)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"[voice] loading {MODEL_ID} on {device}", flush=True)
+    model_dir = Path(snapshot_download(MODEL_ID, allow_patterns=MODEL_FILES))
+    return model_dir, ChatterboxMultilingualTTS.from_local(model_dir, device=device)
+
+
+def prompt_path(model_dir: Path, content: Path, prompt: str) -> str:
+    if prompt.startswith("builtin:"):
+        return str(model_dir / BUILTIN_PROMPTS[prompt.split(":", 1)[1]])
+    return str(content / "voices" / prompt)
+
+
+def split_sentences(text: str) -> list[str]:
+    # Chatterbox degrades on long inputs; render sentence by sentence.
+    parts = re.split(r"(?<=[.!?…])\s+", text)
+    return [p for p in (s.strip() for s in parts) if p]
+
+
+def render_line(model, model_dir, content, voice, text, target: Path, seed: int) -> None:
+    gen = {k: voice[k] for k in GEN_KEYS if k in voice}
+    prompt = prompt_path(model_dir, content, voice["prompt"])
+    pieces = []
+    silence = torch.zeros(1, int(model.sr * 0.28))
+    for i, sentence in enumerate(split_sentences(text)):
+        wav = None
+        # Retry with a new seed if the take looks truncated or runaway.
+        for attempt in range(3):
+            torch.manual_seed(seed + i * 101 + attempt * 7919)
+            wav = model.generate(sentence, language_id="da", audio_prompt_path=prompt, **gen)
+            secs = wav.shape[-1] / model.sr
+            per_char = secs / max(len(sentence), 1)
+            if 0.035 < per_char < 0.14:
+                break
+            print(f"[voice]   retry ({secs:.1f}s for {len(sentence)} chars)", flush=True)
+        pieces += [wav.cpu(), silence]
+    audio = torch.cat(pieces[:-1], dim=-1)
+
+    with tempfile.TemporaryDirectory() as tmp:
+        wav_path = Path(tmp) / "line.wav"
+        ta.save(str(wav_path), audio, model.sr)
+        filters = []
+        pitch = float(voice.get("pitch", 0))
+        tempo = float(voice.get("tempo", 1))
+        if pitch or tempo != 1:
+            filters.append(f"rubberband=pitch={2 ** (pitch / 12):.4f}:tempo={tempo:.3f}")
+        filters.append("loudnorm=I=-16:TP=-1.5:LRA=11")
+        subprocess.run(
+            ["ffmpeg", "-loglevel", "error", "-y", "-i", str(wav_path), "-af", ",".join(filters),
+             "-ar", "44100", "-ac", "1", "-codec:a", "libmp3lame", "-q:a", "4", str(target)],
+            check=True,
+        )
+
+
+if __name__ == "__main__":
+    sys.exit(main())

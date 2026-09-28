@@ -1,0 +1,31 @@
+# Voices for the offline narration renderer (tools/voice, Røst-v3).
+# prompt: "builtin:mic" / "builtin:nic" (CoRal-TTS speakers shipped with the model),
+#         or a file in content/voices/ — a clean 10–20 s WAV of a speaker who has
+#         consented to having their voice cloned.
+# pitch: semitones (post-processing), tempo: speed factor.
+# Changing anything here re-renders that speaker's lines.
+engine: roest-v3
+speakers:
+  fortaeller:
+    prompt: builtin:nic
+    exaggeration: 0.5
+    cfg_weight: 0.5
+    temperature: 0.7
+  kanel:
+    prompt: builtin:mic
+    exaggeration: 0.75
+    cfg_weight: 0.35
+    temperature: 0.75
+  pind:
+    prompt: builtin:mic
+    exaggeration: 0.4
+    cfg_weight: 0.5
+    temperature: 0.65
+    pitch: -2.5
+    tempo: 0.92
+  spiller:
+    prompt: builtin:nic
+    exaggeration: 0.6
+    cfg_weight: 0.5
+    temperature: 0.7
+    pitch: 2

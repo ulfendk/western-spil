@@ -41,7 +41,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* "safe" keeps the top reachable (scrollable) when the menu is taller than the screen. */
+  justify-content: safe center;
   gap: 16px;
   padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
   background: radial-gradient(ellipse at center, transparent 30%, rgba(60, 20, 0, 0.35));
@@ -365,4 +366,13 @@ h3 {
 
 .toast.out {
   opacity: 0;
+}
+
+.select {
+  font: inherit;
+  font-size: 1.1rem;
+  padding: 6px 10px;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  background: #fff;
 }

@@ -1,11 +1,14 @@
+export type QualitySetting = 'auto' | 'low' | 'medium' | 'high';
+
 export interface Settings {
+  quality: QualitySetting;
   narration: boolean;
   volume: number;
   lookSensitivity: number;
 }
 
 const KEY = 'kanel.settings';
-const DEFAULTS: Settings = { narration: true, volume: 0.9, lookSensitivity: 1 };
+const DEFAULTS: Settings = { quality: 'auto', narration: true, volume: 0.9, lookSensitivity: 1 };
 
 function load(): Settings {
   try {

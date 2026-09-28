@@ -93,7 +93,11 @@ export class Controls {
 
   private onPointerDown(e: PointerEvent) {
     if (!this.enabled || e.pointerType === 'mouse') return;
-    this.canvas.setPointerCapture(e.pointerId);
+    try {
+      this.canvas.setPointerCapture(e.pointerId);
+    } catch {
+      // Not capturable (e.g. synthetic events); tracking still works without it.
+    }
     if (e.clientX < window.innerWidth / 2 && this.joystickId === null) {
       this.joystickId = e.pointerId;
       this.joystickOrigin.set(e.clientX, e.clientY);

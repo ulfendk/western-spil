@@ -17,7 +17,8 @@
     "format": "prettier --write .",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "vitest run",
-    "tts": "npm run render -w @western/tts"
+    "tts": "npm run render -w @western/tts",
+    "voice": "sh tools/voice/render.sh"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

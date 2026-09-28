@@ -18,6 +18,9 @@ const game = new Game(canvas, {
   onPlayers: (count, online) => hud.setPlayers(count, online),
 });
 
+// ?debug exposes the game for automated screenshots and poking around in devtools.
+if (new URLSearchParams(location.search).has('debug')) Object.assign(window, { game });
+
 const screens = new Screens(ui, { play: () => play() });
 const hud = new Hud(
   () => pause(),

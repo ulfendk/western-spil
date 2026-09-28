@@ -211,6 +211,21 @@ export class Screens {
       settings.lookSensitivity = Number(look.value);
       saveSettings();
     };
+    const quality = h('select', { class: 'select' });
+    for (const [value, label] of [
+      ['auto', 'Automatisk'],
+      ['high', 'Høj'],
+      ['medium', 'Mellem'],
+      ['low', 'Lav (hurtigst)'],
+    ] as const) {
+      quality.append(h('option', { value, selected: settings.quality === value }, label));
+    }
+    quality.onchange = () => {
+      settings.quality = quality.value as typeof settings.quality;
+      saveSettings();
+      toast('Grafikken skifter, når spillet genstarter');
+      setTimeout(() => window.location.reload(), 1200);
+    };
     const back = h('button', { class: 'btn btn-small' }, '← Tilbage');
     back.onclick = () => this.title();
     this.show(
@@ -218,6 +233,7 @@ export class Screens {
         'div',
         { class: 'panel' },
         h('h2', {}, 'Indstillinger'),
+        h('label', { class: 'setting' }, 'Grafik ', quality),
         h('label', { class: 'setting' }, narration, ' Læs teksten højt'),
         h('label', { class: 'setting' }, 'Lydstyrke ', volume),
         h('label', { class: 'setting' }, 'Kigge-følsomhed ', look),
