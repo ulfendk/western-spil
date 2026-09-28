@@ -50,7 +50,8 @@ export class TownLife {
     const inTown = this.game.world.town.contains(p);
     const flag = `set-${regionInfo(this.game.region).townId}`;
     if (inTown && !store.save.progress.flags.includes(flag)) void this.welcome(flag);
-    const nearPit = p.distanceTo(this.game.world.town.pitStart) < 3.5;
+    const town = this.game.world.town;
+    const nearPit = town.hasPit !== false && p.distanceTo(town.pitStart) < 3.5;
     if (nearPit === this.prompt.hidden) {
       const touch = matchMedia('(pointer: coarse)').matches;
       this.prompt.textContent = `🐴 Spil hestesko${touch ? '' : '  [E]'}`;

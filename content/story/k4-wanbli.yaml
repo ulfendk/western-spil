@@ -1,0 +1,12 @@
+# Wanbli finds the player in the storm.
+id: k4-wanbli
+lines:
+  - id: hej
+    speaker: wanbli
+    text: Hallo! Er I faret vild? Kom med mig. Vores lejr ligger lige her ved floden.
+  - id: navn
+    speaker: wanbli
+    text: Jeg hedder Wanbli. Det betyder ørn på mit folks sprog. Vi er lakota.
+  - id: tak
+    speaker: kanel
+    text: Tusind tak. Min grønskolling her er dygtig, men ikke til uvejr.

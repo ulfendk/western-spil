@@ -1,0 +1,14 @@
+# Track-reading minigame.
+id: k4-spor
+lines:
+  - id: start
+    speaker: wanbli
+    text: >-
+      Se på sporet i sandet, og vælg det dyr, der har lavet det. Kig på tæerne og formen.
+    say: Se på sporet i sandet og vælg det dyr der har lavet det. Kig på tæerne og formen.
+  - id: rigtigt
+    speaker: wanbli
+    text: Rigtigt!
+  - id: forkert
+    speaker: wanbli
+    text: Ikke helt. Prøv igen.

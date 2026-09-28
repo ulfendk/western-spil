@@ -1,0 +1,12 @@
+# Water fetched.
+id: k4-vand
+lines:
+  - id: fyldt
+    speaker: fortaeller
+    text: Du fylder spanden med koldt, klart vand fra floden.
+  - id: tak
+    speaker: wanbli
+    text: Tak for hjælpen. Når alle hjælper til, bliver arbejdet let.
+  - id: aften
+    speaker: fortaeller
+    text: Solen går ned bag bjergene. Om aftenen samles alle ved bålet.

@@ -18,8 +18,8 @@ export type Horse = THREE.Group &
     follow(target: THREE.Vector3 | null, heading: number): void;
   };
 
-export function buildHorse(): Horse {
-  const coat = '#b5652b';
+export function buildHorse(opts: { saddle?: boolean; coat?: string } = {}): Horse {
+  const coat = opts.coat ?? '#b5652b';
   const dark = '#4a2a14';
   const horse = new THREE.Group() as Horse;
 
@@ -118,12 +118,15 @@ export function buildHorse(): Horse {
   horse.add(tail);
 
   // Saddle blanket and saddle with horn and stirrups.
-  horse.add(part(new THREE.BoxGeometry(0.9, 0.05, 0.75), '#c8553d', [0, 1.84, 0.02], [0, 0, 0]));
-  horse.add(part(new THREE.BoxGeometry(0.62, 0.14, 0.55), '#6b3a1a', [0, 1.92, 0.02]));
-  horse.add(part(new THREE.CylinderGeometry(0.04, 0.05, 0.16, 8), '#6b3a1a', [0, 2.05, -0.22]));
+  const saddle = new THREE.Group();
+  saddle.visible = opts.saddle !== false;
+  horse.add(saddle);
+  saddle.add(part(new THREE.BoxGeometry(0.9, 0.05, 0.75), '#c8553d', [0, 1.84, 0.02], [0, 0, 0]));
+  saddle.add(part(new THREE.BoxGeometry(0.62, 0.14, 0.55), '#6b3a1a', [0, 1.92, 0.02]));
+  saddle.add(part(new THREE.CylinderGeometry(0.04, 0.05, 0.16, 8), '#6b3a1a', [0, 2.05, -0.22]));
   for (const side of [-1, 1]) {
-    horse.add(part(new THREE.BoxGeometry(0.03, 0.55, 0.05), '#4a2a14', [side * 0.46, 1.62, 0.02]));
-    horse.add(
+    saddle.add(part(new THREE.BoxGeometry(0.03, 0.55, 0.05), '#4a2a14', [side * 0.46, 1.62, 0.02]));
+    saddle.add(
       part(
         new THREE.TorusGeometry(0.07, 0.02, 4, 10),
         '#3a3330',

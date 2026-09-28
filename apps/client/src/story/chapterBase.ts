@@ -234,6 +234,18 @@ export abstract class ChapterBase<S extends string> {
     );
   }
 
+  /** Fade to a caption ("Næste morgen…"), run `change` while it's dark, and fade back. */
+  protected async fade(caption: string, change: () => void): Promise<void> {
+    const veil = h('div', { class: 'fade-veil' }, h('p', {}, caption));
+    document.body.append(veil);
+    await new Promise((r) => setTimeout(r, 700));
+    change();
+    await new Promise((r) => setTimeout(r, 1500));
+    veil.classList.add('out');
+    await new Promise((r) => setTimeout(r, 700));
+    veil.remove();
+  }
+
   /** "Kapitel N klaret!" card: a natural pause, so it's also a safe point for updates. */
   protected showChapterCard(
     kicker: string,

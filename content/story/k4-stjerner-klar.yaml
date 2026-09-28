@@ -1,0 +1,10 @@
+# After finding Karlsvognen.
+id: k4-stjerner-klar
+lines:
+  - id: fandt
+    speaker: wanbli
+    text: Du fandt den! Og de to yderste stjerner i vognen peger altid mod Nordstjernen.
+  - id: vej
+    speaker: mato
+    text: Den, der kender stjernerne, farer aldrig vild. Det kan du bruge i bjergene.
+    say: Den der kender stjernerne farer aldrig vild. Det kan du bruge i bjergene.

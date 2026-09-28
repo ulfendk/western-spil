@@ -9,6 +9,11 @@
     "text": "Og jeg har stadig ikke fået havre.",
     "speaker": "kanel"
   },
+  "by-lejren.velkommen": {
+    "file": "f780aa2f4779508b.mp3",
+    "text": "Velkommen tilbage til lejren! Her er der altid plads ved bålet.",
+    "speaker": "wanbli"
+  },
   "by-st-louis.velkommen": {
     "file": "010596f773b776db.mp3",
     "text": "Velkommen til St. Louis! Her mødes grønskollinger fra hele prærien.",
@@ -613,6 +618,176 @@
     "file": "d6a2b850a6f204a8.mp3",
     "text": "Følg telegrafpælene langs jernbanen, og find stedet, hvor ledningen er klippet over.",
     "speaker": "telegrafist"
+  },
+  "k4-intro.uvejr": {
+    "file": "2a3b7ce42d8fb8ba.mp3",
+    "text": "På vej mod bjergene trækker et voldsomt uvejr op. Himlen bliver mørk, og regnen pisker ned.",
+    "speaker": "fortaeller"
+  },
+  "k4-intro.bange": {
+    "file": "e41c0cca7200ffbf.mp3",
+    "text": "Jeg er ikke bange for torden. Jeg står bare meget tæt på dig. Helt tilfældigt.",
+    "speaker": "kanel"
+  },
+  "k4-intro.lys": {
+    "file": "05cff63a890c1662.mp3",
+    "text": "Langt fremme ser du et lille lys. Måske er der nogen, der kan hjælpe.",
+    "speaker": "fortaeller"
+  },
+  "k4-mato.velkommen": {
+    "file": "f22ce8fb9c1a615c.mp3",
+    "text": "Velkommen. En gæst, der kommer i uvejr, skal have et tørt sted at sove.",
+    "speaker": "mato"
+  },
+  "k4-mato.bison": {
+    "file": "153829d7edaead19.mp3",
+    "text": "Mit folk har levet her i meget lang tid. Vi følger bisonerne, og vi tager kun det, vi har brug for.",
+    "speaker": "mato"
+  },
+  "k4-mato.forandring": {
+    "file": "1f62a8bbb557f958.mp3",
+    "text": "Men nu kommer jernbanen og mange nye folk. Bisonerne bliver færre, og vores land forandrer sig.",
+    "speaker": "mato"
+  },
+  "k4-mato.spoerg": {
+    "file": "54c0b584f8e85511.mp3",
+    "text": "Hvad vil du gerne lære, mens du er her?",
+    "speaker": "mato"
+  },
+  "k4-mato.spoerg-valg1": {
+    "file": "339e3bf9fbad3904.mp3",
+    "text": "Tryk på nummer et for at lære at læse spor.",
+    "speaker": "fortaeller"
+  },
+  "k4-mato.spor": {
+    "file": "dd57d93cb26b131c.mp3",
+    "text": "Et godt valg. Wanbli er den bedste sporfinder i lejren.",
+    "speaker": "mato"
+  },
+  "k4-mato.spoerg-valg2": {
+    "file": "56c3cc929fed509e.mp3",
+    "text": "Tryk på nummer to for at høre om stjernerne.",
+    "speaker": "fortaeller"
+  },
+  "k4-mato.stjerner": {
+    "file": "abb5a81ae64075be.mp3",
+    "text": "Stjernerne venter til i aften. Først skal Wanbli lære dig at læse spor.",
+    "speaker": "mato"
+  },
+  "k4-mato.spor-start": {
+    "file": "862454e347245168.mp3",
+    "text": "Kom! Ved floden er der spor fra mange dyr.",
+    "speaker": "wanbli"
+  },
+  "k4-morgen.morgen": {
+    "file": "577378f96760c08f.mp3",
+    "text": "Næste morgen er stormen drevet over. Solen skinner på tipierne, og hestene græsser ved floden.",
+    "speaker": "fortaeller"
+  },
+  "k4-morgen.bedstefar": {
+    "file": "84ff6f53c25c2f17.mp3",
+    "text": "Godmorgen! Kom og hils på min bedstefar. Han hedder Mato.",
+    "speaker": "wanbli"
+  },
+  "k4-slut.gave": {
+    "file": "4c2b2cf9a20c5421.mp3",
+    "text": "Jeg har lavet noget til dig. Et armbånd med perler. Så husker du os, når du er langt mod vest.",
+    "speaker": "wanbli"
+  },
+  "k4-slut.tak": {
+    "file": "13a048fb2aa47c80.mp3",
+    "text": "God rejse, lille ven. Pas på din hest. Han taler meget, men han har et godt hjerte.",
+    "speaker": "mato"
+  },
+  "k4-slut.hjerte": {
+    "file": "bf7a24a9457bf313.mp3",
+    "text": "Endelig en, der forstår mig.",
+    "speaker": "kanel"
+  },
+  "k4-slut.bjergene": {
+    "file": "682ea1040ded4bfe.mp3",
+    "text": "Med armbåndet om håndleddet rider du videre. Nu venter Klippebjergene.",
+    "speaker": "fortaeller"
+  },
+  "k4-spor-klar.flot": {
+    "file": "d4552ab281e54951.mp3",
+    "text": "Du har skarpe øjne! Nu kan du hjælpe os med vand. Hent en spand vand ved floden.",
+    "speaker": "wanbli"
+  },
+  "k4-spor-klar.kanel": {
+    "file": "4f170e1f50e79374.mp3",
+    "text": "Vand. Endelig noget jeg er ekspert i. At drikke det.",
+    "speaker": "kanel"
+  },
+  "k4-spor.start": {
+    "file": "eaf86854843118d6.mp3",
+    "text": "Se på sporet i sandet, og vælg det dyr, der har lavet det. Kig på tæerne og formen.",
+    "speaker": "wanbli"
+  },
+  "k4-spor.rigtigt": {
+    "file": "4e8304dcd0a4e1c2.mp3",
+    "text": "Rigtigt!",
+    "speaker": "wanbli"
+  },
+  "k4-spor.forkert": {
+    "file": "feaeb5e7acf0a793.mp3",
+    "text": "Ikke helt. Prøv igen.",
+    "speaker": "wanbli"
+  },
+  "k4-stjerner-klar.fandt": {
+    "file": "1a1a817f953021f7.mp3",
+    "text": "Du fandt den! Og de to yderste stjerner i vognen peger altid mod Nordstjernen.",
+    "speaker": "wanbli"
+  },
+  "k4-stjerner-klar.vej": {
+    "file": "4701d32818927e90.mp3",
+    "text": "Den, der kender stjernerne, farer aldrig vild. Det kan du bruge i bjergene.",
+    "speaker": "mato"
+  },
+  "k4-stjerner.himlen": {
+    "file": "16ef476513a3a462.mp3",
+    "text": "Se op. Mit folk ser billeder og fortællinger i stjernerne, ligesom dit folk gør. Vores billeder er bare ofte nogle andre.",
+    "speaker": "mato"
+  },
+  "k4-stjerner.vogn": {
+    "file": "bf51aa27cb9baf4c.mp3",
+    "text": "I Danmark kalder I syv af stjernerne for Karlsvognen, ikke? Kan du finde den?",
+    "speaker": "wanbli"
+  },
+  "k4-stjerner.forbind": {
+    "file": "7df2e65f7ab46da4.mp3",
+    "text": "Tryk på stjernerne i den rigtige rækkefølge, så de bliver forbundet.",
+    "speaker": "fortaeller"
+  },
+  "k4-vand.fyldt": {
+    "file": "da99524b6dcfbe47.mp3",
+    "text": "Du fylder spanden med koldt, klart vand fra floden.",
+    "speaker": "fortaeller"
+  },
+  "k4-vand.tak": {
+    "file": "e37ee221b9023bcb.mp3",
+    "text": "Tak for hjælpen. Når alle hjælper til, bliver arbejdet let.",
+    "speaker": "wanbli"
+  },
+  "k4-vand.aften": {
+    "file": "69d75b77e2409be1.mp3",
+    "text": "Solen går ned bag bjergene. Om aftenen samles alle ved bålet.",
+    "speaker": "fortaeller"
+  },
+  "k4-wanbli.hej": {
+    "file": "e30bc7c12aec4a27.mp3",
+    "text": "Hallo! Er I faret vild? Kom med mig. Vores lejr ligger lige her ved floden.",
+    "speaker": "wanbli"
+  },
+  "k4-wanbli.navn": {
+    "file": "b6b5fa5002b94498.mp3",
+    "text": "Jeg hedder Wanbli. Det betyder ørn på mit folks sprog. Vi er lakota.",
+    "speaker": "wanbli"
+  },
+  "k4-wanbli.tak": {
+    "file": "74337f190cc900ae.mp3",
+    "text": "Tusind tak. Min grønskolling her er dygtig, men ikke til uvejr.",
+    "speaker": "kanel"
   },
   "titel.velkommen": {
     "file": "61a87cd4c855d8b6.mp3",

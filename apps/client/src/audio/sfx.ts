@@ -96,3 +96,31 @@ export function note(name: string): number {
   const semis = steps[m[1]!]! + (m[2] ? 1 : 0) + (Number(m[3]) - 4) * 12;
   return 440 * 2 ** (semis / 12);
 }
+
+/** Rolling thunder: filtered noise that swells and fades. Farther = later and quieter. */
+export function thunder(distance = 1) {
+  const c = ctx();
+  if (!c) return;
+  const t = c.currentTime + distance * 0.8;
+  const len = Math.floor(c.sampleRate * 2.5);
+  const buffer = c.createBuffer(1, len, c.sampleRate);
+  const data = buffer.getChannelData(0);
+  let last = 0;
+  for (let i = 0; i < len; i++) {
+    // Brown-ish noise for a deep rumble.
+    last = (last + (Math.random() * 2 - 1) * 0.08) * 0.985;
+    data[i] = last * 6;
+  }
+  const src = c.createBufferSource();
+  src.buffer = buffer;
+  const filter = c.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 300;
+  const g = c.createGain();
+  const peak = (0.5 / (0.6 + distance)) * settings.volume;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(peak, t + 0.15);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 2.4);
+  src.connect(filter).connect(g).connect(c.destination);
+  src.start(t);
+}

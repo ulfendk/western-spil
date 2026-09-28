@@ -1206,3 +1206,68 @@ h3 {
   pointer-events: auto;
   touch-action: none;
 }
+
+/* Scene transitions ("Næste morgen …") */
+.fade-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  background: #0b0906;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadein 0.6s ease-out;
+  transition: opacity 0.6s;
+}
+
+.fade-veil p {
+  font-family: 'Rye', serif;
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  color: var(--sand);
+}
+
+.fade-veil.out {
+  opacity: 0;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Tracks and stars */
+.tracks-canvas,
+.stars-canvas {
+  width: min(520px, 90vw);
+  height: auto;
+  border: 5px solid var(--ink);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.stars-canvas {
+  width: min(640px, 92vw);
+  touch-action: none;
+  cursor: pointer;
+}
+
+.tracks-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.tracks-choice {
+  font-family: 'Patrick Hand', sans-serif;
+  font-size: 1.5rem;
+}
+
+.tracks-choice.right {
+  background: #bfe3a0;
+}
+
+.tracks-choice.wrong {
+  opacity: 0.5;
+  text-decoration: line-through;
+}

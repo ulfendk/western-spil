@@ -8,6 +8,7 @@ import { Chapter1 } from './chapter1.js';
 import type { ChapterBase } from './chapterBase.js';
 import { Chapter2 } from './chapter2.js';
 import { Chapter3 } from './chapter3.js';
+import { Chapter4 } from './chapter4.js';
 
 /**
  * Owns the active chapter and town for the region the player is in, and handles
@@ -83,11 +84,13 @@ export class Director {
 
   private makeChapter(): ChapterBase<string> {
     const chapter =
-      this.game.region === 'fortet'
-        ? new Chapter3(this.game, this.hud)
-        : this.game.region === 'praerien'
-          ? new Chapter2(this.game, this.hud, () => void this.travel('fortet'))
-          : new Chapter1(this.game, this.hud, () => void this.travel('praerien'));
+      this.game.region === 'lejren'
+        ? new Chapter4(this.game, this.hud)
+        : this.game.region === 'fortet'
+          ? new Chapter3(this.game, this.hud, () => void this.travel('lejren'))
+          : this.game.region === 'praerien'
+            ? new Chapter2(this.game, this.hud, () => void this.travel('fortet'))
+            : new Chapter1(this.game, this.hud, () => void this.travel('praerien'));
     return chapter as unknown as ChapterBase<string>;
   }
 }

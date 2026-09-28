@@ -1,0 +1,18 @@
+# Stories about the stars by the fire.
+id: k4-stjerner
+lines:
+  - id: himlen
+    speaker: mato
+    text: >-
+      Se op. Mit folk ser billeder og fortællinger i stjernerne, ligesom dit folk gør. Vores
+      billeder er bare ofte nogle andre.
+    say: >-
+      Se op. Mit folk ser billeder og fortællinger i stjernerne ligesom dit folk gør. Vores
+      billeder er bare ofte nogle andre.
+  - id: vogn
+    speaker: wanbli
+    text: I Danmark kalder I syv af stjernerne for Karlsvognen, ikke? Kan du finde den?
+    say: I Danmark kalder I syv af stjernerne for Karlsvognen ikke? Kan du finde den?
+  - id: forbind
+    speaker: fortaeller
+    text: Tryk på stjernerne i den rigtige rækkefølge, så de bliver forbundet.

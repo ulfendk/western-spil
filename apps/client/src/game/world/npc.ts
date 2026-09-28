@@ -122,6 +122,8 @@ interface PersonOptions {
   scale: number;
   dress: string;
   apron?: string;
+  /** Beaded yoke across the shoulders (colours of the bands). */
+  yoke?: string[];
   hair: string;
   braids?: boolean;
   bonnet?: string;
@@ -305,6 +307,86 @@ export function buildSoldier(
     );
     body.rotation.y += diff * (1 - Math.exp(-dt * 4));
     if (!target) body.position.y = Math.sin(time * 1.2) * 0.005;
+  };
+  return npc;
+}
+
+/** Mato, Wanbli's grandfather: buckskin shirt and leggings, long grey braids and a striped blanket. */
+export function buildElder(): Npc {
+  const skin = '#c98d64';
+  const hide = '#b8905c';
+  const npc = new THREE.Group() as Npc;
+  const body = new THREE.Group();
+  npc.add(body);
+  for (const side of [-1, 1]) {
+    body.add(part(new THREE.CapsuleGeometry(0.1, 0.6, 4, 8), hide, [side * 0.12, 0.45, 0]));
+    body.add(part(new THREE.BoxGeometry(0.15, 0.08, 0.26), '#6b4a2e', [side * 0.12, 0.04, -0.05]));
+  }
+  body.add(part(new THREE.CapsuleGeometry(0.26, 0.5, 4, 12), hide, [0, 1.3, 0]));
+  // Beaded strip down the chest and a blanket over the shoulders.
+  for (const [i, c] of ['#3d6b8a', '#f3ecdc', '#b8322a', '#f3ecdc', '#3d6b8a'].entries()) {
+    body.add(part(new THREE.BoxGeometry(0.08, 0.1, 0.02), c, [0, 1.55 - i * 0.1, -0.27]));
+  }
+  const blanket = new THREE.Group();
+  for (const [i, c] of ['#b8322a', '#2f4a78', '#d9a441', '#2f4a78', '#b8322a'].entries()) {
+    blanket.add(
+      part(
+        new THREE.CylinderGeometry(
+          0.34,
+          0.38 + i * 0.01,
+          0.12,
+          16,
+          1,
+          true,
+          Math.PI * 0.15,
+          Math.PI * 1.7,
+        ),
+        c,
+        [0, 1.62 - i * 0.12, 0.02],
+      ),
+    );
+  }
+  body.add(blanket);
+  for (const side of [-1, 1]) {
+    const arm = new THREE.Group();
+    arm.position.set(side * 0.33, 1.58, 0);
+    arm.add(part(new THREE.CapsuleGeometry(0.08, 0.45, 4, 8), hide, [0, -0.27, 0]));
+    arm.add(part(new THREE.SphereGeometry(0.07, 8, 6), skin, [0, -0.57, 0]));
+    arm.rotation.z = side * 0.12;
+    body.add(arm);
+  }
+  body.add(part(new THREE.SphereGeometry(0.21, 16, 12), skin, [0, 1.92, 0]));
+  body.add(part(new THREE.SphereGeometry(0.05, 8, 6), '#b87a55', [0, 1.9, -0.21]));
+  for (const side of [-1, 1]) {
+    body.add(part(new THREE.SphereGeometry(0.024, 6, 4), '#1b1b1b', [side * 0.07, 1.96, -0.185]));
+    // Long grey braids.
+    body.add(
+      part(new THREE.CapsuleGeometry(0.045, 0.55, 4, 6), '#b9b6ae', [side * 0.2, 1.62, -0.02]),
+    );
+  }
+  body.add(
+    part(
+      new THREE.SphereGeometry(0.225, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.55),
+      '#b9b6ae',
+      [0, 1.96, 0.02],
+    ),
+  );
+  outline(body, 0.018);
+
+  let target: THREE.Vector3 | null = null;
+  npc.lookAtPlayer = (p) => (target = p);
+  npc.update = (dt, time) => {
+    body.position.y = Math.sin(time * 1.1) * 0.008;
+    let desired = 0;
+    if (target) {
+      const local = npc.worldToLocal(target.clone());
+      desired = Math.atan2(-local.x, -local.z);
+    }
+    const diff = Math.atan2(
+      Math.sin(desired - body.rotation.y),
+      Math.cos(desired - body.rotation.y),
+    );
+    body.rotation.y += diff * (1 - Math.exp(-dt * 3));
   };
   return npc;
 }

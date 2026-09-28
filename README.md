@@ -35,14 +35,16 @@ Run `npm run tts` once to copy the committed narration into the dev client. Add 
 
 The journey runs east to west. Each region has its own map, chapter and shared town:
 
-| Region    | Chapter                  | Town        | Code                                                                      |
-| --------- | ------------------------ | ----------- | ------------------------------------------------------------------------- |
-| St. Louis | 1 – Afsked ved St. Louis | St. Louis   | `game/world/regions/stLouis.ts`, `story/chapter1.ts`                      |
-| Prærien   | 2 – Prærien              | Støvby      | `game/world/regions/praerien.ts`, `story/chapter2.ts`                     |
-| Fortet    | 3 – Fortet               | Fort Kearny | `game/world/regions/fortet.ts`, `game/world/fort.ts`, `story/chapter3.ts` |
+| Region    | Chapter                  | Town            | Code                                                                       |
+| --------- | ------------------------ | --------------- | -------------------------------------------------------------------------- |
+| St. Louis | 1 – Afsked ved St. Louis | St. Louis       | `game/world/regions/stLouis.ts`, `story/chapter1.ts`                       |
+| Prærien   | 2 – Prærien              | Støvby          | `game/world/regions/praerien.ts`, `story/chapter2.ts`                      |
+| Fortet    | 3 – Fortet               | Fort Kearny     | `game/world/regions/fortet.ts`, `game/world/fort.ts`, `story/chapter3.ts`  |
+| Lejren    | 4 – Lejren               | The Lakota camp | `game/world/regions/lejren.ts`, `game/world/camp4.ts`, `story/chapter4.ts` |
 
 - **Regions:** they are listed in `packages/shared/src/regions.ts`. Each region builder sets its own `TerrainProfile` (hills, trail, levelled towns, river) and adds its landmarks, camp and town (`TownConfig`).
 - **Chapters:** each chapter extends `story/chapterBase.ts`. It provides quest steps (saved per chapter in `progress.steps`), the objective line, the "!" marker, the "Tal med…" prompt, voiced conversations and the chapter card.
+- **Weather and time of day:** `world.setMood('day' | 'storm' | 'night')` changes the sky, light, fog, rain and lightning (with thunder).
 - **Travel:** `story/director.ts` swaps region, chapter and town. The player travels onward from a chapter card, or back and forth with the 🗺️ travel map in the pause menu.
 
 ## Multiplayer

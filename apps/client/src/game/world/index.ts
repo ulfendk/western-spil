@@ -3,14 +3,16 @@ import type { RegionId } from '@western/shared';
 import type { Herd, Horse } from './animals.js';
 import type { Circle, Colliders } from './colliders.js';
 import type { Fort } from './fort.js';
+import type { Mood } from './sky.js';
 import { buildFortet, FORTET_TERRAIN } from './regions/fortet.js';
+import { buildLejren, LEJREN_TERRAIN } from './regions/lejren.js';
 import { buildPraerien, PRAERIEN_TERRAIN } from './regions/praerien.js';
 import { buildStLouis, ST_LOUIS_TERRAIN } from './regions/stLouis.js';
 import { setTerrain } from './terrain.js';
 import type { TownSpots } from './town.js';
 
 export { heightAt, trailX, WORLD_HALF, riverWater, terrainProfile } from './terrain.js';
-export { SUN_DIR } from './sky.js';
+export { SUN_DIR, type Mood } from './sky.js';
 export type { TownSpots, TownConfig } from './town.js';
 export type { Herd, Horse } from './animals.js';
 export type { Fort } from './fort.js';
@@ -40,6 +42,10 @@ export interface World {
   setPosterVisible?(visible: boolean): void;
   setWheelFixed?(fixed: boolean): void;
   setWireFixed?(fixed: boolean): void;
+  /** Weather / time of day. */
+  setMood(mood: Mood): void;
+  /** Where Wanbli is: meeting the player in the storm, or at home in the camp. */
+  setWanbli?(where: 'storm' | 'camp'): void;
   fort?: Fort;
   herd?: Herd;
   kanel?: Horse;
@@ -52,6 +58,10 @@ export interface WorldOptions {
 
 /** Builds a region into the (empty) scene. The land's shape is switched first. */
 export function buildWorld(scene: THREE.Scene, region: RegionId, opts: WorldOptions): World {
+  if (region === 'lejren') {
+    setTerrain(LEJREN_TERRAIN);
+    return buildLejren(scene, opts);
+  }
   if (region === 'fortet') {
     setTerrain(FORTET_TERRAIN);
     return buildFortet(scene, opts);

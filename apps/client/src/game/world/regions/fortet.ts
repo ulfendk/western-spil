@@ -188,6 +188,7 @@ export function buildFortet(scene: THREE.Scene, opts: WorldOptions): World {
       return moving;
     },
     update: common.update,
+    setMood: common.setMood,
   };
 }
 

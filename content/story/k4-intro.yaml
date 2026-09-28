@@ -1,0 +1,14 @@
+# Kapitel 4 – Lejren. A storm catches Kanel and the player in the foothills.
+id: k4-intro
+lines:
+  - id: uvejr
+    speaker: fortaeller
+    text: >-
+      På vej mod bjergene trækker et voldsomt uvejr op. Himlen bliver mørk, og regnen pisker
+      ned.
+  - id: bange
+    speaker: kanel
+    text: Jeg er ikke bange for torden. Jeg står bare meget tæt på dig. Helt tilfældigt.
+  - id: lys
+    speaker: fortaeller
+    text: Langt fremme ser du et lille lys. Måske er der nogen, der kan hjælpe.

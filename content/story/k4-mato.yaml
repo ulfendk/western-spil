@@ -1,0 +1,41 @@
+# Meeting Mato, Wanbli's grandfather.
+id: k4-mato
+lines:
+  - id: velkommen
+    speaker: mato
+    text: Velkommen. En gæst, der kommer i uvejr, skal have et tørt sted at sove.
+    say: Velkommen. En gæst der kommer i uvejr skal have et tørt sted at sove.
+  - id: bison
+    speaker: mato
+    text: >-
+      Mit folk har levet her i meget lang tid. Vi følger bisonerne, og vi tager kun det, vi
+      har brug for.
+    say: >-
+      Mit folk har levet her i meget lang tid. Vi følger bisonerne og vi tager kun det vi har
+      brug for.
+  - id: forandring
+    speaker: mato
+    text: >-
+      Men nu kommer jernbanen og mange nye folk. Bisonerne bliver færre, og vores land
+      forandrer sig.
+  - id: spoerg
+    speaker: mato
+    text: Hvad vil du gerne lære, mens du er her?
+    choices:
+      - text: At læse spor
+        flag: valgte-spor
+        say: Tryk på nummer et for at lære at læse spor.
+        lines:
+          - id: spor
+            speaker: mato
+            text: Et godt valg. Wanbli er den bedste sporfinder i lejren.
+      - text: Om stjernerne
+        flag: valgte-stjerner
+        say: Tryk på nummer to for at høre om stjernerne.
+        lines:
+          - id: stjerner
+            speaker: mato
+            text: Stjernerne venter til i aften. Først skal Wanbli lære dig at læse spor.
+  - id: spor-start
+    speaker: wanbli
+    text: Kom! Ved floden er der spor fra mange dyr.

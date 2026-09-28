@@ -47,6 +47,8 @@ export const ST_LOUIS_TOWN: TownConfig = {
 
 export interface TownSpots {
   config: TownConfig;
+  /** False for meeting places without a horseshoe pit (the camp). */
+  hasPit?: boolean;
   /** Is this point inside the town (for the first-visit welcome)? */
   contains(p: THREE.Vector3): boolean;
   /** Middle of the main street. */

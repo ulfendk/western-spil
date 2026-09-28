@@ -1,0 +1,11 @@
+# The next morning in the camp.
+id: k4-morgen
+lines:
+  - id: morgen
+    speaker: fortaeller
+    text: >-
+      Næste morgen er stormen drevet over. Solen skinner på tipierne, og hestene græsser ved
+      floden.
+  - id: bedstefar
+    speaker: wanbli
+    text: Godmorgen! Kom og hils på min bedstefar. Han hedder Mato.

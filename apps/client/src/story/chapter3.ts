@@ -37,14 +37,18 @@ const STEPS: Record<Step, StepInfo> = {
     marker: { spot: 'parade', height: 3 },
     interact: { spot: 'parade', radius: 7, label: 'Start paraden' },
   },
-  done: { objective: 'Kast hestesko med soldaterne. Kapitel 4 er på vej!' },
+  done: { objective: 'Rejs videre mod vest via rejsekortet i pausemenuen' },
 };
 
 /** Chapter 3 – "Fortet": the cut telegraph line, Morse code and the parade. */
 export class Chapter3 extends ChapterBase<Step> {
   protected introScript = 'k3-intro';
 
-  constructor(game: Game, hud: Hud) {
+  constructor(
+    game: Game,
+    hud: Hud,
+    private travelOn: () => void,
+  ) {
     super(game, hud, 'k3', STEPS, [
       'intro',
       'find-sergeant',
@@ -150,8 +154,11 @@ export class Chapter3 extends ChapterBase<Step> {
     await this.showChapterCard(
       'Kapitel 3',
       'Fortet',
-      'Du reddede telegrafen! Kapitel 4 er på vej. Imens kan du kaste hestesko med soldaterne.',
-      [{ label: 'Fortsæt', primary: true }],
+      'Du reddede telegrafen! Nu går rejsen videre mod bjergene.',
+      [
+        { label: 'Rejs videre 🐴', primary: true, action: this.travelOn },
+        { label: 'Bliv lidt på fortet' },
+      ],
     );
   }
 }

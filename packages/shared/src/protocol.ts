@@ -10,7 +10,7 @@ export const ERR_OUTDATED_CLIENT = 4400;
 export const ROOM_TOWN = 'town';
 export const ROOM_HORSESHOE = 'hestesko';
 
-export type TownId = 'st-louis' | 'stoevby' | 'fortet' | 'soelvkloeften' | 'promontory';
+export type TownId = 'st-louis' | 'stoevby' | 'fortet' | 'lejren' | 'soelvkloeften' | 'promontory';
 
 export const TOWN_MAX_PLAYERS = 16;
 
