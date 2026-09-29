@@ -112,7 +112,14 @@ export function buildPromontory(scene: THREE.Scene, opts: WorldOptions): World {
   };
   for (let i = 0; i < 5; i++) {
     const z = CEREMONY_Z - 5 + i * 2.4;
-    addPerson(i % 2 ? buildSoldier() : buildMiner(), RAIL_X + 6 + (i % 2) * 1.2, z, RAIL_X);
+    // Formand Morten came down from the mountains for the ceremony.
+    const miner = i === 2 ? 'morten' : 'miner';
+    addPerson(
+      i % 2 ? buildSoldier({ moustache: i === 3 }) : buildMiner(miner),
+      RAIL_X + 6 + (i % 2) * 1.2,
+      z,
+      RAIL_X,
+    );
     addPerson(
       buildPerson({
         scale: 1,
@@ -120,6 +127,7 @@ export function buildPromontory(scene: THREE.Scene, opts: WorldOptions): World {
         apron: '#f3ecdc',
         hair: '#5e3a1a',
         bonnet: i % 2 ? '#e8d6b0' : undefined,
+        model: ['woman-a', 'woman-b', 'woman-c'][i % 3],
       }),
       RAIL_X - 7.5 - (i % 2) * 1.2,
       z + 1,
@@ -128,7 +136,7 @@ export function buildPromontory(scene: THREE.Scene, opts: WorldOptions): World {
   }
   const pind = addPerson(buildPind(), RAIL_X - 4.5, CEREMONY_Z + 3, RAIL_X);
   const ruth = addPerson(
-    buildPerson({ scale: 1, dress: '#6b3a5a', apron: '#f3ecdc', hair: '#5e3a1a' }),
+    buildPerson({ scale: 1, dress: '#6b3a5a', apron: '#f3ecdc', hair: '#5e3a1a', model: 'ruth' }),
     RAIL_X - 4.5,
     CEREMONY_Z - 4,
     RAIL_X,
@@ -144,7 +152,9 @@ export function buildPromontory(scene: THREE.Scene, opts: WorldOptions): World {
   // Formand Li and his crew at the end of the Central Pacific track.
   const workZ = CEREMONY_Z - 30;
   const li = addPerson(buildForeman(), RAIL_X - 4, workZ, RAIL_X);
-  for (let i = 0; i < 3; i++) addPerson(buildForeman(), RAIL_X + 3, workZ - 3 + i * 2.5, RAIL_X);
+  for (let i = 0; i < 3; i++) {
+    addPerson(buildForeman(i === 1 ? 'crew-b' : 'crew-a'), RAIL_X + 3, workZ - 3 + i * 2.5, RAIL_X);
+  }
   for (let i = 0; i < 6; i++) {
     const stack = part(new THREE.BoxGeometry(2.6, 0.16, 0.28), '#5e4128', [
       RAIL_X - 8,

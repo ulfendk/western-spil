@@ -18,10 +18,12 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "vitest run",
     "tts": "npm run render -w @western/tts",
-    "voice": "sh tools/voice/render.sh"
+    "voice": "sh tools/voice/render.sh",
+    "models": "sh tools/models/render.sh"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@gltf-transform/cli": "^4.5.1",
     "@types/node": "^24.0.0",
     "concurrently": "^10.0.5",
     "eslint": "^10.11.0",

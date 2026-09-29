@@ -111,13 +111,21 @@ export function buildPraerien(scene: THREE.Scene, opts: WorldOptions): World {
       apron: '#f3ecdc',
       hair: '#c9a26a',
       bonnet: '#e8d6b0',
+      model: 'jensen',
     }),
     C.x - 3,
     C.y + 3.5,
     0,
   );
   const sofie = place(
-    buildPerson({ scale: 0.72, dress: '#c8553d', apron: '#f7f3ea', hair: '#f0d27a', braids: true }),
+    buildPerson({
+      scale: 0.72,
+      dress: '#c8553d',
+      apron: '#f7f3ea',
+      hair: '#f0d27a',
+      braids: true,
+      model: 'sofie',
+    }),
     C.x - 4.5,
     C.y + 1.5,
     0,

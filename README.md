@@ -82,6 +82,15 @@ lines:
 
 After editing, run `npm run voice` to voice new or changed lines, then commit `content/narration`.
 
+## People (sculpted models)
+
+The characters are sculpted in code and built with headless Blender in Docker (`tools/models`, run with `npm run models`; add `-- --preview` for review renders in `tools/models/.cache`). The results are committed in `apps/client/public/models`.
+
+- `characters.py`: a parametric comic head (nose, brows, eyes with lids, ears, mouth, hair, beards, moustaches, spectacles, hats) and one `figure()` body builder (coat, duster, uniform, shirt with braces, work tunic, buckskin, dress with apron, beaded cape, blanket). The cast is at the bottom of the file.
+- `sdf.py`: shapes are blended signed-distance fields, meshed with marching cubes. Every shape has a colour; "paint" shapes only recolour.
+- `build.py`: meshes each part (body, head, beard, limbs) and makes two levels of detail. Colour edges are protected while simplifying. Colours go per face for crisp toon edges, ambient occlusion is baked into the vertex alpha, and eyes, spectacles and buttons are built as real spheres and tubes.
+- The game loads them at start (`game/models.ts`, with toon materials, ink outlines and LOD switching). `game/world/people.ts` makes them NPCs that look at you and breathe; soldiers march with their separate limbs. If the models can't load, the old primitive figures are used.
+
 ## Narration (Danish voices)
 
 Story lines are voiced offline with [Røst-v3](https://huggingface.co/CoRal-project/roest-v3-chatterbox-500m). It's the CoRal project's Danish Chatterbox model, and it runs in its own Docker image (`tools/voice`), so the game image never needs PyTorch.

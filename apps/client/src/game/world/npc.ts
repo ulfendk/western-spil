@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { mergeLocal } from './batch.js';
 import { outline, part } from '../toon.js';
 import type { Animated } from './animals.js';
+import { sculptedNpc } from './people.js';
 
 /** An NPC that turns to face the player when they come close. */
 export type Npc = THREE.Group & Animated & { lookAtPlayer(p: THREE.Vector3 | null): void };
@@ -11,6 +12,8 @@ export type Npc = THREE.Group & Animated & { lookAtPlayer(p: THREE.Vector3 | nul
  * a long white beard, a mail satchel and a walking cane.
  */
 export function buildPind(): Npc {
+  const sculpted = sculptedNpc('pind');
+  if (sculpted) return sculpted;
   const coat = '#34507a';
   const skin = '#efc39c';
   const npc = new THREE.Group() as Npc;
@@ -131,10 +134,14 @@ interface PersonOptions {
   hair: string;
   braids?: boolean;
   bonnet?: string;
+  /** The sculpted character to use (tools/models); the options below are the fallback. */
+  model?: string;
 }
 
 /** A pioneer in a long dress: used for Mor Jensen and Sofie. */
 export function buildPerson(o: PersonOptions): Npc {
+  const sculpted = o.model ? sculptedNpc(o.model) : null;
+  if (sculpted) return sculpted;
   const skin = '#f1c9a0';
   const npc = new THREE.Group() as Npc;
   const body = new THREE.Group();
@@ -222,6 +229,10 @@ export function buildPerson(o: PersonOptions): Npc {
 export function buildSoldier(
   opts: { sergeant?: boolean; moustache?: boolean } = {},
 ): Npc & { step(phase: number): void } {
+  const sculpted = sculptedNpc(
+    opts.sergeant ? 'sergeant' : opts.moustache ? 'soldier-m' : 'soldier',
+  );
+  if (sculpted && 'step' in sculpted) return sculpted as Npc & { step(phase: number): void };
   const blue = '#2f4a78';
   const skin = '#f1c9a0';
   const npc = new THREE.Group() as Npc & { step(phase: number): void };
@@ -319,6 +330,8 @@ export function buildSoldier(
 
 /** Mato, Wanbli's grandfather: buckskin shirt and leggings, long grey braids and a striped blanket. */
 export function buildElder(): Npc {
+  const sculpted = sculptedNpc('mato');
+  if (sculpted) return sculpted;
   const skin = '#c98d64';
   const hide = '#b8905c';
   const npc = new THREE.Group() as Npc;
@@ -397,8 +410,13 @@ export function buildElder(): Npc {
   return npc;
 }
 
-/** A miner (Formand Morten): red shirt, braces, a leather cap with a candle lamp and a beard. */
-export function buildMiner(): Npc {
+/**
+ * A miner (Formand Morten): red shirt, braces, a leather cap with a candle lamp and a beard.
+ * `model` picks another sculpted miner for crowds.
+ */
+export function buildMiner(model = 'morten'): Npc {
+  const sculpted = sculptedNpc(model);
+  if (sculpted) return sculpted;
   const skin = '#f1c9a0';
   const npc = new THREE.Group() as Npc;
   const body = new THREE.Group();

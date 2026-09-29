@@ -28,7 +28,7 @@ export default defineConfig({
       registerType: 'prompt',
       pwaAssets: { config: true },
       injectManifest: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff,woff2,glb}', 'models/manifest.json'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       manifest: {

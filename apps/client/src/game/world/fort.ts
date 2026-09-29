@@ -342,7 +342,13 @@ export function buildFort(scene: THREE.Scene, colliders: Colliders, L: FortLayou
 
   // Ruth, the telegraphist, outside her office.
   const telegraphist = at(hw - 9 + 2, hd - 8 - 1.8);
-  const ruth = buildPerson({ scale: 1, dress: '#6b3a5a', apron: '#f3ecdc', hair: '#5e3a1a' });
+  const ruth = buildPerson({
+    scale: 1,
+    dress: '#6b3a5a',
+    apron: '#f3ecdc',
+    hair: '#5e3a1a',
+    model: 'ruth',
+  });
   ruth.position.copy(telegraphist);
   g.add(ruth);
   animated.push(ruth);

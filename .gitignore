@@ -10,3 +10,4 @@ apps/client/public/pwa-*.png
 apps/client/public/maskable-*.png
 apps/client/public/apple-touch-icon*.png
 apps/client/public/favicon.ico
+tools/models/.cache/

@@ -2,6 +2,7 @@ import '@fontsource/rye/400.css';
 import '@fontsource/patrick-hand/400.css';
 import './style.css';
 import { Game } from './game/game.js';
+import { loadModels } from './game/models.js';
 import { updater } from './pwa/updater.js';
 import { store } from './save/store.js';
 import { PHRASES } from '@western/shared';
@@ -14,6 +15,8 @@ import { Screens } from './ui/screens.js';
 
 updater.start();
 void store.sync();
+// The sculpted people must be ready before the first region is built.
+await loadModels();
 
 const canvas = document.querySelector<HTMLCanvasElement>('#game')!;
 const ui = document.querySelector<HTMLElement>('#ui')!;

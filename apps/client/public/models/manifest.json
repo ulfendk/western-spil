@@ -1,0 +1,107 @@
+{
+  "boevl-1": {
+    "file": "boevl-1.glb",
+    "hash": "ebd91c494114-boevl-1",
+    "tris": 15375
+  },
+  "boevl-2": {
+    "file": "boevl-2.glb",
+    "hash": "ebd91c494114-boevl-2",
+    "tris": 15373
+  },
+  "boevl-3": {
+    "file": "boevl-3.glb",
+    "hash": "ebd91c494114-boevl-3",
+    "tris": 15374
+  },
+  "boevl-4": {
+    "file": "boevl-4.glb",
+    "hash": "ebd91c494114-boevl-4",
+    "tris": 15374
+  },
+  "crew-a": {
+    "file": "crew-a.glb",
+    "hash": "ebd91c494114-crew-a",
+    "tris": 14576
+  },
+  "crew-b": {
+    "file": "crew-b.glb",
+    "hash": "ebd91c494114-crew-b",
+    "tris": 14575
+  },
+  "jensen": {
+    "file": "jensen.glb",
+    "hash": "ebd91c494114-jensen",
+    "tris": 14518
+  },
+  "li": {
+    "file": "li.glb",
+    "hash": "ebd91c494114-li",
+    "tris": 14576
+  },
+  "mato": {
+    "file": "mato.glb",
+    "hash": "ebd91c494114-mato",
+    "tris": 14575
+  },
+  "miner": {
+    "file": "miner.glb",
+    "hash": "ebd91c494114-miner",
+    "tris": 14576
+  },
+  "morten": {
+    "file": "morten.glb",
+    "hash": "ebd91c494114-morten",
+    "tris": 14575
+  },
+  "pind": {
+    "file": "pind.glb",
+    "hash": "ebd91c494114-pind",
+    "tris": 17881
+  },
+  "ruth": {
+    "file": "ruth.glb",
+    "hash": "ebd91c494114-ruth",
+    "tris": 14576
+  },
+  "sergeant": {
+    "file": "sergeant.glb",
+    "hash": "ebd91c494114-sergeant",
+    "tris": 19473
+  },
+  "sofie": {
+    "file": "sofie.glb",
+    "hash": "ebd91c494114-sofie",
+    "tris": 14574
+  },
+  "soldier": {
+    "file": "soldier.glb",
+    "hash": "ebd91c494114-soldier",
+    "tris": 19474
+  },
+  "soldier-m": {
+    "file": "soldier-m.glb",
+    "hash": "ebd91c494114-soldier-m",
+    "tris": 19472
+  },
+  "wanbli": {
+    "file": "wanbli.glb",
+    "hash": "ebd91c494114-wanbli",
+    "tris": 14575
+  },
+  "woman-a": {
+    "file": "woman-a.glb",
+    "hash": "ebd91c494114-woman-a",
+    "tris": 14518
+  },
+  "woman-b": {
+    "file": "woman-b.glb",
+    "hash": "ebd91c494114-woman-b",
+    "tris": 14576
+  },
+  "woman-c": {
+    "file": "woman-c.glb",
+    "hash": "ebd91c494114-woman-c",
+    "tris": 14576
+  }
+}

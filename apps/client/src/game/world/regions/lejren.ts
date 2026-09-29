@@ -97,6 +97,7 @@ export function buildLejren(scene: THREE.Scene, opts: WorldOptions): World {
       hair: '#1f1a17',
       braids: true,
       yoke: ['#2f4a78', '#f3ecdc', '#b8322a'],
+      model: 'wanbli',
     }),
     CAMP_X + 5,
     CAMP_Z - 2,

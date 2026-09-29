@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { mergeLocal } from './batch.js';
 import { outline, part } from '../toon.js';
 import type { Npc } from './npc.js';
+import { sculptedNpc } from './people.js';
 
 /**
  * A 4-4-0 steam locomotive, standing still, facing −z. Colours tell the two apart:
@@ -138,7 +139,9 @@ function figure(npc: Npc, body: THREE.Group, turnSpeed = 4): Npc {
 }
 
 /** Formand Li: foreman of a Central Pacific track crew, in a work tunic and a wide straw hat. */
-export function buildForeman(): Npc {
+export function buildForeman(model = 'li'): Npc {
+  const sculpted = sculptedNpc(model);
+  if (sculpted) return sculpted;
   const skin = '#e8bf94';
   const npc = new THREE.Group() as Npc;
   const body = new THREE.Group();
@@ -177,6 +180,13 @@ export function buildForeman(): Npc {
 
 /** One of the four Bøvl brothers: long coat, bandana, hat. `size` 0.8 … 1.35. */
 export function buildBoevl(size: number, coat: string): Npc {
+  // The sculpted brothers come in the same four sizes, smallest first.
+  const index = [0.82, 1, 1.15, 1.35].reduce(
+    (best, s, i, all) => (Math.abs(s - size) < Math.abs(all[best]! - size) ? i : best),
+    0,
+  );
+  const sculpted = sculptedNpc(`boevl-${index + 1}`);
+  if (sculpted) return sculpted;
   const npc = new THREE.Group() as Npc;
   const body = new THREE.Group();
   npc.add(body);
