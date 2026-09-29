@@ -1,19 +1,40 @@
-import { regionInfo } from '@western/shared';
+import { regionInfo, type ContestKind } from '@western/shared';
 import type { Game } from '../game/game.js';
+import { playCans } from '../minigames/cans.js';
+import { ContestClient, type ContestGame } from '../minigames/contest.js';
 import { HorseshoeClient } from '../minigames/horseshoe.js';
+import { playPosters } from '../minigames/posters.js';
+import { playRace } from '../minigames/race.js';
 import { store } from '../save/store.js';
 import { DialogueRunner } from '../story/dialogue.js';
 import { script } from '../story/scripts.js';
 import type { Hud } from '../ui/hud.js';
 import { h } from '../ui/dom.js';
 
-/** Things to do in the region's shared town: a welcome the first time, and the horseshoe pit. */
+type Activity = 'hestesko' | ContestKind;
+
+const PROMPTS: Record<Activity, string> = {
+  hestesko: '🐴 Spil hestesko',
+  daaser: '🥫 Skyd til dåser',
+  loeb: '🐎 Hestevæddeløb',
+  plakater: '📜 Find de efterlyste',
+};
+
+const GAMES: Record<ContestKind, ContestGame> = {
+  daaser: playCans,
+  loeb: playRace,
+  plakater: playPosters,
+};
+
+/** Things to do in the region's shared town: a welcome the first time, the horseshoe pit and the contests. */
 export class TownLife {
   private dialogue = new DialogueRunner();
   private prompt = h('button', { class: 'interact-prompt', hidden: true });
   private busyHere = false;
+  /** The activity whose prompt is showing. */
+  private near: Activity | null = null;
   private onKey = (e: KeyboardEvent) => {
-    if (e.code === 'KeyE' && !this.prompt.hidden && !this.busy) void this.playHorseshoe();
+    if (e.code === 'KeyE' && !this.prompt.hidden && !this.busy) void this.startActivity();
   };
 
   constructor(
@@ -22,7 +43,7 @@ export class TownLife {
     /** True while something else (the chapter's story) has the player's attention. */
     private othersBusy: () => boolean,
   ) {
-    this.prompt.onclick = () => void this.playHorseshoe();
+    this.prompt.onclick = () => void this.startActivity();
     document.body.append(this.prompt);
     window.addEventListener('keydown', this.onKey);
   }
@@ -51,11 +72,24 @@ export class TownLife {
     const flag = `set-${regionInfo(this.game.region).townId}`;
     if (inTown && !store.save.progress.flags.includes(flag)) void this.welcome(flag);
     const town = this.game.world.town;
-    const nearPit = town.hasPit !== false && p.distanceTo(town.pitStart) < 3.5;
-    if (nearPit === this.prompt.hidden) {
+    const spots: { kind: Activity; at: typeof p }[] = [
+      ...(town.hasPit !== false ? [{ kind: 'hestesko' as const, at: town.pitStart }] : []),
+      ...(town.contests ?? []),
+    ];
+    let near: Activity | null = null;
+    let best = 3.5;
+    for (const s of spots) {
+      const d = p.distanceTo(s.at);
+      if (d < best) {
+        best = d;
+        near = s.kind;
+      }
+    }
+    if (near !== this.near) {
+      this.near = near;
       const touch = matchMedia('(pointer: coarse)').matches;
-      this.prompt.textContent = `🐴 Spil hestesko${touch ? '' : '  [E]'}`;
-      this.prompt.hidden = !nearPit;
+      if (near) this.prompt.textContent = `${PROMPTS[near]}${touch ? '' : '  [E]'}`;
+      this.prompt.hidden = !near;
     }
   }
 
@@ -80,17 +114,20 @@ export class TownLife {
     }
   }
 
-  private async playHorseshoe() {
-    if (this.busyHere) return;
+  private async startActivity() {
+    const kind = this.near;
+    if (this.busyHere || !kind) return;
     this.busyHere = true;
     this.prompt.hidden = true;
+    this.near = null;
     this.hud.setTalking(true);
+    const townId = regionInfo(this.game.region).townId;
     try {
-      await new HorseshoeClient(
-        this.game,
-        this.game.world.town,
-        regionInfo(this.game.region).townId,
-      ).play();
+      if (kind === 'hestesko') {
+        await new HorseshoeClient(this.game, this.game.world.town, townId).play();
+      } else {
+        await new ContestClient(this.game, kind, townId, GAMES[kind]).play();
+      }
     } finally {
       this.hud.setTalking(false);
       this.busyHere = false;

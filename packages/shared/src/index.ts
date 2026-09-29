@@ -9,3 +9,4 @@ export * from './rejsekode.js';
 export * from './phrases.js';
 export * from './horseshoe.js';
 export * from './regions.js';
+export * from './contests.js';

@@ -1,9 +1,10 @@
 import { Server } from '@colyseus/core';
 import { WebSocketTransport } from '@colyseus/ws-transport';
-import { ROOM_HORSESHOE, ROOM_TOWN } from '@western/shared';
+import { ROOM_CONTEST, ROOM_HORSESHOE, ROOM_TOWN } from '@western/shared';
 import { config } from './config.js';
 import { scheduleBackups } from './db.js';
 import { configureHttp } from './http.js';
+import { ContestRoom } from './rooms/ContestRoom.js';
 import { HorseshoeRoom } from './rooms/HorseshoeRoom.js';
 import { TownRoom } from './rooms/TownRoom.js';
 
@@ -21,6 +22,8 @@ const server = new Server({
 server.define(ROOM_TOWN, TownRoom).filterBy(['townId']);
 // One horseshoe pit per town: players at the same pit meet in the same lobby.
 server.define(ROOM_HORSESHOE, HorseshoeRoom).filterBy(['townId']);
+// Town contests: players at the same game in the same town meet in the same lobby.
+server.define(ROOM_CONTEST, ContestRoom).filterBy(['townId', 'kind']);
 
 scheduleBackups();
 

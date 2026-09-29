@@ -1425,3 +1425,71 @@ h3 {
 .journal-entry.playing {
   background: #fdecc0;
 }
+
+/* Town contests: live scoreboard strip, countdown and the poster hunt hint. */
+.contest-strip {
+  position: fixed;
+  top: max(10px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 12px;
+  max-width: calc(100vw - 32px);
+  padding: 6px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  background: var(--paper);
+  font-size: 1rem;
+}
+.contest-strip .me {
+  font-weight: 700;
+  color: #b8322a;
+}
+.contest-time {
+  font-weight: 700;
+  min-width: 3.2em;
+}
+.contest-countdown {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  font:
+    9rem Rye,
+    serif;
+  color: var(--paper);
+  text-shadow: 5px 5px 0 var(--ink);
+  pointer-events: none;
+}
+.contest-hint {
+  position: fixed;
+  bottom: max(90px, calc(env(safe-area-inset-bottom) + 80px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 7;
+  padding: 6px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  background: var(--paper);
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+.pack.contest-game {
+  /* Below the live scoreboard and the HUD's objective line. */
+  padding-top: 118px;
+}
+.contest-buttons {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+.contest-strip[hidden],
+.contest-countdown[hidden],
+.contest-hint[hidden] {
+  display: none;
+}

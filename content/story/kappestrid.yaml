@@ -1,0 +1,39 @@
+# Town contests: Kanel explains each game the first time, and cheers at the end.
+id: kappestrid
+lines:
+  - id: daaser-regler
+    speaker: kanel
+    text: >-
+      Dåseskydning! Dåserne dukker op på hegnet. Tryk på dem, før de forsvinder igen. De
+      gyldne dåser giver tre point.
+  - id: daaser-alle
+    speaker: kanel
+    text: Alle skyder på samme tid. Den med flest point vinder.
+  - id: loeb-regler
+    speaker: kanel
+    text: >-
+      Hestevæddeløb! Tryk skiftevis på venstre og højre pil, så galopperer hesten. Tryk ikke
+      på den samme to gange i træk.
+  - id: loeb-hop
+    speaker: kanel
+    text: >-
+      Når der kommer en tønde, så tryk på pilen opad for at hoppe. Og husk: jeg er stadig den
+      hurtigste hest i Vesten.
+  - id: plakater-regler
+    speaker: kanel
+    text: >-
+      Efterlyst! Nogen har hængt plakater af Bøvl-brødrene op rundt i byen. Find dem, og riv
+      dem ned.
+    say: >-
+      Efterlyst! Nogen har hængt plakater af Bøvl brødrene op rundt i byen. Find dem og riv
+      dem ned.
+  - id: plakater-hvor
+    speaker: kanel
+    text: De hænger på husenes mure. Gå tæt på, og tryk, når du står ved en plakat.
+    say: De hænger på husenes mure. Gå tæt på og tryk når du står ved en plakat.
+  - id: vandt
+    speaker: kanel
+    text: Flot klaret, makker!
+  - id: slut
+    speaker: kanel
+    text: Godt kæmpet! Skal vi prøve igen?

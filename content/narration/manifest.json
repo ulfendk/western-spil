@@ -1084,6 +1084,46 @@
     "text": "Og Kanel og hans ven red ud i solnedgangen. Men det er en helt anden historie.",
     "speaker": "fortaeller"
   },
+  "kappestrid.daaser-regler": {
+    "file": "8637e116fdd2eb6e.mp3",
+    "text": "Dåseskydning! Dåserne dukker op på hegnet. Tryk på dem, før de forsvinder igen. De gyldne dåser giver tre point.",
+    "speaker": "kanel"
+  },
+  "kappestrid.daaser-alle": {
+    "file": "09ffc27bb320f378.mp3",
+    "text": "Alle skyder på samme tid. Den med flest point vinder.",
+    "speaker": "kanel"
+  },
+  "kappestrid.loeb-regler": {
+    "file": "900cee3a7221b4aa.mp3",
+    "text": "Hestevæddeløb! Tryk skiftevis på venstre og højre pil, så galopperer hesten. Tryk ikke på den samme to gange i træk.",
+    "speaker": "kanel"
+  },
+  "kappestrid.loeb-hop": {
+    "file": "78610a67bb1e30f4.mp3",
+    "text": "Når der kommer en tønde, så tryk på pilen opad for at hoppe. Og husk: jeg er stadig den hurtigste hest i Vesten.",
+    "speaker": "kanel"
+  },
+  "kappestrid.plakater-regler": {
+    "file": "d759cceb5aea3ff1.mp3",
+    "text": "Efterlyst! Nogen har hængt plakater af Bøvl-brødrene op rundt i byen. Find dem, og riv dem ned.",
+    "speaker": "kanel"
+  },
+  "kappestrid.plakater-hvor": {
+    "file": "4cf48ed91652d1f1.mp3",
+    "text": "De hænger på husenes mure. Gå tæt på, og tryk, når du står ved en plakat.",
+    "speaker": "kanel"
+  },
+  "kappestrid.vandt": {
+    "file": "376e666bba5b73ba.mp3",
+    "text": "Flot klaret, makker!",
+    "speaker": "kanel"
+  },
+  "kappestrid.slut": {
+    "file": "c634ce29e0b49714.mp3",
+    "text": "Godt kæmpet! Skal vi prøve igen?",
+    "speaker": "kanel"
+  },
   "titel.velkommen": {
     "file": "61a87cd4c855d8b6.mp3",
     "text": "Nå, så du er den nye grønskolling? Jeg hedder Kanel, og jeg er den klogeste hest vest for Mississippi. Sæt dig op i sadlen, makker. Vi skal hele vejen til Stillehavet, og solen venter ikke på nogen!",

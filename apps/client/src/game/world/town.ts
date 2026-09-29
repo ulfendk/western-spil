@@ -3,6 +3,12 @@ import { markStatic } from './batch.js';
 import { mulberry32 } from '../noise.js';
 import { outline, part } from '../toon.js';
 import type { Colliders } from './colliders.js';
+import {
+  buildContestCorner,
+  posterSpotsOn,
+  type ContestSpot,
+  type PosterSpot,
+} from './contestCorner.js';
 import { heightAt, trailX } from './terrain.js';
 
 /** Layout of a frontier town along the trail. */
@@ -58,6 +64,10 @@ export interface TownSpots {
   pitStart: THREE.Vector3;
   pitStake: THREE.Vector3;
   pitDir: THREE.Vector3;
+  /** Where the town contests start (none at the camp). */
+  contests?: ContestSpot[];
+  /** Walls where wanted posters can hang in the poster hunt. */
+  posterSpots?: PosterSpot[];
 }
 
 export function signTexture(
@@ -252,11 +262,13 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders, cfg: TownCon
   /** Front line of the buildings, measured from the middle of the street. */
   const FRONT = 8.5;
 
+  const posterSpots: PosterSpot[] = [];
   const place = (obj: THREE.Object3D, side: -1 | 1, z: number, depth: number, width: number) => {
     const x = street(z) + side * FRONT;
     obj.position.set(x, heightAt(x, z) - 0.05, z);
     obj.rotation.y = side < 0 ? FACE_EAST : FACE_WEST;
     scene.add(markStatic(obj));
+    posterSpotsOn(obj, width, posterSpots);
     // Collider covers the body and the porch.
     const centerOffset = (depth - 2.8) / 2;
     const cx = x + side * centerOffset;
@@ -339,6 +351,7 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders, cfg: TownCon
   const pitStake = pitStart.clone().addScaledVector(pitDir, 12);
   pitStake.y = heightAt(pitStake.x, pitStake.z);
   scene.add(markStatic(buildPit(pitStart, pitStake)));
+  const contests = buildContestCorner(scene, colliders, pitStart, pitDir);
 
   const cz = (cfg.zStart + cfg.zEnd) / 2;
   return {
@@ -348,6 +361,8 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders, cfg: TownCon
     pitStart,
     pitStake,
     pitDir,
+    contests,
+    posterSpots,
   };
 }
 

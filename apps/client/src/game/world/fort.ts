@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { markStatic } from './batch.js';
+import { buildContestCorner, posterSpotsOn, type PosterSpot } from './contestCorner.js';
 import type { Animated } from './animals.js';
 import type { Colliders } from './colliders.js';
 import { buildPerson, buildSoldier, type Npc } from './npc.js';
@@ -268,10 +269,12 @@ export function buildFort(scene: THREE.Scene, colliders: Colliders, L: FortLayou
   }
 
   // Buildings inside, doors facing the parade ground.
+  const posterSpots: PosterSpot[] = [];
   const place = (obj: THREE.Object3D, x: number, z: number, rotY: number, w: number, d: number) => {
     obj.position.copy(at(x, z));
     obj.rotation.y = rotY;
     g.add(markStatic(obj));
+    posterSpotsOn(obj, w, posterSpots);
     // Body extends backwards from the door (local −z).
     const back = new THREE.Vector3(0, 0, -d / 2).applyAxisAngle(new THREE.Vector3(0, 1, 0), rotY);
     colliders.addBox(L.x + x + back.x, L.z + z + back.z, w + 0.3, d + 0.3, rotY);
@@ -310,6 +313,7 @@ export function buildFort(scene: THREE.Scene, colliders: Colliders, L: FortLayou
   const pitStake = pitStart.clone().addScaledVector(pitDir, 12);
   pitStake.y = heightAt(pitStake.x, pitStake.z);
   g.add(buildPit(pitStart, pitStake));
+  const contests = buildContestCorner(g, colliders, pitStart, pitDir);
 
   // People: the sergeant at the gate, guards, and soldiers who drill for the parade.
   const sergeant = buildSoldier({ sergeant: true, moustache: true });
@@ -363,6 +367,8 @@ export function buildFort(scene: THREE.Scene, colliders: Colliders, L: FortLayou
     pitStart,
     pitStake,
     pitDir,
+    contests,
+    posterSpots,
     gate: at(hw + 4, 0),
     office: officeWorld,
     parade: at(0, -6),
