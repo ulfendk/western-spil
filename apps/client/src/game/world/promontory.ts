@@ -1,5 +1,7 @@
 import * as THREE from 'three';
+import { fitText } from '../canvasText.js';
 import { mergeLocal } from './batch.js';
+import { buildCowcatcher } from './railway.js';
 import { outline, part } from '../toon.js';
 import type { Npc } from './npc.js';
 import { sculptedNpc } from './people.js';
@@ -51,10 +53,7 @@ export function buildLocomotive(o: {
   ctx.fillStyle = o.trim;
   ctx.fillRect(0, 0, 256, 64);
   ctx.fillStyle = '#1b1b1b';
-  ctx.font = '40px Rye, serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(o.name, 128, 34);
+  fitText(ctx, o.name, 128, 34, 256 - 48, 40);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   for (const side of [-1, 1]) {
@@ -66,14 +65,7 @@ export function buildLocomotive(o: {
     plate.rotation.y = side * (Math.PI / 2);
     g.add(plate);
   }
-  const catcher = part(
-    new THREE.ConeGeometry(1.1, 1.2, 4),
-    o.wheels,
-    [0, 0.7, -3.9],
-    [-Math.PI / 2, Math.PI / 4, 0],
-  );
-  catcher.scale.set(1, 1, 0.5);
-  g.add(catcher);
+  g.add(buildCowcatcher(o.wheels, -3.5));
   for (const [z, r] of [
     [-2.4, 0.45],
     [-1.6, 0.45],

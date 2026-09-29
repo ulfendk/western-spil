@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { ambience } from '../../audio/ambience.js';
-import { buildTumbleweeds, buildVultures, type Animated } from './animals.js';
+import { buildCoyotes, buildTumbleweeds, buildVultures, type Animated } from './animals.js';
 import { Colliders, type Circle } from './colliders.js';
 import { buildRailway } from './railway.js';
 import { buildSky, SUN_DIR, type Mood } from './sky.js';
@@ -41,7 +41,14 @@ const LIGHT: Record<Mood, { hemi: number; sun: number; fog: string; near: number
   sunset: { hemi: 0.8, sun: 1.7, fog: '#e8a070', near: 120, far: 800 },
 };
 
-export function buildCommon(scene: THREE.Scene, opts: { train?: boolean } = {}): Common {
+export function buildCommon(
+  scene: THREE.Scene,
+  opts: {
+    train?: boolean;
+    /** Where a coyote pack roams (out of town, away from the trail). */
+    coyotes?: THREE.Vector2;
+  } = {},
+): Common {
   const colliders = new Colliders();
   const animated: Animated[] = [];
   const sky = buildSky();
@@ -92,6 +99,17 @@ export function buildCommon(scene: THREE.Scene, opts: { train?: boolean } = {}):
   const player = new THREE.Vector3();
 
   let mood: Mood = 'day';
+  if (opts.coyotes) {
+    const pack = buildCoyotes(
+      opts.coyotes,
+      3,
+      22,
+      () => player,
+      () => mood === 'night',
+    );
+    scene.add(pack);
+    animated.push(pack);
+  }
   let nextLightning = 5;
   let flash = 0;
   const setMood = (m: Mood) => {

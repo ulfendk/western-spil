@@ -27,7 +27,8 @@ export const LEJREN_TERRAIN: TerrainProfile = {
 };
 
 export function buildLejren(scene: THREE.Scene, opts: WorldOptions): World {
-  const common = buildCommon(scene);
+  // A coyote pack roams west of the trail.
+  const common = buildCommon(scene, { coyotes: new THREE.Vector2(trailX(90) - 60, 90) });
   const { colliders, animated } = common;
   // The Rockies, much closer now.
   const mountains = buildMountains();

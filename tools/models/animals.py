@@ -166,7 +166,70 @@ def prairie_dog(s):
                 preview_face=(V((0, 0.05, 0.44)), 0.5), preview_body=(V((0, 0, 0.25)), 1.4))
 
 
+def coyote(s):
+    """A lean, big-eared, cheeky coyote. Parts split like the horse (legs, head, tail) so it can trot and howl."""
+    fur, back, rust, pale, dark = "#9c8062", "#5e4a38", "#b8703a", "#eadcc0", "#3a2a1e"
+    s.part = "body"
+    s.color = fur
+    s.k = 0.05
+    # A long, lean body, deeper at the chest, with a darker saddle along the back.
+    s.capsule(V((0, -0.36, 0.56)), V((0, 0.32, 0.6)), 0.14, 0.17)
+    s.sphere(V((0, 0.36, 0.62)), 0.15, k=0.08)
+    s.capsule(V((0, 0.4, 0.66)), V((0, 0.5, 0.8)), 0.1, 0.08, k=0.06)
+    s.paint("ellipsoid", V((0, -0.02, 0.76)), (0.12, 0.46, 0.08), color=back)
+    s.paint("ellipsoid", V((0, 0.3, 0.46)), (0.1, 0.2, 0.1), color=pale)
+    s.paint("ellipsoid", V((0, 0.46, 0.7)), (0.07, 0.07, 0.1), color=pale)
+    legs = [(-0.09, 0.3), (0.09, 0.3), (-0.09, -0.34), (0.09, -0.34)]
+    for i, (x, y) in enumerate(legs):
+        s.part = f"leg_{i}"
+        s.color = rust
+        s.k = 0.02
+        top = V((x, y, 0.5))
+        if y > 0:
+            s.capsule(top, V((x, y + 0.02, 0.22)), 0.055, 0.032, color=fur)
+            s.capsule(V((x, y + 0.02, 0.22)), V((x, y + 0.03, 0.03)), 0.032, 0.027)
+        else:
+            hock = V((x, y - 0.08, 0.24))
+            s.capsule(top + V((0, 0.03, 0.02)), hock, 0.075, 0.032, color=fur)
+            s.capsule(hock, V((x, y - 0.04, 0.03)), 0.03, 0.027)
+        s.ellipsoid(V((x, y + 0.045, 0.022)), (0.032, 0.05, 0.022), color=dark, k=0.01)
+    # Head: a long, pointed muzzle, big rusty ears, amber eyes with a sly lid.
+    s.part = "head"
+    s.color = fur
+    s.k = 0.03
+    H = V((0, 0.55, 0.88))
+    s.sphere(H, 0.09)
+    s.capsule(H + V((0, 0.04, -0.02)), H + V((0, 0.24, -0.06)), 0.058, 0.022)
+    s.paint("ellipsoid", H + V((0, 0.14, -0.075)), (0.05, 0.12, 0.035), color=pale)
+    s.paint("sphere", H + V((0, -0.02, 0.07)), 0.07, color=back)
+    s.sphere(H + V((0, 0.255, -0.055)), 0.014, color="#1b1410", k=0.004)
+    for sx in (-1, 1):
+        base = H + V((sx * 0.05, -0.02, 0.06))
+        tip = base + V((sx * 0.045, -0.025, 0.16))
+        s.capsule(base, tip, 0.045, 0.008, color=rust, k=0.015)
+        s.carve("capsule", base + V((0, 0.02, 0.01)), tip + V((0, 0.012, -0.01)), 0.024, 0.004, color=pale, k=0.005)
+        animal_eye(s, H + V((sx * 0.045, 0.07, 0.025)), 0.02, (sx * 0.45, 0.9, 0.05), 0.32, fur, sx, iris="#c8902a")
+    # A bushy tail with a black tip, held low.
+    s.part = "tail"
+    s.color = fur
+    s.k = 0.03
+    base = V((0, -0.48, 0.6))
+    s.capsule(base, base + V((0, -0.14, -0.14)), 0.045, 0.07)
+    s.capsule(base + V((0, -0.14, -0.14)), base + V((0, -0.2, -0.32)), 0.07, 0.045)
+    s.sphere(base + V((0, -0.21, -0.35)), 0.045, color=dark)
+    pivots = dict(body=V((0, 0, 0)), head=H + V((0, -0.08, -0.06)), tail=base)
+    parents = dict(head="body", tail="body")
+    for i, (x, y) in enumerate(legs):
+        pivots[f"leg_{i}"] = V((x, y, 0.5))
+        parents[f"leg_{i}"] = "body"
+    return dict(pivots=pivots, parents=parents,
+                voxel=dict(body=0.006, head=0.003, tail=0.005, **{f"leg_{i}": 0.004 for i in range(4)}),
+                tris=dict(body=(2200, 350), head=(2600, 400), tail=(700, 120), **{f"leg_{i}": (500, 100) for i in range(4)}),
+                preview_face=(H + V((0, 0.1, 0)), 0.8), preview_body=(V((0, 0, 0.5)), 2.2))
+
+
 ANIMALS = {
+    "coyote": coyote,
     "bison": bison,
     "cow-a": lambda s: cow(s, "#b5652b", "#f3ecdc"),
     "cow-b": lambda s: cow(s, "#e9dfc4", "#3d2614"),

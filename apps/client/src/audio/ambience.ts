@@ -100,6 +100,56 @@ class Ambience {
     rainSrc.start(0, 1.3);
   }
 
+  /**
+   * A coyote howl: a rising, wavering glide that falls off at the end, then a few
+   * yips. `loudness` 0..1 (quieter further away).
+   */
+  howl(loudness: number) {
+    const ctx = narrator.audioContext();
+    if (!ctx || ctx.state !== 'running' || !this.master || loudness <= 0.02) return;
+    const t = ctx.currentTime;
+    const base = 520 + Math.random() * 120;
+    const o = ctx.createOscillator();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(base * 0.7, t);
+    o.frequency.exponentialRampToValueAtTime(base * 1.35, t + 0.6);
+    o.frequency.setValueAtTime(base * 1.35, t + 1.4);
+    o.frequency.exponentialRampToValueAtTime(base * 0.8, t + 2.1);
+    // Vibrato: a slow wobble on the pitch.
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 6;
+    const depth = ctx.createGain();
+    depth.gain.value = base * 0.025;
+    lfo.connect(depth).connect(o.frequency);
+    const g = ctx.createGain();
+    // The master bus sits low for the ambience; a howl should stand out a little.
+    const peak = 2.4 * loudness;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(peak, t + 0.35);
+    g.gain.setValueAtTime(peak, t + 1.6);
+    g.gain.linearRampToValueAtTime(0, t + 2.2);
+    o.connect(g).connect(this.master);
+    o.start(t);
+    lfo.start(t);
+    o.stop(t + 2.3);
+    lfo.stop(t + 2.3);
+    // Two or three yips after it.
+    for (let i = 0; i < 2 + Math.floor(Math.random() * 2); i++) {
+      const y0 = t + 2.35 + i * 0.22;
+      const y = ctx.createOscillator();
+      y.type = 'triangle';
+      y.frequency.setValueAtTime(base * 1.5, y0);
+      y.frequency.exponentialRampToValueAtTime(base * 0.9, y0 + 0.12);
+      const yg = ctx.createGain();
+      yg.gain.setValueAtTime(0, y0);
+      yg.gain.linearRampToValueAtTime(peak * 0.7, y0 + 0.02);
+      yg.gain.linearRampToValueAtTime(0, y0 + 0.13);
+      y.connect(yg).connect(this.master);
+      y.start(y0);
+      y.stop(y0 + 0.15);
+    }
+  }
+
   /** A short two- or three-note whistle, like a meadowlark far off. */
   private bird(ctx: AudioContext) {
     if (this.region === 'promontory' && Math.random() < 0.6) return;

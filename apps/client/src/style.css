@@ -1493,3 +1493,9 @@ h3 {
 .contest-hint[hidden] {
   display: none;
 }
+.pack[hidden] {
+  display: none;
+}
+.cook-canvas {
+  touch-action: none;
+}

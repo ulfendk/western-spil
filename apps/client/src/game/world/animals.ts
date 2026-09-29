@@ -1,10 +1,11 @@
 import * as THREE from 'three';
+import { ambience } from '../../audio/ambience.js';
 import { mergeLocal } from './batch.js';
 import { character } from '../models.js';
 import { mulberry32 } from '../noise.js';
 import { outline, part } from '../toon.js';
 import type { Circle } from './colliders.js';
-import { heightAt, walkHeightAt } from './terrain.js';
+import { heightAt, inWater, walkHeightAt } from './terrain.js';
 
 export interface Animated {
   update(dt: number, time: number): void;
@@ -479,7 +480,9 @@ export function buildVultures(center: THREE.Vector3): THREE.Group & Animated {
         center.y + b.height,
         center.z + Math.sin(a) * b.radius,
       );
-      b.bird.rotation.set(0, -a, 0.35);
+      // Face along the circle (the model faces −z) and bank into the turn (the
+      // centre is on the bird's right, so the right wing dips).
+      b.bird.rotation.set(0, Math.PI - a, -0.35);
       const flap = Math.sin(time * 2 + b.phase) * 0.15;
       b.wingL.rotation.z = flap;
       b.wingR.rotation.z = -flap;
@@ -521,4 +524,167 @@ export function buildTumbleweeds(): THREE.Group & Animated {
     }
   };
   return group;
+}
+
+/**
+ * A small coyote pack: they trot between spots around `center`, sit now and then,
+ * keep their distance from the player (trotting off if you come close), and at
+ * night sit down and howl at the sky.
+ */
+export function buildCoyotes(
+  center: THREE.Vector2,
+  count: number,
+  radius: number,
+  player: () => THREE.Vector3,
+  night: () => boolean,
+): THREE.Group & Animated {
+  const group = new THREE.Group() as THREE.Group & Animated;
+  const rand = mulberry32(Math.floor(center.x * 31 + center.y * 17));
+  type Mode = 'trot' | 'sit' | 'howl';
+  const pack = Array.from({ length: count }, () => {
+    const model = character('coyote') ?? primitiveCoyote();
+    const root = new THREE.Group();
+    root.add(model);
+    group.add(root);
+    const a = rand() * Math.PI * 2;
+    let x = center.x + Math.cos(a) * radius * rand();
+    let z = center.y + Math.sin(a) * radius * rand();
+    if (inWater(x, z, 3)) [x, z] = [center.x, center.y];
+    root.position.set(x, heightAt(x, z), z);
+    const get = (n: string) => model.getObjectByName(n) ?? new THREE.Object3D();
+    return {
+      root,
+      body: get('body'),
+      head: get('head'),
+      tail: get('tail'),
+      legs: [0, 1, 2, 3].map((i) => get(`leg_${i}`)),
+      goal: new THREE.Vector2(x, z),
+      mode: 'sit' as Mode,
+      timer: rand() * 4,
+      stride: rand() * 10,
+      heading: rand() * Math.PI * 2,
+      howled: false,
+    };
+  });
+  const pickGoal = (c: (typeof pack)[number], away?: THREE.Vector3) => {
+    // Coyotes keep their paws dry: try a few goals until one is on dry land.
+    for (let tries = 0; tries < 10; tries++) {
+      if (away && tries < 5) {
+        // Trot off, away from the player (turning a bit more each try).
+        const dx = c.root.position.x - away.x;
+        const dz = c.root.position.z - away.z;
+        const a = Math.atan2(dz, dx) + (tries % 2 ? 1 : -1) * tries * 0.4;
+        c.goal.set(c.root.position.x + Math.cos(a) * 16, c.root.position.z + Math.sin(a) * 16);
+      } else {
+        const a = rand() * Math.PI * 2;
+        const r = radius * Math.sqrt(rand());
+        c.goal.set(center.x + Math.cos(a) * r, center.y + Math.sin(a) * r);
+      }
+      if (!inWater(c.goal.x, c.goal.y, 3)) return;
+    }
+    c.goal.set(center.x, center.y);
+  };
+  group.update = (dt, time) => {
+    const p = player();
+    const isNight = night();
+    for (const c of pack) {
+      const pos = c.root.position;
+      const near = Math.hypot(p.x - pos.x, p.z - pos.z);
+      c.timer -= dt;
+      if (near < 12 && c.mode !== 'trot') {
+        c.mode = 'trot';
+        pickGoal(c, p);
+      } else if (c.timer <= 0) {
+        // Choose what to do next: at night mostly sit and howl.
+        const r = rand();
+        c.mode = isNight ? (r < 0.6 ? 'howl' : r < 0.8 ? 'sit' : 'trot') : r < 0.6 ? 'trot' : 'sit';
+        c.timer = c.mode === 'howl' ? 3.2 : 3 + rand() * 5;
+        c.howled = false;
+        if (c.mode === 'trot') pickGoal(c);
+      }
+      let speed = 0;
+      if (c.mode === 'trot') {
+        const dx = c.goal.x - pos.x;
+        const dz = c.goal.y - pos.z;
+        const d = Math.hypot(dx, dz);
+        if (d < 0.8) {
+          c.mode = 'sit';
+          c.timer = 2 + rand() * 4;
+        } else {
+          speed = near < 12 ? 6 : 3;
+          pos.x += (dx / d) * speed * dt;
+          pos.z += (dz / d) * speed * dt;
+          const want = Math.atan2(-dx, -dz);
+          c.heading +=
+            Math.atan2(Math.sin(want - c.heading), Math.cos(want - c.heading)) *
+            Math.min(1, dt * 6);
+        }
+      }
+      pos.y = heightAt(pos.x, pos.z);
+      c.root.rotation.y = c.heading;
+      // Pose: trotting legs, sitting (front up, hind legs folded), howling (nose to the sky).
+      const sitting = c.mode !== 'trot';
+      const ease = Math.min(1, dt * 5);
+      c.body.rotation.x += ((sitting ? 0.42 : 0) - c.body.rotation.x) * ease;
+      c.body.position.y +=
+        ((sitting ? 0.04 : Math.abs(Math.sin(c.stride)) * 0.03) - c.body.position.y) * ease;
+      if (speed > 0) {
+        c.stride += dt * speed * 3.2;
+        const swing = Math.sin(c.stride) * 0.6;
+        c.legs[0]!.rotation.x = swing;
+        c.legs[3]!.rotation.x = swing;
+        c.legs[1]!.rotation.x = -swing;
+        c.legs[2]!.rotation.x = -swing;
+      } else {
+        c.legs[0]!.rotation.x = c.legs[1]!.rotation.x = -0.42;
+        c.legs[2]!.rotation.x = c.legs[3]!.rotation.x = -1.3;
+      }
+      const howling = c.mode === 'howl';
+      c.head.rotation.x += ((howling ? 0.75 : sitting ? -0.15 : 0.1) - c.head.rotation.x) * ease;
+      c.head.rotation.y = sitting && !howling ? Math.sin(time * 0.7 + c.stride) * 0.4 : 0;
+      c.tail.rotation.x = sitting ? -0.4 : Math.sin(c.stride * 2) * 0.15;
+      if (howling && !c.howled && c.timer < 2.9) {
+        c.howled = true;
+        ambience.howl(Math.max(0, 1 - near / 120));
+      }
+    }
+  };
+  return group;
+}
+
+/** A simple stand-in coyote with the same parts, for when the models can't load. */
+function primitiveCoyote(): THREE.Group {
+  const fur = '#9c8062';
+  const root = new THREE.Group();
+  const body = new THREE.Group();
+  body.name = 'body';
+  root.add(body);
+  body.add(
+    part(new THREE.CapsuleGeometry(0.16, 0.6, 4, 8), fur, [0, 0.58, 0], [Math.PI / 2, 0, 0]),
+  );
+  const head = new THREE.Group();
+  head.name = 'head';
+  head.position.set(0, 0.8, -0.5);
+  head.add(part(new THREE.ConeGeometry(0.1, 0.3, 8), fur, [0, 0.05, -0.12], [-Math.PI / 2, 0, 0]));
+  for (const s of [-1, 1])
+    head.add(part(new THREE.ConeGeometry(0.04, 0.14, 4), fur, [s * 0.05, 0.14, 0.02]));
+  body.add(head);
+  const tail = new THREE.Group();
+  tail.name = 'tail';
+  tail.position.set(0, 0.6, 0.48);
+  tail.add(part(new THREE.CapsuleGeometry(0.05, 0.3, 4, 6), fur, [0, -0.15, 0.1], [-0.6, 0, 0]));
+  body.add(tail);
+  [
+    [-0.09, -0.3],
+    [0.09, -0.3],
+    [-0.09, 0.34],
+    [0.09, 0.34],
+  ].forEach(([x, z], i) => {
+    const leg = new THREE.Group();
+    leg.name = `leg_${i}`;
+    leg.position.set(x!, 0.5, z!);
+    leg.add(part(new THREE.CylinderGeometry(0.03, 0.03, 0.5, 6), fur, [0, -0.25, 0]));
+    body.add(leg);
+  });
+  return outline(root, 0.015);
 }

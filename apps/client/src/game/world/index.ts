@@ -7,6 +7,7 @@ import type { Mood } from './sky.js';
 import { buildFortet, FORTET_TERRAIN } from './regions/fortet.js';
 import { buildLejren, LEJREN_TERRAIN } from './regions/lejren.js';
 import { batchStatic } from './batch.js';
+import { buildCookout, clearGrass, freeSpot, type Cookout } from './cookout.js';
 import { buildBjergene, BJERGENE_TERRAIN } from './regions/bjergene.js';
 import { buildPromontory, PROMONTORY_TERRAIN } from './regions/promontory.js';
 import { buildPraerien, PRAERIEN_TERRAIN } from './regions/praerien.js';
@@ -57,6 +58,10 @@ export interface World {
   /** Stop Kanel following (e.g. while you cross the rope bridge). */
   setKanelFollow?(on: boolean): void;
   bridge?: THREE.Group & { setSway(amount: number): void };
+  /** The current weather / time of day (tracked by buildWorld). */
+  mood?(): Mood;
+  /** The cooking spot for the breakfast minigame (placed by buildWorld). */
+  cookout?: Cookout;
   /** The Bøvl brothers at Promontory: not there yet, at the ceremony, or caught. */
   setBrothers?(where: 'hidden' | 'ceremony' | 'caught'): void;
   setNail?(visible: boolean): void;
@@ -75,6 +80,23 @@ export interface WorldOptions {
 /** Builds a region into the (empty) scene. The land's shape is switched first. */
 export function buildWorld(scene: THREE.Scene, region: RegionId, opts: WorldOptions): World {
   const world = buildRegion(scene, region, opts);
+  // A cooking spot near where you arrive, somewhere free.
+  const spot = freeSpot(world.colliders, world.spawn);
+  const cookAnimated: { update(dt: number, time: number): void }[] = [];
+  world.cookout = buildCookout(scene, cookAnimated, world.colliders, spot.x, spot.y);
+  clearGrass(scene, spot.x + 0.2, spot.y + 0.4, 3.5);
+  let mood: Mood = 'day';
+  const setMood = world.setMood.bind(world);
+  world.setMood = (m) => {
+    mood = m;
+    setMood(m);
+  };
+  world.mood = () => mood;
+  const regionUpdate = world.update.bind(world);
+  world.update = (dt, time) => {
+    regionUpdate(dt, time);
+    for (const a of cookAnimated) a.update(dt, time);
+  };
   // Bake everything marked static into a few shared meshes (far fewer draw calls).
   batchStatic(scene);
   // Distance culling (grass and flowers far away are hidden) follows the player.

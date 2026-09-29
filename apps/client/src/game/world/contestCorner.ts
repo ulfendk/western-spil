@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { fitText } from '../canvasText.js';
 import type { ContestKind } from '@western/shared';
 import { markStatic } from './batch.js';
 import { outline, part } from '../toon.js';
@@ -172,10 +173,7 @@ function labelTexture(text: string, bg = '#b07a42', fg = '#2a1a0c'): THREE.Canva
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, 512, 128);
   ctx.fillStyle = fg;
-  ctx.font = `${text.length > 10 ? 54 : 70}px Rye, serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, 256, 68);
+  fitText(ctx, text, 256, 68, 512 - 80, 70);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
@@ -205,8 +203,7 @@ export function wantedPosterTexture(variant: number): THREE.CanvasTexture {
   ctx.strokeRect(8, 8, 240, 324);
   ctx.fillStyle = '#2a1a0c';
   ctx.textAlign = 'center';
-  ctx.font = '40px Rye, serif';
-  ctx.fillText('EFTERLYST', 128, 58);
+  fitText(ctx, 'EFTERLYST', 128, 58, 256 - 60, 40);
   // The brother: bigger face and taller hat the bigger he is.
   const s = 0.8 + v * 0.13;
   ctx.fillStyle = '#e8b48a';
@@ -223,10 +220,8 @@ export function wantedPosterTexture(variant: number): THREE.CanvasTexture {
   ctx.fillStyle = '#5a3a22';
   ctx.fillRect(100, 190, 56, 10 + v * 2);
   ctx.fillStyle = '#2a1a0c';
-  ctx.font = '26px Rye, serif';
-  ctx.fillText(['LILLE BØVL', 'BØVL', 'STORE BØVL', 'KÆMPE BØVL'][v]!, 128, 262);
-  ctx.font = '30px Rye, serif';
-  ctx.fillText('💲 BELØNNING', 128, 306);
+  fitText(ctx, ['LILLE BØVL', 'BØVL', 'STORE BØVL', 'KÆMPE BØVL'][v]!, 128, 262, 256 - 60, 26);
+  fitText(ctx, '💲 BELØNNING', 128, 306, 256 - 60, 30);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   posterTextures[v] = tex;

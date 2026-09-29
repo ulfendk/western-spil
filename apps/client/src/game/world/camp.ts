@@ -1,11 +1,15 @@
 import * as THREE from 'three';
+import { fitText } from '../canvasText.js';
 import { mulberry32 } from '../noise.js';
 import { outline, part } from '../toon.js';
 import type { Animated } from './animals.js';
 
-/** Campfire with stone ring, crossed logs, flickering flames, light and smoke. */
-export function buildCampfire(): THREE.Group & Animated {
-  const fire = new THREE.Group() as THREE.Group & Animated;
+/**
+ * Campfire with stone ring, crossed logs, flickering flames, light and smoke.
+ * `setLit(false)` leaves just the stones and logs.
+ */
+export function buildCampfire(): THREE.Group & Animated & { setLit(on: boolean): void } {
+  const fire = new THREE.Group() as THREE.Group & Animated & { setLit(on: boolean): void };
   const rand = mulberry32(3);
   const stones = new THREE.Group();
   for (let i = 0; i < 10; i++) {
@@ -69,7 +73,13 @@ export function buildCampfire(): THREE.Group & Animated {
     return { p, t: i / 6 };
   });
 
+  let lit = true;
+  fire.setLit = (on) => {
+    lit = on;
+    for (const o of [ember, light, ...flames, ...puffs.map((p) => p.p)]) o.visible = on;
+  };
   fire.update = (dt, time) => {
+    if (!lit) return;
     flames.forEach((f, i) => {
       const k = 1 + Math.sin(time * (9 + i) + i) * 0.15 + Math.sin(time * 23 + i * 3) * 0.08;
       f.scale.set(1, k, 1);
@@ -178,10 +188,8 @@ export function buildSign(text: string): THREE.Group {
     ctx.stroke();
   }
   ctx.fillStyle = '#2a1a0c';
-  ctx.font = '62px Rye, serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, 256, 68);
+  // Centred on the board's straight part (the arrow tip is the last 13 % of the canvas).
+  fitText(ctx, text, 221, 68, 360, 62);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   // Arrow-shaped board.
@@ -220,8 +228,7 @@ export function drawWantedPoster(): HTMLCanvasElement {
   ctx.fillRect(0, 0, 384, 512);
   ctx.fillStyle = '#2a1a0c';
   ctx.textAlign = 'center';
-  ctx.font = '64px Rye, serif';
-  ctx.fillText('EFTERLYST', 192, 78);
+  fitText(ctx, 'EFTERLYST', 192, 78, 384 - 60, 64);
   // Four brothers, shortest to tallest, in a row.
   const heights = [120, 160, 200, 240];
   heights.forEach((hgt, i) => {
@@ -242,10 +249,8 @@ export function drawWantedPoster(): HTMLCanvasElement {
     ctx.fillRect(x - 6, base - hgt + 27, 4, 4);
     ctx.fillRect(x + 3, base - hgt + 27, 4, 4);
   });
-  ctx.font = '40px Rye, serif';
-  ctx.fillText('BØVL-BRØDRENE', 192, 432);
-  ctx.font = '34px Rye, serif';
-  ctx.fillText('500 $ DUSØR', 192, 482);
+  fitText(ctx, 'BØVL-BRØDRENE', 192, 432, 384 - 60, 40);
+  fitText(ctx, '500 $ DUSØR', 192, 482, 384 - 60, 34);
   return c;
 }
 

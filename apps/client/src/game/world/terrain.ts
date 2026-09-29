@@ -118,6 +118,12 @@ export function riverBed(x: number): number {
   return rawHeight(x, r.z(x)) * 0.25 - 0.8;
 }
 
+/** Is this point in (or within `margin` metres of) the region's river or creek? */
+export function inWater(x: number, z: number, margin = 2): boolean {
+  const r = active.river;
+  return !!r && Math.abs(z - r.z(x)) < r.halfWidth + margin;
+}
+
 /** Water surface height of the river at x. */
 export function riverWater(x: number): number {
   return riverBed(x) + 0.55;

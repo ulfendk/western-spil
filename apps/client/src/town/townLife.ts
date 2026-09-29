@@ -1,6 +1,7 @@
 import { regionInfo, type ContestKind } from '@western/shared';
 import type { Game } from '../game/game.js';
 import { playCans } from '../minigames/cans.js';
+import { kanelSays, playCookout } from '../minigames/cookout.js';
 import { ContestClient, type ContestGame } from '../minigames/contest.js';
 import { HorseshoeClient } from '../minigames/horseshoe.js';
 import { playPosters } from '../minigames/posters.js';
@@ -10,11 +11,13 @@ import { DialogueRunner } from '../story/dialogue.js';
 import { script } from '../story/scripts.js';
 import type { Hud } from '../ui/hud.js';
 import { h } from '../ui/dom.js';
+import { toast } from '../ui/toast.js';
 
-type Activity = 'hestesko' | ContestKind;
+type Activity = 'hestesko' | 'kogning' | ContestKind;
 
 const PROMPTS: Record<Activity, string> = {
   hestesko: '🐴 Spil hestesko',
+  kogning: '🍳 Lav morgenmad over bål',
   daaser: '🥫 Skyd til dåser',
   loeb: '🐎 Hestevæddeløb',
   plakater: '📜 Find de efterlyste',
@@ -75,6 +78,9 @@ export class TownLife {
     const spots: { kind: Activity; at: typeof p }[] = [
       ...(town.hasPit !== false ? [{ kind: 'hestesko' as const, at: town.pitStart }] : []),
       ...(town.contests ?? []),
+      ...(this.game.world.cookout
+        ? [{ kind: 'kogning' as const, at: this.game.world.cookout.at }]
+        : []),
     ];
     let near: Activity | null = null;
     let best = 3.5;
@@ -97,6 +103,28 @@ export class TownLife {
     const progress = store.save.progress;
     if (!progress.flags.includes(flag)) {
       store.update({ progress: { ...progress, flags: [...progress.flags, flag] } });
+    }
+  }
+
+  /** Breakfast over the campfire: light it with the sun, open the beans, fry. */
+  private async cook() {
+    const world = this.game.world;
+    this.game.lockInput(true);
+    try {
+      const mood = world.mood?.() ?? 'day';
+      if (mood !== 'day' && mood !== 'sunset') {
+        await kanelSays(['kun-sol']);
+        return;
+      }
+      const result = await playCookout();
+      world.cookout?.setLit(true);
+      const great = result.breakfast >= 12;
+      const dollars = great ? 5 : result.breakfast >= 8 ? 3 : 2;
+      store.update({ dollars: store.save.dollars + dollars });
+      toast(great ? `🍳 Mesterkok! 💲${dollars}` : `🍳 Morgenmad! 💲${dollars}`);
+      await kanelSays([great ? 'mester' : 'fint']);
+    } finally {
+      this.game.lockInput(false);
     }
   }
 
@@ -123,7 +151,9 @@ export class TownLife {
     this.hud.setTalking(true);
     const townId = regionInfo(this.game.region).townId;
     try {
-      if (kind === 'hestesko') {
+      if (kind === 'kogning') {
+        await this.cook();
+      } else if (kind === 'hestesko') {
         await new HorseshoeClient(this.game, this.game.world.town, townId).play();
       } else {
         await new ContestClient(this.game, kind, townId, GAMES[kind]).play();

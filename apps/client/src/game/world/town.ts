@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { fitText } from '../canvasText.js';
 import { markStatic } from './batch.js';
 import { mulberry32 } from '../noise.js';
 import { outline, part } from '../toon.js';
@@ -87,10 +88,8 @@ export function signTexture(
   ctx.lineWidth = 6;
   ctx.strokeRect(8, 8, w - 16, h - 16);
   ctx.fillStyle = fg;
-  ctx.font = `${Math.floor(h * 0.55)}px Rye, serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, w / 2, h / 2 + 4);
+  // A margin of about one letter inside the painted border.
+  fitText(ctx, text, w / 2, h / 2 + 4, w - 2 * Math.max(40, h * 0.35), Math.floor(h * 0.55));
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;

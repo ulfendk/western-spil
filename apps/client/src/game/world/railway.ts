@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { markStatic, mergeLocal } from './batch.js';
-import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
 import { mesh, outline, part } from '../toon.js';
 import type { Animated } from './animals.js';
 import type { Colliders } from './colliders.js';
@@ -183,21 +182,7 @@ function buildTrain(): Train {
   loco.add(part(new THREE.BoxGeometry(2.5, 0.15, 2.4), '#2a2a2a', [0, 3.35, 2.3]));
   for (const side of [-1, 1])
     loco.add(part(new THREE.BoxGeometry(0.05, 0.7, 0.8), '#f6e7b0', [side * 1.06, 2.6, 2.2]));
-  // Cowcatcher.
-  // Wedge sloping down to a point at the front.
-  const catcher = part(
-    new ConvexGeometry([
-      new THREE.Vector3(-1.05, 1.1, -3.45),
-      new THREE.Vector3(1.05, 1.1, -3.45),
-      new THREE.Vector3(-1.05, 0.28, -3.45),
-      new THREE.Vector3(1.05, 0.28, -3.45),
-      new THREE.Vector3(0, 0.28, -4.5),
-      new THREE.Vector3(0, 0.55, -4.4),
-    ]),
-    '#b8322a',
-    [0, 0, 0],
-  );
-  loco.add(catcher);
+  loco.add(buildCowcatcher('#b8322a', -3.45));
   wheelSet(loco, -2.4, 0.45);
   wheelSet(loco, -0.3, 0.8);
   wheelSet(loco, 1.5, 0.8);
@@ -306,4 +291,40 @@ function buildTrain(): Train {
       }
     },
   };
+}
+
+/**
+ * An 1860s cowcatcher ("pilot"): a V of slanted bars below the smokebox, from a
+ * buffer beam at the front of the frame (z = backZ) down to a point at rail level.
+ * In the locomotive's frame (it faces −z).
+ */
+export function buildCowcatcher(color: string, backZ: number): THREE.Group {
+  const g = new THREE.Group();
+  const bar = (a: THREE.Vector3, b: THREE.Vector3, r: number) => {
+    const len = a.distanceTo(b);
+    const m = part(new THREE.CylinderGeometry(r, r, len, 6), color, [0, 0, 0]);
+    m.position.copy(a).add(b).multiplyScalar(0.5);
+    m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
+    g.add(m);
+  };
+  const halfW = 1.0;
+  const topY = 1.05;
+  const lowY = 0.28;
+  const reach = 1.0; // how far the point sticks out in front of the beam
+  // Buffer beam across the front of the frame.
+  g.add(part(new THREE.BoxGeometry(2.3, 0.3, 0.2), '#2a2a2a', [0, topY + 0.08, backZ]));
+  // Top rail and the V along the bottom.
+  const top = (t: number) => new THREE.Vector3(t * halfW, topY, backZ - 0.05);
+  const low = (t: number) => new THREE.Vector3(t * halfW, lowY, backZ - reach * (1 - Math.abs(t)));
+  bar(top(-1), top(1), 0.045);
+  bar(low(-1), low(0), 0.05);
+  bar(low(0), low(1), 0.05);
+  // Slanted bars from the top rail down to the V, fanning out from the point.
+  for (let i = -4; i <= 4; i++) {
+    const t = i / 4;
+    bar(top(t), low(t), 0.035);
+  }
+  // The nose post at the point.
+  bar(new THREE.Vector3(0, topY, backZ - 0.1), low(0), 0.05);
+  return outline(g, 0.02);
 }

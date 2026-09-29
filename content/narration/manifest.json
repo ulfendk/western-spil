@@ -1124,6 +1124,46 @@
     "text": "Godt kæmpet! Skal vi prøve igen?",
     "speaker": "kanel"
   },
+  "kogning.intro": {
+    "file": "6d1fe15541ef2d60.mp3",
+    "text": "Morgenmad over bål! Men først skal vi have ild. Og tændstikkerne er våde.",
+    "speaker": "kanel"
+  },
+  "kogning.lup": {
+    "file": "a603e7032b267cf3.mp3",
+    "text": "Brug luppen. Flyt den, så solpletten lander på det tørre græs. Gør pletten lille og skarp, så bliver den varm.",
+    "speaker": "kanel"
+  },
+  "kogning.ild": {
+    "file": "49411319516ca898.mp3",
+    "text": "Der er ild! Du er en rigtig spejder.",
+    "speaker": "kanel"
+  },
+  "kogning.boenner": {
+    "file": "ff1655e790731229.mp3",
+    "text": "Nu bønnerne. Kør dåseåbneren hele vejen rundt langs kanten.",
+    "speaker": "kanel"
+  },
+  "kogning.steg": {
+    "file": "749f60c2d562da71.mp3",
+    "text": "Så skal der steges. Læg æg og bacon på panden. Vend baconen, når den er gylden, og tag det af, før det brænder på.",
+    "speaker": "kanel"
+  },
+  "kogning.mester": {
+    "file": "a91d4b16ddb5a46c.mp3",
+    "text": "Mmm. Det dufter af mesterkok. Heste spiser ikke bacon, men jeg tager gerne en gulerod.",
+    "speaker": "kanel"
+  },
+  "kogning.fint": {
+    "file": "cab993b594d62a3a.mp3",
+    "text": "Ikke dårligt, grønskolling. Lidt sprødt hist og her, men det smager af Vesten.",
+    "speaker": "kanel"
+  },
+  "kogning.kun-sol": {
+    "file": "588d290dd5c82ff0.mp3",
+    "text": "Luppen virker kun, når solen skinner. Kom tilbage, når det er dag.",
+    "speaker": "kanel"
+  },
   "titel.velkommen": {
     "file": "61a87cd4c855d8b6.mp3",
     "text": "Nå, så du er den nye grønskolling? Jeg hedder Kanel, og jeg er den klogeste hest vest for Mississippi. Sæt dig op i sadlen, makker. Vi skal hele vejen til Stillehavet, og solen venter ikke på nogen!",

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { fitText } from './canvasText.js';
 import { heightAt } from './world/index.js';
 import { character } from './models.js';
 import { outline, part } from './toon.js';
@@ -238,9 +239,7 @@ function nameTag(text: string): THREE.Sprite {
   ctx.fill();
   ctx.stroke();
   ctx.fillStyle = '#1b1b1b';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, 256, 50);
+  fitText(ctx, text, 256, 50, w - 40, 52, '"Patrick Hand", sans-serif');
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false }));
@@ -268,9 +267,7 @@ function speechBubble(text: string): THREE.Sprite {
   ctx.fill();
   ctx.stroke();
   ctx.fillStyle = '#1b1b1b';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, 320, 58);
+  fitText(ctx, text, 320, 58, w - 60, 56, '"Patrick Hand", sans-serif');
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false }));

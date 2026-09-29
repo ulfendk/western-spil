@@ -49,6 +49,11 @@
     "hash": "82340bc19aaa-cow-c",
     "tris": 7076
   },
+  "coyote": {
+    "file": "coyote.glb",
+    "hash": "d5a6e6f3a5e6-coyote",
+    "tris": 10076
+  },
   "crew-a": {
     "file": "crew-a.glb",
     "hash": "82340bc19aaa-crew-a",

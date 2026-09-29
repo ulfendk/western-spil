@@ -48,7 +48,10 @@ export const PROMONTORY_TERRAIN: TerrainProfile = {
 
 export function buildPromontory(scene: THREE.Scene, opts: WorldOptions): World {
   // No passing train here: the two locomotives stand still for the ceremony.
-  const common = buildCommon(scene, { train: false });
+  const common = buildCommon(scene, {
+    train: false,
+    coyotes: new THREE.Vector2(trailX(50) - 60, 50),
+  });
   const { colliders, animated } = common;
   scene.add(buildMountains());
   const rand = mulberry32(69);

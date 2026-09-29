@@ -15,8 +15,13 @@ import { Screens } from './ui/screens.js';
 
 updater.start();
 void store.sync();
-// The sculpted people must be ready before the first region is built.
-await loadModels();
+// The sculpted people must be ready before the first region is built, and the
+// sign font too (signs are painted once, and measured to fit).
+await Promise.all([
+  loadModels(),
+  document.fonts.load('70px Rye').catch(() => undefined),
+  document.fonts.load('52px "Patrick Hand"').catch(() => undefined),
+]);
 
 const canvas = document.querySelector<HTMLCanvasElement>('#game')!;
 const ui = document.querySelector<HTMLElement>('#ui')!;

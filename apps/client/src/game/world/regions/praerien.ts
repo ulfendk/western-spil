@@ -54,7 +54,8 @@ function fordZ(): number {
 }
 
 export function buildPraerien(scene: THREE.Scene, opts: WorldOptions): World {
-  const common = buildCommon(scene);
+  // A coyote pack roams west of the trail.
+  const common = buildCommon(scene, { coyotes: new THREE.Vector2(trailX(60) - 110, 60) });
   const { colliders, animated } = common;
   scene.add(markStatic(buildLandmarks()));
   const water = buildRiverWater();

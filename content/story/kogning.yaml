@@ -1,0 +1,39 @@
+# The breakfast minigame at a campfire: Kanel explains each step.
+id: kogning
+lines:
+  - id: intro
+    speaker: kanel
+    text: Morgenmad over bål! Men først skal vi have ild. Og tændstikkerne er våde.
+  - id: lup
+    speaker: kanel
+    text: >-
+      Brug luppen. Flyt den, så solpletten lander på det tørre græs. Gør pletten lille og
+      skarp, så bliver den varm.
+    say: >-
+      Brug luppen. Flyt den så solpletten lander på det tørre græs. Gør pletten lille og
+      skarp, så bliver den varm.
+  - id: ild
+    speaker: kanel
+    text: Der er ild! Du er en rigtig spejder.
+  - id: boenner
+    speaker: kanel
+    text: Nu bønnerne. Kør dåseåbneren hele vejen rundt langs kanten.
+  - id: steg
+    speaker: kanel
+    text: >-
+      Så skal der steges. Læg æg og bacon på panden. Vend baconen, når den er gylden, og tag
+      det af, før det brænder på.
+    say: >-
+      Så skal der steges. Læg æg og bacon på panden. Vend baconen når den er gylden, og tag
+      det af før det brænder på.
+  - id: mester
+    speaker: kanel
+    text: Mmm. Det dufter af mesterkok. Heste spiser ikke bacon, men jeg tager gerne en gulerod.
+  - id: fint
+    speaker: kanel
+    text: Ikke dårligt, grønskolling. Lidt sprødt hist og her, men det smager af Vesten.
+    say: Ikke dårligt, grønskolling. Lidt sprødt hist og her, men det smager af Vesten.
+  - id: kun-sol
+    speaker: kanel
+    text: Luppen virker kun, når solen skinner. Kom tilbage, når det er dag.
+    say: Luppen virker kun når solen skinner. Kom tilbage når det er dag.
