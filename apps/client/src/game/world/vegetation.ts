@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { chunkInstances, markStatic } from './batch.js';
 import { fbm, mulberry32 } from '../noise.js';
 import { faceted, gradientMap, mesh, outline, part } from '../toon.js';
 import type { Colliders } from './colliders.js';
@@ -128,7 +129,8 @@ export function buildVegetation(opts: VegetationOptions): THREE.Group {
     placed++;
   }
   grass.count = placed;
-  group.add(grass);
+  // Grass blades are too small to see far away: only draw the chunks nearby.
+  group.add(chunkInstances(grass, 110));
 
   // Wildflowers: tiny coloured dots scattered in the grass.
   const flowerGeo = new THREE.IcosahedronGeometry(0.07, 0);
@@ -150,7 +152,7 @@ export function buildVegetation(opts: VegetationOptions): THREE.Group {
     flowers.setMatrixAt(i, dummy.matrix);
     flowers.setColorAt(i, tint.set(flowerColors[Math.floor(rand() * flowerColors.length)]!));
   }
-  group.add(flowers);
+  group.add(chunkInstances(flowers, 90));
 
   // Sagebrush: puffy grey-green bushes.
   const bushGeo = faceted(
@@ -175,7 +177,7 @@ export function buildVegetation(opts: VegetationOptions): THREE.Group {
     opts.colliders.add(x, z, 0.45 * s);
     bushes.setColorAt(i, tint.setHSL(0.2 + rand() * 0.08, 0.22, 0.45 + rand() * 0.12));
   }
-  group.add(bushes);
+  group.add(chunkInstances(bushes, 220));
 
   // Saguaros, prickly pears and rock clusters: individual meshes with outlines.
   for (let i = 0; i < 90; i++) {
@@ -197,7 +199,7 @@ export function buildVegetation(opts: VegetationOptions): THREE.Group {
     }
     prop.position.set(x, heightAt(x, z) - 0.15, z);
     prop.rotation.y = rand() * Math.PI * 2;
-    group.add(prop);
+    group.add(markStatic(prop));
     opts.colliders.add(x, z, radius * prop.scale.x);
   }
   return group;

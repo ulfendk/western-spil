@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { markStatic, mergeLocal } from '../batch.js';
 import { buildBisonHerd, buildCattle, buildHorse } from '../animals.js';
 import { buildCampfire } from '../camp.js';
 import { addVegetation, buildCommon, place, streetKeepOut } from '../common.js';
@@ -55,7 +56,7 @@ function fordZ(): number {
 export function buildPraerien(scene: THREE.Scene, opts: WorldOptions): World {
   const common = buildCommon(scene);
   const { colliders, animated } = common;
-  scene.add(buildLandmarks());
+  scene.add(markStatic(buildLandmarks()));
   const water = buildRiverWater();
   scene.add(water.mesh);
   animated.push(water);
@@ -75,7 +76,8 @@ export function buildPraerien(scene: THREE.Scene, opts: WorldOptions): World {
     const x = C.x + Math.cos(a) * 11;
     const z = C.y + Math.sin(a) * 11;
     const w = place(buildWagon(), x, z, -a);
-    scene.add(w);
+    // The broken wagon tilts when repaired, so it only merges its own parts.
+    scene.add(i === 1 ? w : markStatic(w));
     for (const d of [-1.6, 0, 1.6]) colliders.add(x - Math.sin(-a) * d, z - Math.cos(-a) * d, 1.3);
     if (i === 1) {
       // The Jensens' wagon: a rear wheel has come off and lies in the grass.
@@ -85,6 +87,8 @@ export function buildPraerien(scene: THREE.Scene, opts: WorldOptions): World {
       });
       brokenWheel!.visible = false;
       w.rotation.z = 0.12;
+      brokenWheel!.userData.moving = true;
+      mergeLocal(w);
       looseWheel = wheel(0.85);
       looseWheel.rotation.set(0, 0, Math.PI / 2);
       const wp = new THREE.Vector3(1.6, 0, 3.2)
@@ -139,7 +143,7 @@ export function buildPraerien(scene: THREE.Scene, opts: WorldOptions): World {
   const town = buildTown(scene, colliders, STOEVBY_TOWN);
   const penZ = -135;
   const pen = new THREE.Vector2(trailX(penZ) + 34, penZ);
-  scene.add(buildPen(pen, 10, colliders));
+  scene.add(markStatic(buildPen(pen, 10, colliders)));
   const cattle = buildCattle(pen, 7, 10);
   scene.add(cattle);
   animated.push(cattle);

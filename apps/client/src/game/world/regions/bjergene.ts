@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { markStatic } from '../batch.js';
 import { buildHorse } from '../animals.js';
 import { addVegetation, buildCommon, place, streetKeepOut } from '../common.js';
 import type { World, WorldOptions } from '../index.js';
@@ -78,10 +79,10 @@ export function buildBjergene(scene: THREE.Scene, opts: WorldOptions): World {
   const tunnel = buildMineEntrance('VEJTUNNEL', signTexture('VEJTUNNEL', '#b07a42', '#2a1a0c'));
   place(tunnel, tunnelX, FACE_Z + 3, 0);
   tunnel.position.y = heightAt(tunnelX, FACE_Z + 6);
-  scene.add(tunnel);
+  scene.add(markStatic(tunnel));
   const rocks = buildRockfall(rand, 6);
   place(rocks, tunnelX, FACE_Z + 5.5, 0);
-  scene.add(rocks);
+  scene.add(markStatic(rocks));
   colliders.addBox(tunnelX, FACE_Z + 6, 8, 5, 0);
 
   // The old silver mine on the far side of the gorge.
@@ -89,7 +90,7 @@ export function buildBjergene(scene: THREE.Scene, opts: WorldOptions): World {
   const mine = buildMineEntrance('SØLVMINEN', signTexture('SØLVMINEN', '#b07a42', '#2a1a0c'));
   place(mine, mineX, FACE_Z + 3, 0);
   mine.position.y = heightAt(mineX, FACE_Z + 7);
-  scene.add(mine);
+  scene.add(markStatic(mine));
 
   // The rope bridge over the gorge.
   const bridge = buildRopeBridge(GORGE_X - 10.5, GORGE_X + 10.5, BRIDGE_Z, rimY + 0.05);
@@ -142,7 +143,7 @@ export function buildBjergene(scene: THREE.Scene, opts: WorldOptions): World {
     if (Math.abs(x - mineX) < 8 && Math.abs(z - FACE_Z) < 12) continue;
     const y = heightAt(x, z);
     const pine = place(buildPine(rand, y > 14), x, z, rand() * 6);
-    scene.add(pine);
+    scene.add(markStatic(pine));
     colliders.add(x, z, 0.5);
   }
 

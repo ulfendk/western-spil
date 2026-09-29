@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { markStatic, mergeLocal } from './batch.js';
 import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
 import { mesh, outline, part } from '../toon.js';
 import type { Animated } from './animals.js';
@@ -71,7 +72,7 @@ export function buildRailway(
     for (const x of [-0.5, 0.5])
       pole.add(part(new THREE.CylinderGeometry(0.05, 0.05, 0.14, 6), '#6fb3a8', [x, 6.73, 0]));
     pole.position.set(poleX, y, z);
-    group.add(outline(pole, 0.02));
+    group.add(markStatic(outline(pole, 0.02)));
     colliders.add(poleX, z, 0.3);
     poleTops.push(new THREE.Vector3(poleX, y + 6.8, z));
   }
@@ -142,6 +143,7 @@ function buildTrain(): Train {
       );
       w.add(part(new THREE.BoxGeometry(0.16, r * 1.8, 0.1), '#e8c35a', [0, 0, 0]));
       w.position.set((side * GAUGE) / 2 + side * 0.1, r + 0.2, z);
+      w.userData.moving = true;
       parent.add(w);
       wheels.push(w);
     }
@@ -202,7 +204,7 @@ function buildTrain(): Train {
   // Connecting rods.
   for (const side of [-1, 1])
     loco.add(part(new THREE.BoxGeometry(0.06, 0.1, 2.0), '#c0c0c0', [side * 0.95, 0.95, 0.6]));
-  group.add(outline(loco, 0.04));
+  group.add(mergeLocal(outline(loco, 0.04)));
   cars.push({ obj: loco, offset: 0 });
 
   // Tender with firewood.
@@ -219,7 +221,7 @@ function buildTrain(): Train {
     );
   wheelSet(tender, -0.9, 0.45);
   wheelSet(tender, 0.9, 0.45);
-  group.add(outline(tender, 0.04));
+  group.add(mergeLocal(outline(tender, 0.04)));
   cars.push({ obj: tender, offset: 5.9 });
 
   // Passenger cars and a freight car.
@@ -247,7 +249,7 @@ function buildTrain(): Train {
     car.add(part(new THREE.BoxGeometry(2.0, 0.25, 7.2), '#2a2a2a', [0, 0.85, 0]));
     wheelSet(car, -2.6, 0.45);
     wheelSet(car, 2.6, 0.45);
-    group.add(outline(car, 0.04));
+    group.add(mergeLocal(outline(car, 0.04)));
     cars.push({ obj: car, offset: 5.9 + 5.8 + c * 8.1 });
   }
   const length = cars[cars.length - 1]!.offset + 4;

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { markStatic } from '../batch.js';
 import { buildHorse } from '../animals.js';
 import { addVegetation, buildCommon, place, streetKeepOut } from '../common.js';
 import type { World, WorldOptions } from '../index.js';
@@ -82,7 +83,7 @@ export function buildPromontory(scene: THREE.Scene, opts: WorldOptions): World {
     name: 'No. 119',
   });
   no119.position.set(RAIL_X, railY(CEREMONY_Z + 9), CEREMONY_Z + 9);
-  scene.add(jupiter, no119);
+  scene.add(markStatic(jupiter), markStatic(no119));
   for (const z of [CEREMONY_Z - 9, CEREMONY_Z + 9]) colliders.addBox(RAIL_X, z, 2.8, 8, 0);
 
   // The last sleeper, of polished laurel wood, and the golden nail (after the ceremony).
@@ -91,7 +92,7 @@ export function buildPromontory(scene: THREE.Scene, opts: WorldOptions): World {
     railY(CEREMONY_Z) - 0.05,
     CEREMONY_Z,
   ]);
-  scene.add(outline(tie, 0.02));
+  scene.add(markStatic(outline(tie, 0.02)));
   const nail = new THREE.Group();
   nail.add(part(new THREE.CylinderGeometry(0.04, 0.02, 0.35, 8), '#e8c24a', [0, 0, 0]));
   nail.add(part(new THREE.CylinderGeometry(0.08, 0.08, 0.04, 10), '#e8c24a', [0, 0.18, 0]));
@@ -150,7 +151,7 @@ export function buildPromontory(scene: THREE.Scene, opts: WorldOptions): World {
       heightAt(RAIL_X - 8, workZ + 4) + 0.1 + i * 0.17,
       workZ + 4,
     ]);
-    scene.add(stack);
+    scene.add(markStatic(stack));
   }
   colliders.add(RAIL_X - 8, workZ + 4, 1.5);
 
@@ -166,7 +167,7 @@ export function buildPromontory(scene: THREE.Scene, opts: WorldOptions): World {
   const carX = RAIL_X + 9;
   const carZ = CEREMONY_Z + 22;
   car.position.set(carX, heightAt(carX, carZ), carZ);
-  scene.add(car);
+  scene.add(markStatic(car));
   colliders.addBox(carX, carZ, 2.8, 7.5, 0);
 
   // Kanel walks with the player.

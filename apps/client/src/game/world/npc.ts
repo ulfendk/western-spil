@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mergeLocal } from './batch.js';
 import { outline, part } from '../toon.js';
 import type { Animated } from './animals.js';
 
@@ -97,6 +98,9 @@ export function buildPind(): Npc {
   body.add(part(new THREE.SphereGeometry(0.04, 8, 6), '#e0b84a', [0, 2.22, -0.21]));
 
   outline(body, 0.02);
+  beard.userData.moving = true;
+  mergeLocal(beard);
+  mergeLocal(body);
 
   let target: THREE.Vector3 | null = null;
   npc.lookAtPlayer = (p) => (target = p);
@@ -194,7 +198,7 @@ export function buildPerson(o: PersonOptions): Npc {
     body.add(brim);
   }
   body.scale.setScalar(o.scale);
-  outline(body, 0.018);
+  mergeLocal(outline(body, 0.018));
 
   let target: THREE.Vector3 | null = null;
   npc.lookAtPlayer = (p) => (target = p);
@@ -283,6 +287,8 @@ export function buildSoldier(
   );
   body.add(part(new THREE.CircleGeometry(0.035, 8), '#e0b84a', [0, 2.13, -0.19]));
   outline(body, 0.018);
+  for (const limb of legs) mergeLocal(limb).userData.moving = true;
+  mergeLocal(body);
 
   let target: THREE.Vector3 | null = null;
   npc.lookAtPlayer = (p) => (target = p);
@@ -371,7 +377,7 @@ export function buildElder(): Npc {
       [0, 1.96, 0.02],
     ),
   );
-  outline(body, 0.018);
+  mergeLocal(outline(body, 0.018));
 
   let target: THREE.Vector3 | null = null;
   npc.lookAtPlayer = (p) => (target = p);
@@ -421,7 +427,7 @@ export function buildMiner(): Npc {
   body.add(part(new THREE.CylinderGeometry(0.22, 0.24, 0.16, 14), '#5e3a1a', [0, 2.14, 0]));
   body.add(part(new THREE.CylinderGeometry(0.05, 0.05, 0.12, 8), '#f3ecdc', [0, 2.2, -0.24]));
   body.add(part(new THREE.SphereGeometry(0.035, 6, 4), '#ffcf70', [0, 2.29, -0.24]));
-  outline(body, 0.018);
+  mergeLocal(outline(body, 0.018));
 
   let target: THREE.Vector3 | null = null;
   npc.lookAtPlayer = (p) => (target = p);

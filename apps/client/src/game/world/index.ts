@@ -6,6 +6,7 @@ import type { Fort } from './fort.js';
 import type { Mood } from './sky.js';
 import { buildFortet, FORTET_TERRAIN } from './regions/fortet.js';
 import { buildLejren, LEJREN_TERRAIN } from './regions/lejren.js';
+import { batchStatic } from './batch.js';
 import { buildBjergene, BJERGENE_TERRAIN } from './regions/bjergene.js';
 import { buildPromontory, PROMONTORY_TERRAIN } from './regions/promontory.js';
 import { buildPraerien, PRAERIEN_TERRAIN } from './regions/praerien.js';
@@ -73,6 +74,31 @@ export interface WorldOptions {
 
 /** Builds a region into the (empty) scene. The land's shape is switched first. */
 export function buildWorld(scene: THREE.Scene, region: RegionId, opts: WorldOptions): World {
+  const world = buildRegion(scene, region, opts);
+  // Bake everything marked static into a few shared meshes (far fewer draw calls).
+  batchStatic(scene);
+  // Distance culling (grass and flowers far away are hidden) follows the player.
+  const culls: ((p: THREE.Vector3) => void)[] = [];
+  scene.traverse((o) => {
+    if (typeof o.userData.cull === 'function')
+      culls.push(o.userData.cull as (p: THREE.Vector3) => void);
+  });
+  if (culls.length) {
+    const setPlayer = world.setPlayerPosition.bind(world);
+    let last: THREE.Vector3 | null = null;
+    world.setPlayerPosition = (p, heading) => {
+      setPlayer(p, heading);
+      // Re-check only after moving a few metres.
+      if (!last || last.distanceToSquared(p) > 16) {
+        last = p.clone();
+        for (const cull of culls) cull(p);
+      }
+    };
+  }
+  return world;
+}
+
+function buildRegion(scene: THREE.Scene, region: RegionId, opts: WorldOptions): World {
   if (region === 'promontory') {
     setTerrain(PROMONTORY_TERRAIN);
     return buildPromontory(scene, opts);

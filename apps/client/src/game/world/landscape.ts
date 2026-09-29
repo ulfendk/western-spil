@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { markStatic } from './batch.js';
 import { fbm, mulberry32 } from '../noise.js';
 import { faceted, gradientMap, outline, toon } from '../toon.js';
 
@@ -83,7 +84,7 @@ export function buildMesas(): THREE.Group {
     }
     g.position.set(Math.cos(angle) * dist, -3, Math.sin(angle) * dist);
     g.rotation.y = rand() * Math.PI;
-    group.add(outline(g, 0.35));
+    group.add(markStatic(outline(g, 0.35)));
   }
   return group;
 }

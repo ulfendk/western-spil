@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { markStatic } from './batch.js';
 import { mulberry32 } from '../noise.js';
 import { outline, part } from '../toon.js';
 import type { Colliders } from './colliders.js';
@@ -255,7 +256,7 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders, cfg: TownCon
     const x = street(z) + side * FRONT;
     obj.position.set(x, heightAt(x, z) - 0.05, z);
     obj.rotation.y = side < 0 ? FACE_EAST : FACE_WEST;
-    scene.add(obj);
+    scene.add(markStatic(obj));
     // Collider covers the body and the porch.
     const centerOffset = (depth - 2.8) / 2;
     const cx = x + side * centerOffset;
@@ -309,7 +310,7 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders, cfg: TownCon
   arch.add(archSign);
   const ax = street(archZ);
   arch.position.set(ax, heightAt(ax, archZ), archZ);
-  scene.add(outline(arch, 0.03));
+  scene.add(markStatic(outline(arch, 0.03)));
   for (const side of [-1, 1]) colliders.add(ax + side * 5, archZ, 0.4);
 
   // Water tower behind the east side, props along the boardwalks.
@@ -317,7 +318,7 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders, cfg: TownCon
   const wz = cfg.waterTowerZ;
   const wx = street(wz) + 24;
   wt.position.set(wx, heightAt(wx, wz), wz);
-  scene.add(wt);
+  scene.add(markStatic(wt));
   colliders.add(wx, wz, 2.6);
   for (let z = cfg.zStart + 2; z < cfg.zEnd; z += 6 + rand() * 6) {
     const side = rand() < 0.5 ? -1 : 1;
@@ -326,7 +327,7 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders, cfg: TownCon
     const prop = rand() < 0.7 ? barrel() : trough();
     prop.position.set(x, heightAt(x, z), z);
     prop.rotation.y = rand() * Math.PI;
-    scene.add(prop);
+    scene.add(markStatic(prop));
     colliders.add(x, z, prop.children.length > 3 ? 1.1 : 0.45);
   }
 
@@ -337,7 +338,7 @@ export function buildTown(scene: THREE.Scene, colliders: Colliders, cfg: TownCon
   const pitDir = new THREE.Vector3(-1, 0, 0);
   const pitStake = pitStart.clone().addScaledVector(pitDir, 12);
   pitStake.y = heightAt(pitStake.x, pitStake.z);
-  scene.add(buildPit(pitStart, pitStake));
+  scene.add(markStatic(buildPit(pitStart, pitStake)));
 
   const cz = (cfg.zStart + cfg.zEnd) / 2;
   return {

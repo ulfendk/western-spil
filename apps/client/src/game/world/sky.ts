@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { markStatic } from './batch.js';
 import { mulberry32 } from '../noise.js';
 import { outline } from '../toon.js';
 
@@ -171,7 +172,7 @@ export function buildSky(): Sky {
     const dist = 450 + rand() * 450;
     cloud.position.set(Math.cos(angle) * dist, 130 + rand() * 110, Math.sin(angle) * dist);
     cloud.lookAt(0, cloud.position.y, 0);
-    group.add(outline(cloud, 0.5));
+    group.add(markStatic(outline(cloud, 0.5)));
   }
 
   return {

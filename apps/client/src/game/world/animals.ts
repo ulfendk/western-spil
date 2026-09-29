@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mergeLocal } from './batch.js';
 import { mulberry32 } from '../noise.js';
 import { outline, part } from '../toon.js';
 import type { Circle } from './colliders.js';
@@ -137,6 +138,10 @@ export function buildHorse(opts: { saddle?: boolean; coat?: string } = {}): Hors
   }
 
   outline(horse, 0.022);
+  // Fewer draw calls: merge each moving part on its own (all of them move).
+  for (const moving of [body, ...legs, head, tail, saddle])
+    mergeLocal(moving).userData.moving = true;
+  mergeLocal(neck).userData.moving = true;
 
   let nextSwish = 2;
   let swish = 0;
@@ -243,7 +248,7 @@ function buildBison(): THREE.Group {
     b.add(part(new THREE.CapsuleGeometry(0.13, 0.7, 4, 8), fur, [x, 0.45, z]));
   }
   b.add(part(new THREE.CylinderGeometry(0.03, 0.03, 0.6, 5), shag, [0, 1.3, 1.2], [0.5, 0, 0]));
-  return outline(b, 0.03);
+  return mergeLocal(outline(b, 0.03));
 }
 
 /** A slowly grazing, wandering herd. */
@@ -361,7 +366,7 @@ function buildCow(rand: () => number): THREE.Group {
   ] as const) {
     c.add(part(new THREE.CapsuleGeometry(0.08, 0.6, 4, 6), coat, [x, 0.4, z]));
   }
-  return outline(c, 0.025);
+  return mergeLocal(outline(c, 0.025));
 }
 
 /** A few longhorns mooching around inside a pen (radius r). */
@@ -460,7 +465,7 @@ export function buildTumbleweeds(): THREE.Group & Animated {
       m.castShadow = true;
       w.add(m);
     }
-    group.add(w);
+    group.add(mergeLocal(w));
     return { w, x: -150 + i * 55, z: -40 + i * 30, phase: i * 1.3, speed: 2.6 + rand() * 1.4 };
   });
   group.update = (dt, time) => {

@@ -248,15 +248,64 @@ function groundDetailTexture(): THREE.CanvasTexture {
   return tex;
 }
 
-export function buildTerrain(): THREE.Mesh {
-  const size = WORLD_SIZE * 1.8;
-  const geo = new THREE.PlaneGeometry(size, size, 360, 360);
-  geo.rotateX(-Math.PI / 2);
-  const pos = geo.attributes.position as THREE.BufferAttribute;
-  for (let i = 0; i < pos.count; i++) pos.setY(i, heightAt(pos.getX(i), pos.getZ(i)));
-  geo.computeVertexNormals();
+/** Tiles per side: separate meshes so the ones outside the view are skipped. */
+const TERRAIN_TILES = 8;
+const TERRAIN_SEGMENTS = 360;
 
-  const normals = geo.attributes.normal as THREE.BufferAttribute;
+export function buildTerrain(): THREE.Group {
+  const size = WORLD_SIZE * 1.8;
+  const group = new THREE.Group();
+  const detail = groundDetailTexture();
+  detail.repeat.set(size / 4, size / 4);
+  const mat = new THREE.MeshToonMaterial({ vertexColors: true, map: detail, gradientMap });
+  const tile = size / TERRAIN_TILES;
+  const segs = TERRAIN_SEGMENTS / TERRAIN_TILES;
+  const step = tile / segs;
+  for (let tx = 0; tx < TERRAIN_TILES; tx++) {
+    for (let tz = 0; tz < TERRAIN_TILES; tz++) {
+      const cx = -size / 2 + (tx + 0.5) * tile;
+      const cz = -size / 2 + (tz + 0.5) * tile;
+      const geo = terrainTile(cx, cz, tile, segs, step, size);
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.receiveShadow = true;
+      mesh.matrixAutoUpdate = false;
+      group.add(mesh);
+    }
+  }
+  return group;
+}
+
+/** One square of ground in world coordinates, coloured by height, slope and noise. */
+function terrainTile(
+  cx: number,
+  cz: number,
+  tile: number,
+  segs: number,
+  step: number,
+  size: number,
+): THREE.BufferGeometry {
+  const geo = new THREE.PlaneGeometry(tile, tile, segs, segs);
+  geo.rotateX(-Math.PI / 2);
+  geo.translate(cx, 0, cz);
+  const pos = geo.attributes.position as THREE.BufferAttribute;
+  const uv = geo.attributes.uv as THREE.BufferAttribute;
+  const normal = geo.attributes.normal as THREE.BufferAttribute;
+  const n = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const z = pos.getZ(i);
+    pos.setY(i, heightAt(x, z));
+    // Continuous across tiles: texture coordinates and normals come from the
+    // world position (not the tile's own edges), so there are no seams.
+    uv.setXY(i, x / size + 0.5, 0.5 - z / size);
+    const dx = heightAt(x + step, z) - heightAt(x - step, z);
+    const dz = heightAt(x, z + step) - heightAt(x, z - step);
+    n.set(-dx, 2 * step, -dz).normalize();
+    normal.setXYZ(i, n.x, n.y, n.z);
+  }
+  geo.computeBoundingSphere();
+
+  const normals = normal;
   const colors = new Float32Array(pos.count * 3);
   const c = new THREE.Color();
   for (let i = 0; i < pos.count; i++) {
@@ -298,12 +347,7 @@ export function buildTerrain(): THREE.Mesh {
     colors.set([c.r, c.g, c.b], i * 3);
   }
   geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  const detail = groundDetailTexture();
-  detail.repeat.set(size / 4, size / 4);
-  const mat = new THREE.MeshToonMaterial({ vertexColors: true, map: detail, gradientMap });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.receiveShadow = true;
-  return mesh;
+  return geo;
 }
 
 /** A dirt ribbon with wheel ruts laid over the terrain along the trail. */

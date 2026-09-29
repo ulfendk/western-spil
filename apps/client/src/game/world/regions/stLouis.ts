@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { markStatic } from '../batch.js';
 import { buildBisonHerd, buildHorse } from '../animals.js';
 import {
   buildCampfire,
@@ -26,7 +27,7 @@ export const ST_LOUIS_TERRAIN: TerrainProfile = {
 export function buildStLouis(scene: THREE.Scene, opts: WorldOptions): World {
   const common = buildCommon(scene);
   const { colliders, animated } = common;
-  scene.add(buildMesas());
+  scene.add(markStatic(buildMesas()));
   scene.add(buildMountains());
 
   // The camp by the trail where the journey begins.
@@ -34,7 +35,7 @@ export function buildStLouis(scene: THREE.Scene, opts: WorldOptions): World {
   const camp = new THREE.Vector2(trailX(campZ) + 11, campZ);
 
   const wagon = place(buildWagon(), camp.x - 1.5, camp.y - 6, 0.15);
-  scene.add(wagon);
+  scene.add(markStatic(wagon));
   for (const dz of [-1.6, 0, 1.6]) {
     colliders.add(wagon.position.x + Math.sin(0.15) * dz, wagon.position.z + dz, 1.3);
   }
@@ -49,7 +50,7 @@ export function buildStLouis(scene: THREE.Scene, opts: WorldOptions): World {
   scene.add(fire);
   animated.push(fire);
   colliders.add(fire.position.x, fire.position.z, 1.0);
-  scene.add(place(buildCampProps(), camp.x + 2, camp.y + 2));
+  scene.add(markStatic(place(buildCampProps(), camp.x + 2, camp.y + 2)));
   // Log seats and bedroll around the fire (offsets match buildCampProps).
   for (const [dx, dz, r] of [
     [-0.5, 1.9, 0.4],
@@ -62,7 +63,7 @@ export function buildStLouis(scene: THREE.Scene, opts: WorldOptions): World {
   }
 
   const fence = place(buildFence(24), camp.x + 8, camp.y - 12);
-  scene.add(fence);
+  scene.add(markStatic(fence));
   for (let i = 0; i <= 10; i++) colliders.add(fence.position.x, fence.position.z + i * 2.4, 0.6);
 
   const signZ = 32;

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mergeLocal } from './batch.js';
 import { outline, part } from '../toon.js';
 import type { Npc } from './npc.js';
 
@@ -170,7 +171,7 @@ export function buildForeman(): Npc {
       [0.3, 0, Math.PI / 2],
     ),
   );
-  outline(body, 0.018);
+  mergeLocal(outline(body, 0.018));
   return figure(npc, body);
 }
 
@@ -192,6 +193,6 @@ export function buildBoevl(size: number, coat: string): Npc {
   body.add(part(new THREE.CylinderGeometry(0.36, 0.36, 0.035, 18), '#2a2a2a', [0, 2.04, 0]));
   body.add(part(new THREE.CylinderGeometry(0.17, 0.2, 0.24, 14), '#2a2a2a', [0, 2.18, 0]));
   body.scale.setScalar(size);
-  outline(body, 0.02);
+  mergeLocal(outline(body, 0.02));
   return figure(npc, body, 6);
 }

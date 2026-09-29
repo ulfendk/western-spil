@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { markStatic } from './batch.js';
 import type { Animated } from './animals.js';
 import type { Colliders } from './colliders.js';
 import { buildPerson, buildSoldier, type Npc } from './npc.js';
@@ -235,7 +236,7 @@ export function buildFort(scene: THREE.Scene, colliders: Colliders, L: FortLayou
       L.z + side * (gateHalf + gateHalf / 2 - 0.2),
     );
     door.rotation.y = side * 1.3;
-    g.add(outline(door, 0.02));
+    g.add(markStatic(outline(door, 0.02)));
   }
   const gateSign = new THREE.Mesh(
     new THREE.BoxGeometry(5.6, 1, 0.15),
@@ -262,7 +263,7 @@ export function buildFort(scene: THREE.Scene, colliders: Colliders, L: FortLayou
   ] as const) {
     const b = blockhouse();
     b.position.copy(at(x, z));
-    g.add(b);
+    g.add(markStatic(b));
     colliders.addBox(L.x + x, L.z + z, 6.4, 6.4, 0);
   }
 
@@ -270,7 +271,7 @@ export function buildFort(scene: THREE.Scene, colliders: Colliders, L: FortLayou
   const place = (obj: THREE.Object3D, x: number, z: number, rotY: number, w: number, d: number) => {
     obj.position.copy(at(x, z));
     obj.rotation.y = rotY;
-    g.add(obj);
+    g.add(markStatic(obj));
     // Body extends backwards from the door (local −z).
     const back = new THREE.Vector3(0, 0, -d / 2).applyAxisAngle(new THREE.Vector3(0, 1, 0), rotY);
     colliders.addBox(L.x + x + back.x, L.z + z + back.z, w + 0.3, d + 0.3, rotY);
@@ -288,7 +289,7 @@ export function buildFort(scene: THREE.Scene, colliders: Colliders, L: FortLayou
   const cn = cannon();
   cn.position.copy(at(4, -3));
   cn.rotation.y = -Math.PI / 2;
-  g.add(cn);
+  g.add(markStatic(cn));
   colliders.add(L.x + 4.6, L.z - 3, 1.2);
   for (const [x, z] of [
     [hw - 3, hd - 12],
@@ -297,7 +298,7 @@ export function buildFort(scene: THREE.Scene, colliders: Colliders, L: FortLayou
   ] as const) {
     const b = barrel();
     b.position.copy(at(x, z));
-    g.add(b);
+    g.add(markStatic(b));
     colliders.add(L.x + x, L.z + z, 0.45);
   }
   // Telegraph wire from the office roof out through the gate towards the railway poles.

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { markStatic } from '../batch.js';
 import { buildHorse } from '../animals.js';
 import { buildCampfire } from '../camp.js';
 import { buildBucket, buildCottonwood, buildRack, buildTipi } from '../camp4.js';
@@ -44,7 +45,7 @@ export function buildLejren(scene: THREE.Scene, opts: WorldOptions): World {
     const x = CAMP_X + Math.cos(a) * 15;
     const z = CAMP_Z + Math.sin(a) * 15;
     const h = 5.5 + rand() * 1.5;
-    scene.add(place(buildTipi(i, h), x, z, 0));
+    scene.add(markStatic(place(buildTipi(i, h), x, z, 0)));
     colliders.add(x, z, h * 0.42);
   }
   const fire = place(buildCampfire(), CAMP_X, CAMP_Z);
@@ -55,7 +56,7 @@ export function buildLejren(scene: THREE.Scene, opts: WorldOptions): World {
     [-7, 9, 0],
     [8, -8, 0.6],
   ] as const) {
-    scene.add(place(buildRack(), CAMP_X + dx, CAMP_Z + dz, r));
+    scene.add(markStatic(place(buildRack(), CAMP_X + dx, CAMP_Z + dz, r)));
     colliders.add(CAMP_X + dx, CAMP_Z + dz, 1.7);
   }
 
@@ -82,7 +83,7 @@ export function buildLejren(scene: THREE.Scene, opts: WorldOptions): World {
       const z = creekZ(x) + side * (CREEK_HALF_WIDTH + 4 + rand() * 6);
       if (Math.abs(x - trailX(z)) < 7) continue;
       const tree = place(buildCottonwood(rand), x, z, rand() * 6);
-      scene.add(tree);
+      scene.add(markStatic(tree));
       colliders.add(x, z, 0.6);
     }
   }
