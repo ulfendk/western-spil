@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { mergeLocal } from './batch.js';
+import { character } from '../models.js';
 import { mulberry32 } from '../noise.js';
 import { outline, part } from '../toon.js';
 import type { Circle } from './colliders.js';
@@ -18,6 +19,15 @@ export type Horse = THREE.Group &
     /** Walk towards the player and keep them company (null = stand still). */
     follow(target: THREE.Vector3 | null, heading: number): void;
   };
+
+/** Sculpted horses by coat colour (buildHorse's `coat` option); Kanel by default. */
+const HORSE_MODELS: Record<string, string> = {
+  kanel: 'kanel',
+  '#6b4423': 'horse-bay',
+  '#e9dfc4': 'horse-white',
+  '#3a2a1e': 'horse-black',
+  '#a0703a': 'horse-dun',
+};
 
 export function buildHorse(opts: { saddle?: boolean; coat?: string } = {}): Horse {
   const coat = opts.coat ?? '#b5652b';
@@ -137,11 +147,27 @@ export function buildHorse(opts: { saddle?: boolean; coat?: string } = {}): Hors
     );
   }
 
-  outline(horse, 0.022);
-  // Fewer draw calls: merge each moving part on its own (all of them move).
-  for (const moving of [body, ...legs, head, tail, saddle])
-    mergeLocal(moving).userData.moving = true;
-  mergeLocal(neck).userData.moving = true;
+  // The sculpted horse (tools/models) is split at the same joints: swap its parts
+  // in for the primitive ones and the animation below works unchanged.
+  const sculpted = character(HORSE_MODELS[opts.coat ?? 'kanel'] ?? 'kanel');
+  if (sculpted) {
+    horse.updateMatrixWorld(true);
+    sculpted.updateMatrixWorld(true);
+    const groups: Record<string, THREE.Object3D> = { body, neck, head, tail, saddle };
+    legs.forEach((leg, i) => (groups[`leg_${i}`] = leg));
+    for (const [name, group] of Object.entries(groups)) {
+      for (const child of [...group.children])
+        if ((child as THREE.Mesh).isMesh) group.remove(child);
+      const lod = sculpted.getObjectByName(`${name}_lod`);
+      if (lod) group.attach(lod);
+    }
+  } else {
+    outline(horse, 0.022);
+    // Fewer draw calls: merge each moving part on its own (all of them move).
+    for (const moving of [body, ...legs, head, tail, saddle])
+      mergeLocal(moving).userData.moving = true;
+    mergeLocal(neck).userData.moving = true;
+  }
 
   let nextSwish = 2;
   let swish = 0;

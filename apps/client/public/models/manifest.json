@@ -1,107 +1,132 @@
 {
   "boevl-1": {
     "file": "boevl-1.glb",
-    "hash": "ebd91c494114-boevl-1",
-    "tris": 15375
+    "hash": "e4032e26f902-boevl-1",
+    "tris": 15372
   },
   "boevl-2": {
     "file": "boevl-2.glb",
-    "hash": "ebd91c494114-boevl-2",
-    "tris": 15373
+    "hash": "e4032e26f902-boevl-2",
+    "tris": 15370
   },
   "boevl-3": {
     "file": "boevl-3.glb",
-    "hash": "ebd91c494114-boevl-3",
-    "tris": 15374
+    "hash": "e4032e26f902-boevl-3",
+    "tris": 15373
   },
   "boevl-4": {
     "file": "boevl-4.glb",
-    "hash": "ebd91c494114-boevl-4",
-    "tris": 15374
+    "hash": "e4032e26f902-boevl-4",
+    "tris": 15373
   },
   "crew-a": {
     "file": "crew-a.glb",
-    "hash": "ebd91c494114-crew-a",
-    "tris": 14576
+    "hash": "e4032e26f902-crew-a",
+    "tris": 14572
   },
   "crew-b": {
     "file": "crew-b.glb",
-    "hash": "ebd91c494114-crew-b",
+    "hash": "e4032e26f902-crew-b",
     "tris": 14575
+  },
+  "horse-bay": {
+    "file": "horse-bay.glb",
+    "hash": "e4032e26f902-horse-bay",
+    "tris": 20966
+  },
+  "horse-black": {
+    "file": "horse-black.glb",
+    "hash": "e4032e26f902-horse-black",
+    "tris": 20966
+  },
+  "horse-dun": {
+    "file": "horse-dun.glb",
+    "hash": "e4032e26f902-horse-dun",
+    "tris": 20966
+  },
+  "horse-white": {
+    "file": "horse-white.glb",
+    "hash": "e4032e26f902-horse-white",
+    "tris": 20966
   },
   "jensen": {
     "file": "jensen.glb",
-    "hash": "ebd91c494114-jensen",
-    "tris": 14518
+    "hash": "e4032e26f902-jensen",
+    "tris": 14529
+  },
+  "kanel": {
+    "file": "kanel.glb",
+    "hash": "e4032e26f902-kanel",
+    "tris": 23364
   },
   "li": {
     "file": "li.glb",
-    "hash": "ebd91c494114-li",
-    "tris": 14576
+    "hash": "e4032e26f902-li",
+    "tris": 14572
   },
   "mato": {
     "file": "mato.glb",
-    "hash": "ebd91c494114-mato",
-    "tris": 14575
+    "hash": "e4032e26f902-mato",
+    "tris": 14572
   },
   "miner": {
     "file": "miner.glb",
-    "hash": "ebd91c494114-miner",
-    "tris": 14576
+    "hash": "e4032e26f902-miner",
+    "tris": 14575
   },
   "morten": {
     "file": "morten.glb",
-    "hash": "ebd91c494114-morten",
-    "tris": 14575
+    "hash": "e4032e26f902-morten",
+    "tris": 14576
   },
   "pind": {
     "file": "pind.glb",
-    "hash": "ebd91c494114-pind",
+    "hash": "e4032e26f902-pind",
     "tris": 17881
   },
   "ruth": {
     "file": "ruth.glb",
-    "hash": "ebd91c494114-ruth",
-    "tris": 14576
+    "hash": "e4032e26f902-ruth",
+    "tris": 14574
   },
   "sergeant": {
     "file": "sergeant.glb",
-    "hash": "ebd91c494114-sergeant",
-    "tris": 19473
+    "hash": "e4032e26f902-sergeant",
+    "tris": 19472
   },
   "sofie": {
     "file": "sofie.glb",
-    "hash": "ebd91c494114-sofie",
-    "tris": 14574
+    "hash": "e4032e26f902-sofie",
+    "tris": 14575
   },
   "soldier": {
     "file": "soldier.glb",
-    "hash": "ebd91c494114-soldier",
+    "hash": "e4032e26f902-soldier",
     "tris": 19474
   },
   "soldier-m": {
     "file": "soldier-m.glb",
-    "hash": "ebd91c494114-soldier-m",
+    "hash": "e4032e26f902-soldier-m",
     "tris": 19472
   },
   "wanbli": {
     "file": "wanbli.glb",
-    "hash": "ebd91c494114-wanbli",
-    "tris": 14575
+    "hash": "e4032e26f902-wanbli",
+    "tris": 14572
   },
   "woman-a": {
     "file": "woman-a.glb",
-    "hash": "ebd91c494114-woman-a",
-    "tris": 14518
+    "hash": "e4032e26f902-woman-a",
+    "tris": 14525
   },
   "woman-b": {
     "file": "woman-b.glb",
-    "hash": "ebd91c494114-woman-b",
-    "tris": 14576
+    "hash": "e4032e26f902-woman-b",
+    "tris": 14574
   },
   "woman-c": {
     "file": "woman-c.glb",
-    "hash": "ebd91c494114-woman-c",
-    "tris": 14576
+    "hash": "e4032e26f902-woman-c",
+    "tris": 14574
   }
 }

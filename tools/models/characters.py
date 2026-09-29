@@ -118,17 +118,28 @@ def shape(s, fn, lo, hi, **kw):
 def head(s, H, f):
     """
     A comic head centred at H. `f` holds the face:
-      skin, size, jaw (width), nose ('round' | 'long' | 'button' | 'hook'), nose_size,
-      nose_tint, brows (colour), brow_w (thickness), brow_tilt, eyes (iris colour),
-      eye_size, hair (colour), hair_style ('short' | 'fringe' | 'bun' | 'braids' |
-      'long' | 'bald' | 'none'), beard (None | 'full' | 'short' | 'goatee' | 'stubble'),
-      beard_color, beard_part, moustache (None | 'walrus' | 'handlebar' | 'thin'),
-      glasses, cheeks (blush colour), smile (0..1), age (0..1 wrinkles), ears (size).
+      skin, size
+      shape      skull (width, depth, height) multipliers, e.g. (1.08, 1, 0.94) for a wide head
+      face_len   lower face length (1 = normal, 1.25 = long, 0.85 = short)
+      jaw        jaw width;  chin ('round' | 'square' | 'pointy' | 'double'), chin_size
+      cheekbones 0..1 high, wide cheekbones
+      nose       'round' | 'long' | 'button' | 'hook';  nose_size, nose_tint
+      eyes       iris colour;  eye_size, eye_gap (spacing), eye_style ('round' | 'dot')
+      lids       0..0.7 how far the upper eyelids come down (sleepy, wise, sceptical)
+      lid_tilt   -1..1 outer corners down (sad, kind) or up (sly)
+      lower_lid  0..0.3;  bags (age);  lashes (bool);  gaze (x, z) where the eyes look
+      brows      colour;  brow_w (thickness), brow_tilt (+ angry, - worried), brow_lift
+      hair, hair_style ('short' | 'fringe' | 'bun' | 'braids' | 'long' | 'bald' | 'none')
+      beard ('full' | 'short' | 'goatee'), beard_color, beard_part
+      moustache ('walrus' | 'handlebar' | 'thin'), moustache_color
+      glasses, cheeks (blush colour), freckles, lips, smile (-1..1), age (0..1), ears (size)
     """
     z = f.get("size", 1.0)
     skin = f["skin"]
     hair = f.get("hair", "#5e3a1a")
     jaw = f.get("jaw", 1.0)
+    L = f.get("face_len", 1.0)
+    sw, sd, sh = f.get("shape", (1.0, 1.0, 1.0))
 
     def P(x, y, zz):
         return V(H) + V((x * z, y * z, zz * z))
@@ -137,48 +148,87 @@ def head(s, H, f):
     s.color = skin
     s.k = 0.02 * z
     # Cranium, lower face, cheeks, chin and neck, softly blended.
-    s.ellipsoid(P(0, -0.008, 0.02), (0.104 * z, 0.114 * z, 0.124 * z))
-    s.ellipsoid(P(0, 0.024, -0.052), (0.086 * z * jaw, 0.088 * z, 0.072 * z))
+    s.ellipsoid(P(0, -0.008, 0.02), (0.104 * z * sw, 0.114 * z * sd, 0.124 * z * sh))
+    s.ellipsoid(P(0, 0.024, -0.052 * L), (0.086 * z * jaw, 0.088 * z, 0.072 * z * L))
+    cb = f.get("cheekbones", 0.0)
     for sx in (-1, 1):
-        s.sphere(P(sx * 0.054, 0.066, -0.028), 0.037 * z, k=0.025 * z)
-    s.sphere(P(0, 0.07, -0.098), 0.031 * z * f.get("chin", 1.0))
-    s.capsule(P(0, -0.012, -0.07), P(0, -0.022, -0.21), 0.05 * z, 0.056 * z, k=0.03 * z)
+        s.sphere(P(sx * (0.054 + cb * 0.012), 0.066, -0.028 + cb * 0.012), (0.037 + cb * 0.004) * z, k=0.025 * z)
+    chin = f.get("chin", "round")
+    cs = f.get("chin_size", 1.0)
+    cz = -0.098 * L
+    if chin == "square":
+        s.box(P(0, 0.066, cz), (0.045 * z * cs * jaw, 0.03 * z, 0.026 * z * cs), rnd=0.018 * z, k=0.02 * z)
+    elif chin == "pointy":
+        s.capsule(P(0, 0.06, cz + 0.02), P(0, 0.082, cz - 0.012), 0.03 * z * cs, 0.015 * z * cs, k=0.02 * z)
+    else:
+        s.sphere(P(0, 0.07, cz), 0.031 * z * cs)
+        if chin == "double":
+            s.ellipsoid(P(0, 0.05, cz - 0.03), (0.06 * z, 0.05 * z, 0.03 * z), k=0.025 * z)
+    s.capsule(P(0, -0.012, -0.07 * L), P(0, -0.022, -0.21 * L), 0.05 * z, 0.056 * z, k=0.03 * z)
     # Brow ridge.
     s.capsule(P(-0.048, 0.094, 0.036), P(0.048, 0.094, 0.036), 0.017 * z, k=0.018 * z)
 
-    # Eyes: sockets carved into the face, eyeballs set in, a dark upper lid line,
-    # painted iris and pupil (looking straight ahead).
-    eye_r = 0.0225 * z * f.get("eye_size", 1.0)
+    # Eyes: sockets carved into the face with real eyeballs set in (see build.py),
+    # eyelids of skin that can come down over them, and a dark lid line on the edge.
+    style = f.get("eye_style", "round")
+    eye_r = (0.0125 if style == "dot" else 0.0225) * z * f.get("eye_size", 1.0)
+    gap = f.get("eye_gap", 1.0)
+    lids = f.get("lids", 0.0)
+    tilt = f.get("lid_tilt", 0.0)
+    gx, gz = f.get("gaze", (0.0, 0.0))
     for sx in (-1, 1):
-        ex = sx * 0.041
-        # (No tint: the baked occlusion shades the socket more cleanly.)
+        ex = sx * 0.041 * gap
+        # (No tint in the socket: the baked occlusion shades it more cleanly.)
         s.carve("sphere", P(ex, 0.108, 0.008), 0.028 * z, k=0.01 * z)
-        # The eyeballs are built as real spheres, so the iris and pupil stay round.
-        s.eyes.append(dict(center=P(ex, 0.108 - eye_r / z, 0.008), radius=eye_r, iris=f.get("eyes", "#4a3322"), side=sx))
-        # Upper lid: a dark line along the top of the eyeball.
         c = P(ex, 0.108 - eye_r / z, 0.008)
-        lid = f.get("lid", INK)
+        s.eyes.append(dict(center=c, radius=eye_r, iris=f.get("eyes", "#4a3322"), side=sx, style=style,
+                           look=V((gx, 1.0, gz)).normalized()))
+        # The upper lid: a shell over the eyeball, cut by a plane that comes down
+        # with `lids` and tilts with `lid_tilt` (outer corner up or down).
+        R = eye_r + 0.003 * z  # a lid thick enough to survive the 2 mm meshing
+        n = V((sx * tilt * 0.35, -0.25, 1.0)).normalized()
+        h = R * (0.62 - lids * 1.25)
+        shell = minus(ell_fn(c, (R, R, R)), ell_fn(c, (eye_r * 0.96,) * 3))
+        lid_fn = intersect(shell, plane_fn(c + n * h, n))
+        shape(s, lid_fn, c - V((R, R, R)), c + V((R, R, R)), color=skin, k=0.0015 * z)
+        # The dark line along the lid's edge (thicker with lashes, flicked at the outer corner).
+        u = n.cross(V((1, 0, 0))).normalized()
+        if u.y < 0:
+            u = -u
+        w = n.cross(u).normalized()
+        rho = np.sqrt(max(R * R - h * h, 1e-8))
+        lash = f.get("lashes", False)
         arc = []
-        for t in np.linspace(-1, 1, 7):
-            phi = t * np.radians(75)
-            theta = np.radians(40)
-            d = V((np.sin(phi) * np.sin(theta), np.cos(theta), np.cos(phi) * np.sin(theta)))
-            arc.append(c + d * (eye_r + 0.0012 * z))
+        for t in np.linspace(-1, 1, 9):
+            phi = t * np.radians(80)
+            arc.append(c + n * h + (u * np.cos(phi) + w * np.sin(phi)) * (rho + 0.0008 * z))
+        lid_color = f.get("lid", INK)
         for a, b in zip(arc, arc[1:]):
-            s.capsule(a, b, 0.0034 * z, color=lid, k=0.001 * z)
+            s.capsule(a, b, (0.0042 if lash else 0.0032) * z, color=lid_color, k=0.001 * z)
+        if lash:
+            outer = arc[0] if (arc[0].x - c.x) * sx > 0 else arc[-1]
+            s.capsule(outer, outer + V((sx * 0.007 * z, 0.002 * z, 0.004 * z)), 0.0028 * z, color=lid_color, k=0.001 * z)
+        if f.get("lower_lid", 0) > 0 or f.get("bags", 0) > 0:
+            lower = f.get("lower_lid", 0.0)
+            hl = -R * (0.75 - lower * 1.4)
+            lo_fn = intersect(shell, plane_fn(c + V((0, 0, hl)), (0, 0, -1)))
+            shape(s, lo_fn, c - V((R, R, R)), c + V((R, R, R)), color=skin, k=0.0015 * z)
+            if f.get("bags", 0) > 0:
+                s.capsule(P(ex - sx * 0.012, 0.098, -0.016), P(ex + sx * 0.014, 0.094, -0.014), 0.006 * z * f["bags"], k=0.008 * z)
         # Eyebrows.
         bw = f.get("brow_w", 0.0075) * z
-        tilt = f.get("brow_tilt", 0.0)
-        inner = P(ex - sx * 0.018, 0.108, 0.048 - tilt * 0.01)
-        mid = P(ex + sx * 0.002, 0.112, 0.056)
-        outer = P(ex + sx * 0.024, 0.104, 0.05 + tilt * 0.006)
+        btilt = f.get("brow_tilt", 0.0)
+        lift = f.get("brow_lift", 0.0) * 0.01
+        inner = P(ex - sx * 0.018, 0.108, 0.048 - btilt * 0.01 + lift)
+        mid = P(ex + sx * 0.002, 0.112, 0.056 + lift)
+        outer = P(ex + sx * 0.024, 0.104, 0.05 + btilt * 0.006 + lift * 0.6)
         brows = f.get("brows", hair)
         s.capsule(inner, mid, bw, color=brows, k=0.003 * z)
         s.capsule(mid, outer, bw * 0.85, color=brows, k=0.003 * z)
         # Ears with a hollow.
         ear = f.get("ears", 1.0)
-        s.ellipsoid(P(sx * 0.1, -0.004, 0.0), (0.016 * z, 0.028 * z * ear, 0.04 * z * ear), R=rot(0, sx * -12, 0), k=0.01 * z)
-        s.carve("sphere", P(sx * 0.114, 0.002, 0.002), 0.013 * z * ear, color=shade(skin, 0.8), k=0.004 * z)
+        s.ellipsoid(P(sx * 0.1 * sw, -0.004, 0.0), (0.016 * z, 0.028 * z * ear, 0.04 * z * ear), R=rot(0, sx * -12, 0), k=0.01 * z)
+        s.carve("sphere", P(sx * 0.114 * sw, 0.002, 0.002), 0.013 * z * ear, k=0.004 * z)
 
     # Nose: the comic heart of the face.
     nose = f.get("nose", "round")
@@ -200,7 +250,7 @@ def head(s, H, f):
 
     # Mouth: a carved smile (a frown when negative) and a lower lip.
     smile = f.get("smile", 0.5)
-    mouth_y, mouth_z = 0.101, -0.066
+    mouth_y, mouth_z = 0.101, -0.066 * L
     pts = [P(x, mouth_y - abs(x) * 0.45, mouth_z + (x / 0.028) ** 2 * 0.016 * smile) for x in (-0.028, -0.014, 0.0, 0.014, 0.028)]
     for a, b in zip(pts, pts[1:]):
         # A groove with a dark shape set into it: reads by its shape and stays crisp.
@@ -293,7 +343,7 @@ def beard(s, P, z, style, color, part):
     elif style == "short":
         clipped_ellipsoid(s, P(0, 0.035, -0.07), (0.092 * z, 0.08 * z, 0.078 * z), P(0, 0.1, -0.07), (0, -0.2, -1), k=0.01 * z)
     elif style == "goatee":
-        s.capsule(P(0, 0.09, -0.09), P(0, 0.1, -0.125), 0.022 * z, 0.012 * z, k=0.008 * z)
+        s.capsule(P(0, 0.088, -0.092), P(0, 0.094, -0.118), 0.016 * z, 0.008 * z, k=0.006 * z)
     # ('stubble' adds nothing: painted stubble looked like dirt, the frown carries the look.)
     s.part = "head"
 
@@ -418,11 +468,19 @@ def figure(s, o):
     limbs = o.get("limbs", False)
     s.k = 0.03 * f
 
-    # ---- legs
+    # ---- legs: `stance` spreads the feet, `shift` puts the weight on one leg
+    # (-1 left, 1 right): the other knee bends a little and the foot turns out.
     skirt = garment == "dress"
+    stance = o.get("stance", 0.0)
+    shift = o.get("shift", 0)
     for sx, side in ((-1, "l"), (1, "r")):
         s.part = f"leg_{side}" if limbs else "body"
-        hip, knee, ankle = P(sx * 0.1, 0, 0.9), P(sx * 0.105, 0.01, 0.48), P(sx * 0.105, 0.0, 0.12)
+        free = shift != 0 and sx != shift
+        fx = 0.105 + stance + (0.03 if free else 0.0)
+        hip = P(sx * 0.1, 0, 0.9)
+        knee = P(sx * (0.105 + stance * 0.5 + (0.01 if free else 0)), 0.06 if free else 0.01, 0.48)
+        ankle = P(sx * fx, 0.04 if free else 0.0, 0.12)
+        foot_turn = rot(0, 0, sx * -16) if free else None
         if not skirt:
             leg_color = o.get("trousers", "#3a3330")
             s.capsule(hip, knee, 0.078 * f, 0.063 * f, color=leg_color, k=0.02 * f)
@@ -431,11 +489,12 @@ def figure(s, o):
                 s.paint("box", P(sx * 0.17, 0, 0.5), (0.012 * f, 0.02 * f, 0.4 * f), color=o["stripe"])
         boots = o.get("boots", "#4a2a14")
         tall = o.get("tall_boots", False)
-        s.capsule(P(sx * 0.105, 0.0, 0.42 if tall else 0.2), P(sx * 0.105, 0.0, 0.05), (0.066 if tall else 0.058) * f, 0.058 * f, color=boots, k=0.01 * f)
-        s.box(P(sx * 0.105, 0.05, 0.035), (0.058 * f, 0.12 * f, 0.035 * f), rnd=0.025 * f, color=boots, k=0.015 * f)
+        s.capsule(ankle + V((0, 0, (0.3 if tall else 0.08) * f)), ankle - V((0, 0, 0.07 * f)), (0.066 if tall else 0.058) * f, 0.058 * f, color=boots, k=0.01 * f)
+        toe = ankle + V((0, 0.05 * f, -0.085 * f))
+        s.box(toe, (0.058 * f, 0.12 * f, 0.035 * f), R=foot_turn, rnd=0.025 * f, color=boots, k=0.015 * f)
         if garment == "buckskin":
-            # Moccasins with a beaded strip, fringed leggings.
-            s.paint("box", P(sx * 0.105, 0.1, 0.06), (0.02 * f, 0.05 * f, 0.02 * f), color=o.get("beads", "#2f4a78"))
+            # Moccasins with a beaded strip.
+            s.paint("box", toe + V((0, 0.05 * f, 0.025 * f)), (0.02 * f, 0.05 * f, 0.02 * f), color=o.get("beads", "#2f4a78"))
 
     # ---- torso
     s.part = "body"
@@ -524,14 +583,16 @@ def figure(s, o):
             shape(s, intersect(band, lambda X, Y, Z: drape(X, Y, Z) - 0.012 * f), c - V((0.3 * f, 0.24 * f, 0.34 * f)),
                   c + V((0.3 * f, 0.24 * f, 0.34 * f)), op="paint", color=col, k=0)
 
-    # ---- arms and hands
+    # ---- arms and hands, posed (see ARM_POSES)
     sleeve = o.get("sleeve", top)
     rolled = o.get("rolled", False)
-    for sx, side in ((-1, "l"), (1, "r")):
+    poses = o.get("arms", ("relaxed", "relaxed"))
+    for (sx, side), pose in zip(((-1, "l"), (1, "r")), poses):
         s.part = f"arm_{side}" if limbs else "body"
         sh = P(sx * shoulder_x, -0.01, 1.38)
-        el = P(sx * (shoulder_x + 0.045), 0.03, 1.12)
-        wr = P(sx * (shoulder_x + 0.04), 0.09, 0.92)
+        (ex, ey, ez), (wx, wy, wz) = ARM_POSES[pose](shoulder_x)
+        el = P(sx * ex, ey, ez)
+        wr = P(sx * wx, wy, wz)
         s.capsule(sh, el, 0.07 * f * wide, 0.06 * f * wide, color=sleeve, k=0.02 * f)
         if rolled:
             s.capsule(el, wr, 0.05 * f, 0.045 * f, color=skin, k=0.02 * f)
@@ -544,9 +605,16 @@ def figure(s, o):
                 t = i / 4
                 pnt = sh.lerp(el, t) if i < 3 else el.lerp(wr, t - 0.5)
                 s.capsule(pnt + V((sx * 0.05 * f, -0.02 * f, 0)), pnt + V((sx * 0.08 * f, -0.03 * f, -0.04 * f)), 0.01 * f, color=shade(top, 0.85), k=0.008 * f)
+        # A mitten hand along the forearm, with a thumb on the inside.
+        d = (wr - el).normalized()
+        inward = V((-sx, 0.6, 0)).normalized()
+        inward = (inward - d * inward.dot(d)).normalized()
+        palm = wr + d * 0.05 * f
         s.color = skin
-        s.ellipsoid(wr + V((0, 0.012 * f, -0.075 * f)), (0.036 * f, 0.048 * f, 0.062 * f), k=0.012 * f)
-        s.capsule(wr + V((-sx * 0.02 * f, 0.04 * f, -0.05 * f)), wr + V((-sx * 0.028 * f, 0.06 * f, -0.09 * f)), 0.014 * f, k=0.008 * f)
+        s.ellipsoid(palm, (0.037 * f, 0.028 * f, 0.056 * f), R=along(wr, palm + d), k=0.01 * f)
+        s.capsule(wr + d * 0.03 * f + inward * 0.026 * f, wr + d * 0.07 * f + inward * 0.036 * f, 0.013 * f, 0.012 * f, k=0.008 * f)
+        joints[f"hand_{side}"] = palm
+        joints[f"elbow_{side}"] = el
     s.part = "body"
     return joints
 
@@ -555,6 +623,53 @@ def along(a, b):
     from sdf import along as _along
 
     return _along(a, b)
+
+
+#: Elbow and wrist for each arm pose, as functions of the shoulder's x (mirrored for
+#: the left arm). Metres for an adult; the figure scales them.
+ARM_POSES = {
+    "relaxed": lambda s0: ((s0 + 0.045, 0.03, 1.12), (s0 + 0.04, 0.09, 0.92)),
+    "hips": lambda s0: ((s0 + 0.16, -0.03, 1.15), (s0 + 0.0, 0.0, 0.99)),
+    "crossed": lambda s0: ((s0 + 0.03, 0.16, 1.15), (-0.12, 0.2, 1.25)),
+    "behind": lambda s0: ((s0 + 0.03, -0.1, 1.12), (0.07, -0.2, 0.98)),
+    "clasped": lambda s0: ((s0 + 0.03, 0.1, 1.12), (0.035, 0.23, 1.0)),
+    "hold": lambda s0: ((s0 + 0.02, 0.12, 1.13), (0.1, 0.32, 1.12)),
+    "tool": lambda s0: ((s0 + 0.12, 0.1, 1.2), (s0 - 0.02, 0.15, 1.43)),
+    "braces": lambda s0: ((s0 + 0.11, 0.03, 1.14), (0.12, 0.2, 1.22)),
+    "under_arm": lambda s0: ((s0 + 0.07, 0.02, 1.13), (s0 + 0.01, 0.16, 1.0)),
+    "cane": lambda s0: ((s0 + 0.06, 0.1, 1.12), (s0 + 0.05, 0.22, 0.94)),
+}
+
+
+def plan_roll(s, f, j):
+    """A rolled plan of the track tucked under the right arm."""
+    s.part = "body"
+    x = j["elbow_r"].x - 0.06 * f
+    a = V((x, -0.22 * f, 1.1 * f))
+    b = V((x + 0.02 * f, 0.4 * f, 1.02 * f))
+    s.cylinder(a, b, 0.036 * f, rnd=0.01 * f, color="#f3ecdc", k=0.004 * f)
+    s.paint("box", (a + b) / 2, (0.05 * f, 0.012 * f, 0.05 * f), color="#b8322a")
+
+
+def shoulder_tool(s, f, j, kind="pick"):
+    """A pickaxe or sledgehammer resting on the right shoulder, held at the front."""
+    s.part = "body"
+    s.k = 0.004 * f
+    hand = j["hand_r"]
+    front = hand + V((0, 0.12 * f, -0.04 * f))
+    back = hand + V((0.02 * f, -0.55 * f, 0.1 * f))
+    s.capsule(front, back, 0.018 * f, color="#8a5a2b")
+    if kind == "pick":
+        s.capsule(back + V((0, 0.02 * f, 0.18 * f)), back + V((0, -0.03 * f, -0.2 * f)), 0.02 * f, 0.008 * f, color="#6f7479")
+    else:
+        s.box(back, (0.05 * f, 0.09 * f, 0.05 * f), rnd=0.01 * f, color="#4a4f5a")
+
+
+def telegram(s, f, j):
+    """A telegram held in both hands."""
+    s.part = "body"
+    c = (j["hand_l"] + j["hand_r"]) / 2 + V((0, 0.03 * f, 0.04 * f))
+    s.box(c, (0.12 * f, 0.006 * f, 0.085 * f), R=rot(-25, 0, 0), rnd=0.003 * f, color="#f3ecdc", k=0.004 * f)
 
 
 def satchel(s, f, color="#7a4a24", strap="#5a3418"):
@@ -573,7 +688,7 @@ def cane(s, f, hand, color="#5e3a1a"):
     """A walking stick from the hand to the ground, with a crook handle."""
     s.part = "body"
     s.k = 0.004 * f
-    top = V(hand) + V((0, 0.02 * f, -0.06 * f))
+    top = V(hand) + V((0, 0.0, -0.01 * f))
     s.capsule(top, V((top.x + 0.04 * f, top.y + 0.08 * f, 0.01)), 0.016 * f, color=color)
     s.torus(top + V((0, 0.045 * f, 0.03 * f)), 0.045 * f, 0.015 * f, R=rot(0, 90, 0), color=color)
 
@@ -614,71 +729,77 @@ SKIN_DEEP = "#b07a52"
 
 
 def pind(s):
-    """Postmester Pind: an old postmaster in a blue coat, white beard and spectacles."""
+    """Postmester Pind: an old postmaster, round and kind, leaning on his cane."""
     return person(
         s,
-        dict(skin=SKIN_LIGHT, garment="coat", top="#2f4a78", trousers="#3a3530", buttons="#e0b84a", belly=0.8, scale=0.97),
-        dict(
-            skin=SKIN_LIGHT, nose="round", nose_size=1.2, nose_tint="#eaa88a", hair="#f2f0ea", hair_style="fringe",
-            brows="#f2f0ea", brow_w=0.009, brow_tilt=-0.6, eyes="#3d6b8a", smile=0.7, age=0.8, cheeks="#f0b09a",
-            beard="full", beard_color="#f2f0ea", beard_part="beard", moustache="walrus", glasses="#3a3330",
-        ),
+        dict(skin=SKIN_LIGHT, garment="coat", top="#2f4a78", trousers="#3a3530", buttons="#e0b84a", belly=0.8, scale=0.97,
+             arms=("relaxed", "cane"), shift=1),
+        dict(skin=SKIN_LIGHT, shape=(1.06, 1.0, 0.96), face_len=0.95, nose="round", nose_size=1.2, nose_tint="#eaa88a",
+             hair="#f2f0ea", hair_style="fringe", brows="#f2f0ea", brow_w=0.01, brow_tilt=-0.7, brow_lift=0.6, eyes="#3d6b8a",
+             lids=0.22, lid_tilt=-0.6, bags=0.8, smile=0.7, age=0.8, cheeks="#f0b09a", beard="full", beard_color="#f2f0ea",
+             beard_part="beard", moustache="walrus", glasses="#3a3330", gaze=(0, -0.05)),
         hat=(kepi, "#2f4a78", "#e0b84a", "#1f2f4a"),
-        extras=(lambda s, f, j: satchel(s, f), lambda s, f, j: cane(s, f, j["shoulder_r"] + V((0.05 * f, 0.1 * f, -0.48 * f)))),
+        extras=(lambda s, f, j: satchel(s, f), lambda s, f, j: cane(s, f, j["hand_r"])),
     )
 
 
 def jensen(s):
-    """Mor Jensen: a Danish pioneer mother in a blue dress, apron and sunbonnet."""
+    """Mor Jensen: a warm, round-faced Danish pioneer mother, hands folded over her apron."""
     return person(
         s,
-        dict(skin=SKIN_LIGHT, build="woman", garment="dress", top="#3d6b8a", apron="#f3ecdc", boots="#4a2a14"),
-        dict(skin=SKIN_LIGHT, nose="button", nose_size=1.05, hair="#c9a26a", hair_style="bun", brows="#a07a4a", brow_w=0.006,
-             eyes="#4a6b3a", smile=0.8, cheeks="#f3b4a4", lips="#c8736a", jaw=0.92),
+        dict(skin=SKIN_LIGHT, build="woman", garment="dress", top="#3d6b8a", apron="#f3ecdc", boots="#4a2a14",
+             arms=("clasped", "clasped")),
+        dict(skin=SKIN_LIGHT, shape=(1.04, 1.0, 0.96), face_len=0.92, chin="double", chin_size=0.9, nose="button", nose_size=1.1,
+             hair="#c9a26a", hair_style="bun", brows="#a07a4a", brow_w=0.006, brow_tilt=-0.4, eyes="#4a6b3a", lashes=True,
+             lids=0.12, lid_tilt=-0.5, smile=0.9, cheeks="#f3b4a4", lips="#d9907f", jaw=1.02),
         hat=(bonnet, "#e8d6b0"),
     )
 
 
 def sofie(s):
-    """Sofie Jensen: a girl with blonde braids, a red dress and freckles."""
+    """Sofie Jensen: a curious girl with blonde braids and freckles, hands behind her back."""
     return person(
         s,
-        dict(skin=SKIN_LIGHT, build="woman", garment="dress", top="#c8553d", apron="#f7f3ea", scale=0.72),
-        dict(skin=SKIN_LIGHT, size=1.08, nose="button", nose_size=0.8, hair="#f0d27a", hair_style="braids", brows="#d8b060",
-             brow_w=0.006, eyes="#3d6b8a", eye_size=1.15, smile=1.0, cheeks="#f4a8a0", lips="#d9807a", jaw=0.9, freckles="#d9956a"),
+        dict(skin=SKIN_LIGHT, build="woman", garment="dress", top="#c8553d", apron="#f7f3ea", scale=0.72,
+             arms=("behind", "behind")),
+        dict(skin=SKIN_LIGHT, size=1.1, shape=(1.04, 1.0, 1.0), face_len=0.85, nose="button", nose_size=0.75, hair="#e8c050",
+             hair_style="braids", brows="#c89a40", brow_w=0.006, brow_lift=0.8, eyes="#3d6b8a", eye_size=1.18, lashes=True,
+             smile=1.0, cheeks="#f4a0a0", lips="#e08a80", jaw=0.9, freckles="#c9855a", gaze=(0.12, 0.05)),
     )
 
 
 def wanbli(s):
-    """Wanbli: a Lakota girl in a buckskin dress with a beaded yoke and long braids."""
+    """Wanbli: a bright, steady Lakota girl with a beaded cape and long braids."""
     return person(
         s,
         dict(skin=SKIN_BROWN, build="woman", garment="dress", top="#c8a06a", yoke=["#2f4a78", "#f3ecdc", "#b8322a"], scale=0.74,
-             boots="#8a6a44"),
-        dict(skin=SKIN_BROWN, size=1.08, nose="button", nose_size=0.9, hair="#1f1a17", hair_style="braids", brows="#1f1a17",
-             brow_w=0.006, eyes="#3a2618", eye_size=1.12, smile=0.75, cheeks="#c9765a", lips="#a85a48", jaw=0.9),
+             boots="#8a6a44", arms=("relaxed", "hips")),
+        dict(skin=SKIN_BROWN, size=1.08, face_len=0.9, cheekbones=0.5, nose="button", nose_size=0.95, hair="#1f1a17",
+             hair_style="braids", brows="#1f1a17", brow_w=0.0068, brow_tilt=0.1, eyes="#3a2618", eye_size=1.08, lashes=True,
+             lid_tilt=0.3, smile=0.65, cheeks="#c9765a", lips="#a85a48", jaw=0.9, chin="pointy", chin_size=0.9),
     )
 
 
 def mato(s):
-    """Mato, Wanbli's grandfather: buckskin, long grey braids and a striped blanket."""
+    """Mato: Wanbli's grandfather. A long, wise face, arms folded under the blanket."""
     return person(
         s,
         dict(skin=SKIN_DEEP, garment="buckskin", top="#b89060", trousers="#a8835a", boots="#8a6a44", beads="#2f4a78",
-             blanket=["#8a2a22", "#e0b84a", "#2f4a78", "#e0b84a"]),
-        dict(skin=SKIN_DEEP, nose="hook", nose_size=1.1, hair="#c8c4bc", hair_style="braids", brows="#c8c4bc", brow_w=0.008,
-             eyes="#2a1a10", smile=0.45, age=0.9, jaw=1.06),
+             blanket=["#8a2a22", "#e0b84a", "#2f4a78", "#e0b84a"], arms=("crossed", "crossed")),
+        dict(skin=SKIN_DEEP, shape=(0.96, 1.0, 1.06), face_len=1.18, cheekbones=0.9, chin="square", nose="hook", nose_size=1.15,
+             hair="#c8c4bc", hair_style="braids", brows="#c8c4bc", brow_w=0.009, eyes="#2a1a10", lids=0.38, lid_tilt=-0.3,
+             bags=0.6, smile=0.35, age=0.9, jaw=1.02),
     )
 
 
-def soldier(s, moustache=None, sergeant=False, skin=SKIN_LIGHT, hair="#5e3a1a"):
+def soldier(s, moustache=None, sergeant=False, skin=SKIN_LIGHT, hair="#5e3a1a", face=None):
     body = dict(skin=skin, garment="jacket", top="#2f4a78", trousers="#5b6f96", stripe="#e0b84a", boots="#1e1a16",
                 tall_boots=True, limbs=True)
-    face = dict(skin=skin, nose="round", nose_size=1.05, hair=hair, hair_style="short", brows=hair, brow_w=0.008,
+    look = dict(skin=skin, nose="round", nose_size=1.05, hair=hair, hair_style="short", brows=hair, brow_w=0.008,
                 eyes="#4a3322", smile=0.35 if sergeant else 0.55, brow_tilt=0.7 if sergeant else 0.1, moustache=moustache,
-                moustache_color=hair,
-                beard="stubble" if sergeant else None, beard_color=shade(skin, 0.85))
-    rig = person(s, body, face, hat=(kepi, "#2f4a78", "#e0b84a", "#1f2f4a"))
+                moustache_color=hair)
+    look.update(face or {})
+    rig = person(s, body, look, hat=(kepi, "#2f4a78", "#e0b84a", "#1f2f4a"))
     if sergeant:
         for sx, side in ((-1, "l"), (1, "r")):
             s.part = f"arm_{side}"
@@ -689,92 +810,122 @@ def soldier(s, moustache=None, sergeant=False, skin=SKIN_LIGHT, hair="#5e3a1a"):
 
 
 def ruth(s):
-    """Ruth, the telegraphist: plum dress, apron, hair in a bun."""
+    """Ruth, the telegraphist: a narrow, clever face, a telegram in her hands."""
     return person(
         s,
-        dict(skin=SKIN_LIGHT, build="woman", garment="dress", top="#6b3a5a", apron="#f3ecdc"),
-        dict(skin=SKIN_LIGHT, nose="long", nose_size=0.82, hair="#5e3a1a", hair_style="bun", brows="#5e3a1a", brow_w=0.006,
-             eyes="#5a3a22", smile=0.6, lips="#b8665e", cheeks="#f0b4a0", jaw=0.9),
+        dict(skin=SKIN_LIGHT, build="woman", garment="dress", top="#6b3a5a", apron="#f3ecdc", arms=("hold", "hold")),
+        dict(skin=SKIN_LIGHT, shape=(0.94, 1.0, 1.04), face_len=1.08, chin="pointy", nose="long", nose_size=0.85, hair="#5e3a1a",
+             hair_style="bun", brows="#5e3a1a", brow_w=0.006, brow_tilt=-0.1, brow_lift=0.4, eyes="#5a3a22", lashes=True,
+             lids=0.2, lid_tilt=0.4, smile=0.55, lips="#c0706a", cheeks="#f0b4a0", jaw=0.88, gaze=(-0.1, -0.12)),
+        extras=(telegram,),
     )
 
 
 def morten(s):
-    """Formand Morten: a miner in a red shirt and braces, leather cap with a lamp, dark beard."""
+    """Formand Morten: a broad, cheerful miner with his pickaxe over his shoulder."""
     return person(
         s,
-        dict(skin=SKIN_WARM, garment="shirt", top="#a8322a", rolled=True, trousers="#4a4038", braces="#2a2320", belly=0.5),
-        dict(skin=SKIN_WARM, nose="round", nose_size=1.3, nose_tint="#d98a70", hair="#4a3222", hair_style="short", brows="#3a2618",
-             brow_w=0.01, eyes="#4a3322", smile=0.8, beard="short", beard_color="#4a3222", moustache="thin", age=0.4),
+        dict(skin=SKIN_WARM, garment="shirt", top="#a8322a", rolled=True, trousers="#4a4038", braces="#2a2320", belly=0.5,
+             arms=("hips", "tool"), stance=0.04),
+        dict(skin=SKIN_WARM, shape=(1.1, 1.0, 0.94), face_len=0.98, jaw=1.12, chin="square", nose="round", nose_size=1.3,
+             nose_tint="#d98a70", hair="#4a3222", hair_style="short", brows="#3a2618", brow_w=0.011, brow_lift=0.3,
+             eyes="#4a3322", eye_size=0.92, lid_tilt=-0.4, smile=0.95, beard="short", beard_color="#4a3222", moustache="thin",
+             moustache_color="#3a2618", age=0.4),
         hat=(miner_helmet, "#6b4423"),
+        extras=(lambda s, f, j: shoulder_tool(s, f, j, "pick"),),
     )
 
 
 def miner(s):
-    """Another miner (crowds): ginger goatee, blue shirt."""
+    """Another miner (crowds): long and thin, sleepy-eyed, thumbs in his braces."""
     return person(
         s,
-        dict(skin=SKIN_LIGHT, garment="shirt", top="#3d5a7a", rolled=True, trousers="#5a4a3a", braces="#6b4423"),
-        dict(skin=SKIN_LIGHT, nose="long", nose_size=1.0, hair="#b8602a", hair_style="short", brows="#a0501e", eyes="#3d6b8a",
-             smile=0.6, beard="goatee", beard_color="#b8602a", cheeks="#f0a898"),
+        dict(skin=SKIN_LIGHT, garment="shirt", top="#3d5a7a", rolled=True, trousers="#5a4a3a", braces="#6b4423",
+             arms=("braces", "braces"), shift=-1),
+        dict(skin=SKIN_LIGHT, shape=(0.94, 1.0, 1.06), face_len=1.2, jaw=0.9, chin="pointy", nose="long", nose_size=1.1,
+             hair="#b8602a", hair_style="short", brows="#a0501e", eyes="#3d6b8a", lids=0.42, smile=0.4, beard="goatee",
+             beard_color="#6a3414", cheeks="#f0a898", gaze=(0.15, 0)),
         hat=(miner_helmet, "#8a6a44"),
     )
 
 
 def li(s):
-    """Formand Li: foreman of the Central Pacific track crew, blue tunic and a straw hat."""
+    """Formand Li: a sharp, friendly foreman with the track plan under his arm."""
     return person(
         s,
-        dict(skin=SKIN_TAN, garment="tunic", top="#2f4a78", trousers="#2a3346", boots="#1e1a16", sash="#1f2f4a"),
-        dict(skin=SKIN_TAN, nose="button", nose_size=1.05, hair="#1a1512", hair_style="short", brows="#1a1512", brow_w=0.009,
-             eyes="#2a1a10", smile=0.65, brow_tilt=-0.2),
+        dict(skin=SKIN_TAN, garment="tunic", top="#2f4a78", trousers="#2a3346", boots="#1e1a16", sash="#1f2f4a",
+             arms=("relaxed", "under_arm"), shift=1),
+        dict(skin=SKIN_TAN, cheekbones=0.6, face_len=1.0, chin="round", nose="button", nose_size=1.05, hair="#1a1512",
+             hair_style="short", brows="#1a1512", brow_w=0.009, brow_tilt=0.2, eyes="#2a1a10", lids=0.18, lid_tilt=0.35,
+             smile=0.75, gaze=(-0.08, 0)),
         hat=(straw_hat, "#d9b870"),
+        extras=(plan_roll,),
     )
 
 
 def crew(s, variant):
-    """Li's track crew: two variations."""
-    faces = [
-        dict(nose="round", nose_size=0.95, smile=0.8, moustache="thin", age=0.3),
-        dict(nose="long", nose_size=0.9, smile=0.5, brow_tilt=0.2, jaw=0.94),
+    """Li's track crew: a round, cheerful one with a hammer, and a long-faced quiet one."""
+    looks = [
+        (dict(shape=(1.08, 1.0, 0.94), face_len=0.9, chin="double", nose="round", nose_size=1.0, smile=0.9, moustache="thin",
+              eye_size=0.9, lid_tilt=-0.5, age=0.3),
+         dict(arms=("relaxed", "tool"), stance=0.03), lambda s, f, j: shoulder_tool(s, f, j, "hammer")),
+        (dict(shape=(0.94, 1.0, 1.04), face_len=1.2, chin="pointy", nose="long", nose_size=0.9, smile=0.2, lids=0.4, brow_tilt=0.3,
+              jaw=0.9, eye_style="dot", eye_size=1.1),
+         dict(arms=("crossed", "crossed"), shift=-1), None),
     ]
+    face, pose, prop = looks[variant]
     tops = ["#3d5a7a", "#6b5a3a"]
     return person(
         s,
-        dict(skin=SKIN_TAN, garment="tunic", top=tops[variant], trousers="#2a3346", boots="#1e1a16", sash=shade(tops[variant], 0.6)),
-        dict(skin=SKIN_TAN, hair="#1a1512", hair_style="short", brows="#1a1512", eyes="#2a1a10", beard_color="#1a1512", **faces[variant]),
+        dict(skin=SKIN_TAN, garment="tunic", top=tops[variant], trousers="#2a3346", boots="#1e1a16", sash=shade(tops[variant], 0.6),
+             **pose),
+        dict(skin=SKIN_TAN, hair="#1a1512", hair_style="short", brows="#1a1512", eyes="#2a1a10", moustache_color="#1a1512", **face),
         hat=(straw_hat, "#d9b870" if variant == 0 else "#c8a860"),
+        extras=(prop,) if prop else (),
     )
 
 
-BOEVL = [(0.82, "#6b4a2e"), (1.0, "#4a3a2a"), (1.15, "#5a2a1a"), (1.32, "#3a3a3a")]
+#: The Bøvl brothers, smallest (and cleverest) first: size, coat colour, pose.
+BOEVL = [
+    (0.82, "#6b4a2e", ("hips", "hips")),
+    (1.0, "#4a3a2a", ("crossed", "crossed")),
+    (1.15, "#5a2a1a", ("behind", "behind")),
+    (1.32, "#3a3a3a", ("relaxed", "relaxed")),
+]
 
 
 def boevl(s, i):
-    """The Bøvl brothers: the same grumpy face, four sizes (and less brain the taller)."""
-    scale, coat = BOEVL[i]
+    """The Bøvl brothers: long chins, dot eyes and scowls, dimmer the taller."""
+    scale, coat, arms = BOEVL[i]
     return person(
         s,
-        dict(skin=SKIN_WARM, garment="duster", top=coat, trousers="#2a2320", boots="#1e1a16", bandana="#b8322a", scale=scale),
-        dict(skin=SKIN_WARM, size=1.16 * scale**0.35, nose="long", nose_size=1.15, hair="#1a1512", hair_style="short", brows="#1a1512",
-             brow_w=0.011, brow_tilt=1.0, eyes="#2a1a10", eye_size=0.85 + i * 0.03, smile=-0.6, beard="stubble",
-             beard_color=shade(SKIN_WARM, 0.75), ears=1.15 + i * 0.05),
+        dict(skin=SKIN_WARM, garment="duster", top=coat, trousers="#2a2320", boots="#1e1a16", bandana="#b8322a", scale=scale,
+             arms=arms),
+        dict(skin=SKIN_WARM, size=1.16 * scale**0.35, shape=(0.95, 1.0, 1.02 + i * 0.02), face_len=1.2 + i * 0.05, chin="square",
+             chin_size=1.1 + i * 0.1, nose="long", nose_size=1.15, hair="#1a1512", hair_style="short", brows="#1a1512",
+             brow_w=0.011, brow_tilt=1.0 - i * 0.35, eye_style="dot", eye_size=1.0 + i * 0.06, eye_gap=0.9 + i * 0.05,
+             lids=0.3 if i == 0 else (0.0 if i == 3 else 0.15), smile=-0.6 + i * 0.35, ears=1.15 + i * 0.05,
+             gaze=(0.25, 0.1) if i == 3 else (0, 0)),
         hat=(bowler, "#2a2320"),
     )
 
 
 def woman(s, variant):
-    """Townswomen for crowds: three dresses and hairstyles."""
+    """Townswomen for crowds: three faces, dresses, hairstyles and poses."""
     looks = [
-        ("#6b3a5a", "#e8d6b0", "#5e3a1a", SKIN_LIGHT, "button"),
-        ("#2f6b4a", None, "#1f1a17", SKIN_BROWN, "round"),
-        ("#8a5a2b", None, "#b8602a", SKIN_LIGHT, "long"),
+        ("#6b3a5a", "#e8d6b0", "#5e3a1a", SKIN_LIGHT, dict(nose="button", face_len=0.92, chin="round", lids=0.1, smile=0.8),
+         ("clasped", "clasped")),
+        ("#2f6b4a", None, "#1f1a17", SKIN_BROWN, dict(nose="round", nose_size=0.85, cheekbones=0.6, face_len=1.02, lid_tilt=0.4,
+                                                      smile=0.6), ("relaxed", "hips")),
+        ("#8a5a2b", None, "#b8602a", SKIN_LIGHT, dict(nose="long", nose_size=0.9, face_len=1.1, chin="pointy", lids=0.3,
+                                                      brow_lift=0.8, smile=0.3, freckles="#d9956a"), ("hold", "relaxed")),
     ]
-    dress, hat_color, hair, skin, nose = looks[variant]
+    dress, hat_color, hair, skin, face, arms = looks[variant]
     return person(
         s,
-        dict(skin=skin, build="woman", garment="dress", top=dress, apron="#f3ecdc" if variant != 1 else None),
-        dict(skin=skin, nose=nose, nose_size=0.9, hair=hair, hair_style="bun", brows=hair, brow_w=0.006, eyes="#4a3322",
-             smile=0.7, lips=shade(skin, 0.78), cheeks=shade(skin, 0.95), jaw=0.9),
+        dict(skin=skin, build="woman", garment="dress", top=dress, apron="#f3ecdc" if variant != 1 else None, arms=arms),
+        dict(skin=skin, hair=hair, hair_style="bun", brows=hair, brow_w=0.006, eyes="#4a3322", lashes=True,
+             lips=shade(skin, 0.8), cheeks=shade(skin, 0.95), jaw=0.9, **face),
         hat=(bonnet, hat_color) if hat_color else None,
     )
 
@@ -785,9 +936,11 @@ CHARACTERS = {
     "sofie": sofie,
     "wanbli": wanbli,
     "mato": mato,
-    "soldier": lambda s: soldier(s),
-    "soldier-m": lambda s: soldier(s, moustache="handlebar", hair="#3a2618"),
-    "sergeant": lambda s: soldier(s, moustache="walrus", sergeant=True, hair="#6b4423"),
+    "soldier": lambda s: soldier(s, face=dict(chin="square", jaw=1.06, lid_tilt=-0.2)),
+    "soldier-m": lambda s: soldier(s, moustache="handlebar", hair="#3a2618", face=dict(shape=(1.08, 1, 0.95), face_len=0.92,
+                                                                                    nose_size=1.2, smile=0.8, lids=0.15)),
+    "sergeant": lambda s: soldier(s, moustache="walrus", sergeant=True, hair="#6b4423",
+                                  face=dict(chin="square", chin_size=1.25, jaw=1.12, lids=0.3, face_len=1.05, eye_size=0.9)),
     "ruth": ruth,
     "morten": morten,
     "miner": miner,

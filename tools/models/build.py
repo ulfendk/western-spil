@@ -28,6 +28,9 @@ from mathutils import Matrix, Vector  # noqa: E402
 from skimage import measure  # noqa: E402
 
 from characters import CHARACTERS  # noqa: E402
+from horse import HORSES  # noqa: E402
+
+MODELS = {**CHARACTERS, **HORSES}
 
 #: Marching-cubes cell size per part (fine for faces, coarser for clothes).
 VOXEL = {"head": 0.002, "beard": 0.0028}
@@ -65,8 +68,7 @@ def select_only(obj):
     bpy.context.view_layer.objects.active = obj
 
 
-def mesh_part(sculpt, part):
-    voxel = VOXEL.get(part, VOXEL_DEFAULT)
+def mesh_part(sculpt, part, voxel):
     D, lo = sculpt.field(part, voxel)
     verts, faces, _n, _v = measure.marching_cubes(D, level=0.0, spacing=(voxel, voxel, voxel))
     verts += np.array([lo.x, lo.y, lo.z], dtype=np.float32)
@@ -167,21 +169,22 @@ def make_eyes(eyes, segments, rings, name):
         before = len(bm.faces)
         geom = bmesh.ops.create_uvsphere(bm, u_segments=segments, v_segments=rings, radius=e["radius"])
         verts = [g for g in geom["verts"]]
-        # Pole (+Z) → forward (+Y), then into place.
-        m = Matrix.Translation(e["center"]) @ Matrix.Rotation(-np.pi / 2, 4, "X")
+        # Pole (+Z) → where the eye looks (about +Y), then into place.
+        forward = Vector(e.get("look", (0, 1, 0))).normalized()
+        m = Matrix.Translation(e["center"]) @ Vector((0, 0, 1)).rotation_difference(forward).to_matrix().to_4x4()
         bmesh.ops.transform(bm, matrix=m, verts=verts)
         bm.faces.ensure_lookup_table()
         center = Vector(e["center"])
-        forward = Vector((0, 1, 0))
         # A catch-light up and to the outer side.
         light = Vector((-0.35 * e["side"], 1.0, 0.45)).normalized()
         iris = tuple(int(e["iris"].lstrip("#")[i : i + 2], 16) / 255 for i in (0, 2, 4))
+        dot = e.get("style") == "dot"
         for f in bm.faces[before:]:
             d = (f.calc_center_median() - center).normalized()
             ang = np.degrees(forward.angle(d))
-            if np.degrees(light.angle(d)) < 9:
+            if np.degrees(light.angle(d)) < (14 if dot else 9):
                 colors.append((1.0, 1.0, 1.0))
-            elif ang < 15.5:
+            elif dot or ang < 15.5:
                 colors.append((0.05, 0.035, 0.03))
             elif ang < 31:
                 colors.append(iris)
@@ -381,9 +384,10 @@ def build(name, fn, out, cache, want_preview):
     pivots, parents = rig["pivots"], rig["parents"]
     nodes, lods = {}, {0: [], 1: []}
     tris = 0
+    voxels, budgets = rig.get("voxel", {}), rig.get("tris", {})
     for part in sculpt.parts():
-        raw = mesh_part(sculpt, part)
-        t0, t1 = TRIS.get(part, TRIS_DEFAULT)
+        raw = mesh_part(sculpt, part, voxels.get(part, VOXEL.get(part, VOXEL_DEFAULT)))
+        t0, t1 = budgets.get(part, TRIS.get(part, TRIS_DEFAULT))
         lod0 = decimate(raw, t0, f"{part}_lod0")
         lod1 = decimate(raw, t1, f"{part}_lod1")
         bpy.data.objects.remove(raw)
@@ -448,8 +452,10 @@ def build(name, fn, out, cache, want_preview):
         for _p, o in lods[1]:
             o.hide_render = True
         head = pivots.get("head", Vector((0, 0, 1.5)))
-        preview(shown, cache / f"{name}-face.png", head + Vector((0, 0.05, 0.2)), 0.75, lens=70)
-        preview(shown, cache / f"{name}.png", Vector((0, 0, 0.95)), 3.4, lens=55)
+        face_focus, face_dist = rig.get("preview_face", (head + Vector((0, 0.05, 0.2)), 0.75))
+        body_focus, body_dist = rig.get("preview_body", (Vector((0, 0, 0.95)), 3.4))
+        preview(shown, cache / f"{name}-face.png", face_focus, face_dist, lens=70)
+        preview(shown, cache / f"{name}.png", body_focus, body_dist, lens=55)
     return tris
 
 
@@ -468,9 +474,9 @@ def main():
     manifest_path = out / "manifest.json"
     manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
     here = Path(__file__).parent
-    code_hash = hashlib.sha1(b"".join((here / f).read_bytes() for f in ("build.py", "sdf.py", "characters.py"))).hexdigest()[:12]
+    code_hash = hashlib.sha1(b"".join((here / f).read_bytes() for f in ("build.py", "sdf.py", "characters.py", "horse.py"))).hexdigest()[:12]
     only = [n for n in args.only.split(",") if n]
-    for name, fn in CHARACTERS.items():
+    for name, fn in MODELS.items():
         if only and name not in only:
             continue
         key = f"{code_hash}-{name}"
