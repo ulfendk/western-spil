@@ -29,8 +29,9 @@ from skimage import measure  # noqa: E402
 
 from characters import CHARACTERS  # noqa: E402
 from horse import HORSES  # noqa: E402
+from animals import ANIMALS  # noqa: E402
 
-MODELS = {**CHARACTERS, **HORSES}
+MODELS = {**CHARACTERS, **HORSES, **ANIMALS}
 
 #: Marching-cubes cell size per part (fine for faces, coarser for clothes).
 VOXEL = {"head": 0.002, "beard": 0.0028}
@@ -419,7 +420,7 @@ def build(name, fn, out, cache, want_preview):
             o.hide_render = False
     # Eyes and spectacles never move on their own: join them into the head (fewer draw calls).
     for level in (0, 1):
-        head = next((o for p, o in lods[level] if p == "head"), None)
+        head = next((o for p, o in lods[level] if p == "head"), None) or next((o for p, o in lods[level] if p == "body"), None)
         extra = [o for p, o in lods[level] if p in ("eyes", "glasses")]
         if head and extra:
             bpy.ops.object.select_all(action="DESELECT")
@@ -474,7 +475,7 @@ def main():
     manifest_path = out / "manifest.json"
     manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
     here = Path(__file__).parent
-    code_hash = hashlib.sha1(b"".join((here / f).read_bytes() for f in ("build.py", "sdf.py", "characters.py", "horse.py"))).hexdigest()[:12]
+    code_hash = hashlib.sha1(b"".join((here / f).read_bytes() for f in ("build.py", "sdf.py", "characters.py", "horse.py", "animals.py"))).hexdigest()[:12]
     only = [n for n in args.only.split(",") if n]
     for name, fn in MODELS.items():
         if only and name not in only:

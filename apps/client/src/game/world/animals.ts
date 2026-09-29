@@ -239,7 +239,9 @@ export function buildHorse(opts: { saddle?: boolean; coat?: string } = {}): Hors
 }
 
 /** Stylised American bison: big shaggy front, hump, small horns, low head. */
-function buildBison(): THREE.Group {
+function buildBison(): THREE.Object3D {
+  const sculpted = character('bison');
+  if (sculpted) return sculpted;
   const fur = '#5a3a22';
   const shag = '#3d2614';
   const b = new THREE.Group();
@@ -364,7 +366,9 @@ export function buildBisonHerd(center: THREE.Vector2, count: number, spread = 1)
 }
 
 /** Texas longhorn cow for the cattle pens in Støvby. */
-function buildCow(rand: () => number): THREE.Group {
+function buildCow(rand: () => number): THREE.Object3D {
+  const sculpted = character(['cow-a', 'cow-b', 'cow-c'][Math.floor(rand() * 3)]!);
+  if (sculpted) return sculpted;
   const coat = ['#b5652b', '#8a4b22', '#e9dfc4', '#5b3a22'][Math.floor(rand() * 4)]!;
   const patch = rand() < 0.5 ? '#f3ecdc' : '#3d2614';
   const c = new THREE.Group();
@@ -447,13 +451,23 @@ export function buildVultures(center: THREE.Vector3): THREE.Group & Animated {
   const group = new THREE.Group() as THREE.Group & Animated;
   const birds = Array.from({ length: 3 }, (_, i) => {
     const bird = new THREE.Group();
-    const wingL = part(new THREE.BoxGeometry(1.4, 0.05, 0.4), '#1f1a17', [-0.7, 0, 0]);
-    const wingR = part(new THREE.BoxGeometry(1.4, 0.05, 0.4), '#1f1a17', [0.7, 0, 0]);
-    bird.add(
-      wingL,
-      wingR,
-      part(new THREE.CapsuleGeometry(0.12, 0.5, 4, 6), '#1f1a17', [0, 0, 0], [Math.PI / 2, 0, 0]),
-    );
+    // The sculpted vulture flaps its own wings (hinged at the shoulders).
+    const sculpted = character('vulture');
+    let wingL: THREE.Object3D;
+    let wingR: THREE.Object3D;
+    if (sculpted) {
+      bird.add(sculpted);
+      wingL = sculpted.getObjectByName('wing_l')!;
+      wingR = sculpted.getObjectByName('wing_r')!;
+    } else {
+      wingL = part(new THREE.BoxGeometry(1.4, 0.05, 0.4), '#1f1a17', [-0.7, 0, 0]);
+      wingR = part(new THREE.BoxGeometry(1.4, 0.05, 0.4), '#1f1a17', [0.7, 0, 0]);
+      bird.add(
+        wingL,
+        wingR,
+        part(new THREE.CapsuleGeometry(0.12, 0.5, 4, 6), '#1f1a17', [0, 0, 0], [Math.PI / 2, 0, 0]),
+      );
+    }
     group.add(bird);
     return { bird, wingL, wingR, phase: (i / 3) * Math.PI * 2, radius: 14 + i * 5, height: i * 4 };
   });

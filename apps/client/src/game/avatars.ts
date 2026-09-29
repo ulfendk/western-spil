@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { heightAt } from './world/index.js';
+import { character } from './models.js';
 import { outline, part } from './toon.js';
 
 export const HAT_COLORS = [
@@ -16,6 +17,11 @@ const SHIRT_COLORS = ['#c8553d', '#3d6b8a', '#d9a441', '#6b8a3d', '#8a3d6b', '#e
 const VEST_COLORS = ['#5e3a1a', '#2f2f2f', '#7a4e2d', '#3b4a3a'];
 const BANDANA_COLORS = ['#c8553d', '#3d6b8a', '#d9a441', '#6b8a3d'];
 const SKIN = '#f1c9a0';
+/** For the sculpted avatars: skin tones and hair colours picked from the nickname. */
+const SKINS = ['#f1c9a0', '#e8b890', '#d9a47a', '#c98e62', '#a8744e'];
+const HAIRS = ['#5e3a1a', '#2a1d14', '#c9a26a', '#b8602a', '#1a1512'];
+/** Nickname first names that get the cowgirl (with braids). */
+const GIRL_NAMES = new Set(['Maja', 'Ella', 'Liv', 'Frida', 'Alma', 'Ida']);
 
 /** A cowboy figure for other players, with a floating name tag and a simple walk cycle. */
 export class RemoteAvatar {
@@ -25,12 +31,15 @@ export class RemoteAvatar {
   private body = new THREE.Group();
   private legs: THREE.Object3D[] = [];
   private arms: THREE.Object3D[] = [];
-  private rightArm: THREE.Object3D;
+  private rightArm!: THREE.Object3D;
+  /** The right arm's resting sideways angle (the sculpted arms already hang naturally). */
+  private restZ = 0.12;
   private walkPhase = 0;
   private emoteTime = 0;
   private emoteKind = '';
   private bubble: THREE.Sprite | null = null;
   private bubbleTime = 0;
+  private bubbleHeight = 3.5;
 
   constructor(nickname: string, hat: number) {
     const h = hashString(nickname);
@@ -39,6 +48,30 @@ export class RemoteAvatar {
     const bandana = BANDANA_COLORS[(h >> 5) % BANDANA_COLORS.length]!;
     const hatColor = HAT_COLORS[hat % HAT_COLORS.length]!;
     const b = this.body;
+
+    // The sculpted cowboy or cowgirl (tools/models), recoloured for this player.
+    const girl = GIRL_NAMES.has(nickname.split(' ').at(-1) ?? '');
+    const model = character(girl ? 'avatar-girl' : 'avatar-boy', {
+      '#ff00ff': hatColor,
+      '#00ff00': shirt,
+      '#0000ff': vest,
+      '#ff0000': bandana,
+      '#ffff00': SKINS[(h >> 7) % SKINS.length]!,
+      '#00ffff': HAIRS[(h >> 9) % HAIRS.length]!,
+    });
+    if (model) {
+      b.add(model);
+      this.legs = ['leg_l', 'leg_r'].map((n) => model.getObjectByName(n)!);
+      this.arms = ['arm_l', 'arm_r'].map((n) => model.getObjectByName(n)!);
+      this.rightArm = this.arms[1]!;
+      this.restZ = 0;
+      this.root.add(b);
+      const tag = nameTag(nickname);
+      tag.position.y = 2.4;
+      this.root.add(tag);
+      this.bubbleHeight = 3.0;
+      return;
+    }
 
     // Legs (jeans + boots), pivoting at the hip.
     for (const side of [-1, 1]) {
@@ -136,6 +169,7 @@ export class RemoteAvatar {
   say(text: string) {
     this.bubble?.removeFromParent();
     this.bubble = speechBubble(text);
+    this.bubble.position.y = this.bubbleHeight;
     this.root.add(this.bubble);
     this.bubbleTime = 4;
   }
@@ -179,7 +213,7 @@ export class RemoteAvatar {
       }
     } else {
       this.body.rotation.x = 0;
-      this.rightArm.rotation.z = THREE.MathUtils.lerp(this.rightArm.rotation.z, 0.12, k);
+      this.rightArm.rotation.z = THREE.MathUtils.lerp(this.rightArm.rotation.z, this.restZ, k);
       this.rightArm.rotation.x = swing * 0.8;
     }
   }

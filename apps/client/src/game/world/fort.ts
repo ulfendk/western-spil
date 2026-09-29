@@ -238,6 +238,14 @@ export function buildFort(scene: THREE.Scene, colliders: Colliders, L: FortLayou
     );
     door.rotation.y = side * 1.3;
     g.add(markStatic(outline(door, 0.02)));
+    // The open doors are solid too: a row of circles along each one.
+    const along = new THREE.Vector3(0, 0, 1).applyAxisAngle(
+      new THREE.Vector3(0, 1, 0),
+      door.rotation.y,
+    );
+    for (let t = -1.4; t <= 1.41; t += 0.7) {
+      colliders.add(door.position.x + along.x * t, door.position.z + along.z * t, 0.3);
+    }
   }
   const gateSign = new THREE.Mesh(
     new THREE.BoxGeometry(5.6, 1, 0.15),
@@ -317,12 +325,13 @@ export function buildFort(scene: THREE.Scene, colliders: Colliders, L: FortLayou
 
   // People: the sergeant at the gate, guards, and soldiers who drill for the parade.
   const sergeant = buildSoldier({ sergeant: true, moustache: true });
-  sergeant.position.copy(at(hw + 3, -5));
+  // Just outside the gate, beside the opening (clear of the open door).
+  sergeant.position.copy(at(hw + 4.2, -3.9));
   g.add(sergeant);
   animated.push(sergeant);
-  colliders.add(L.x + hw + 3, L.z - 5, 0.45);
+  colliders.add(L.x + hw + 4.2, L.z - 3.9, 0.45);
   for (const [x, z] of [
-    [hw + 1.5, gateHalf + 1.2],
+    [hw - 1.5, gateHalf + 0.9],
     [hw - 1.5, -hd + 6],
   ] as const) {
     const guard = buildSoldier();

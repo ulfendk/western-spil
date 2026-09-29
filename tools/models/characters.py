@@ -382,7 +382,7 @@ def cowboy_hat(s, H, z, color, band="#3a2615"):
     s.torus(c + V((0, 0, 0.008 * z)), 0.14 * z, 0.012 * z, scale=(1, 1.12, 1), color=color)
     s.ellipsoid(c, (0.165 * z, 0.18 * z, 0.01 * z), color=color)
     s.ellipsoid(c + V((0, 0, 0.075 * z)), (0.098 * z, 0.114 * z, 0.085 * z), color=color, k=0.01 * z)
-    s.carve("capsule", c + V((0, -0.06 * z, 0.165 * z)), c + V((0, 0.06 * z, 0.165 * z)), 0.028 * z, color=shade(color, 0.8), k=0.02 * z)
+    s.carve("capsule", c + V((0, -0.06 * z, 0.165 * z)), c + V((0, 0.06 * z, 0.165 * z)), 0.028 * z, k=0.02 * z)
     s.torus(c + V((0, 0, 0.022 * z)), 0.098 * z, 0.01 * z, scale=(1, 1.14, 1), color=band)
 
 
@@ -537,11 +537,11 @@ def figure(s, o):
         s.box(P(0, 0.2, 0.995), (0.045 * f, 0.02 * f, 0.035 * f), rnd=0.006 * f, color="#e0b84a", k=0.003 * f)
     if garment == "shirt":
         s.cylinder(P(0, 0, 0.9), P(0, 0, 0.97), 0.19 * f, rnd=0.01 * f, color="#3a2615", k=0.008 * f)
-        for sx in (-1, 1):
-            braces = o.get("braces", "#3a3330")
+        braces = o.get("braces", "#3a3330")
+        for sx in (-1, 1) if braces else ():
             s.capsule(P(sx * 0.1, 0.17, 0.97), P(sx * 0.12, 0.12, 1.42), 0.018 * f, color=braces, k=0.004 * f)
             s.capsule(P(sx * 0.1, -0.17, 0.97), P(sx * 0.12, -0.12, 1.42), 0.018 * f, color=braces, k=0.004 * f)
-        s.torus(P(0, 0.0, 1.45), 0.07 * f, 0.02 * f, R=rot(-10, 0, 0), color=shade(top, 0.8), k=0.008 * f)
+        s.torus(P(0, 0.0, 1.45), 0.07 * f, 0.02 * f, R=rot(-10, 0, 0), color=o.get("collar", shade(top, 0.8)), k=0.008 * f)
     if garment == "tunic":
         # Side-fastened work tunic with a band across the chest.
         s.capsule(P(-0.02, 0.2, 1.4), P(0.13, 0.19, 1.2), 0.016 * f, color=shade(top, 0.7), k=0.006 * f)
@@ -930,7 +930,46 @@ def woman(s, variant):
     )
 
 
+def vest(s, f, j, color):
+    """An open waistcoat over the shirt."""
+    s.part = "body"
+    c = V((0, 0.02 * f, 1.18 * f))
+    outer = ell_fn(c, (0.225 * f, 0.205 * f, 0.3 * f))
+    inner = ell_fn(c, (0.195 * f, 0.175 * f, 0.29 * f))
+    band = lambda X, Y, Z: np.abs(Z - 1.19 * f) - 0.25 * f  # noqa: E731
+    opening = lambda X, Y, Z: np.maximum(np.abs(X) - 0.07 * f, 0.02 * f - Y)  # noqa: E731
+    body = minus(intersect(minus(outer, inner), band), opening)
+    shape(s, body, c - V((0.24 * f, 0.22 * f, 0.31 * f)), c + V((0.24 * f, 0.22 * f, 0.31 * f)), color=color, k=0.01 * f)
+    for i in range(3):
+        s.studs.append(dict(part="body", center=V((0.075 * f, 0.215 * f, (1.3 - i * 0.09) * f)), radius=0.012 * f, color="#e0b84a"))
+
+
+#: Key colours in the player avatars, swapped per player in the game (models.ts):
+#: pure primaries, so they survive the colour-space conversion exactly.
+KEY_HAT, KEY_SHIRT, KEY_VEST, KEY_BANDANA, KEY_SKIN, KEY_HAIR = "#ff00ff", "#00ff00", "#0000ff", "#ff0000", "#ffff00", "#00ffff"
+
+
+def avatar(s, girl):
+    """A young cowboy (or cowgirl) for the players: hat, shirt, vest, bandana and skin are recoloured in the game."""
+    face = dict(skin=KEY_SKIN, size=1.25, face_len=0.88, nose="button", nose_size=0.95, hair=KEY_HAIR, brows=KEY_HAIR,
+                brow_w=0.007, eyes="#4a3322", eye_size=1.12, smile=0.9, lips=KEY_SKIN, jaw=0.94)
+    if girl:
+        face.update(hair_style="braids", lashes=True, chin="pointy", chin_size=0.9)
+    else:
+        face.update(hair_style="short", chin="round", brow_w=0.008)
+    return person(
+        s,
+        dict(skin=KEY_SKIN, garment="shirt", top=KEY_SHIRT, collar=KEY_SHIRT, braces=None, trousers="#3d4f6b", boots="#5e3a1a",
+             bandana=KEY_BANDANA, limbs=True, build="woman" if girl else "man", belly=0.0),
+        face,
+        hat=(cowboy_hat, KEY_HAT, "#3a2615"),
+        extras=(lambda s, f, j: vest(s, f, j, KEY_VEST),),
+    )
+
+
 CHARACTERS = {
+    "avatar-boy": lambda s: avatar(s, False),
+    "avatar-girl": lambda s: avatar(s, True),
     "pind": pind,
     "jensen": jensen,
     "sofie": sofie,

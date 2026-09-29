@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { character } from '../../models.js';
 import { buildBisonHerd, buildHorse, type Animated } from '../animals.js';
 import { addVegetation, buildCommon } from '../common.js';
 import { buildFort } from '../fort.js';
@@ -213,15 +214,21 @@ function buildPrairieDogs(center: THREE.Vector2): THREE.Group & Animated {
       [-Math.PI / 2, 0, 0],
     );
     hole.userData.noOutline = true;
+    const sculpted = character('prairie-dog');
     const dog = new THREE.Group();
-    dog.add(part(new THREE.CapsuleGeometry(0.11, 0.22, 4, 8), '#c49a62', [0, 0.2, 0]));
-    dog.add(part(new THREE.SphereGeometry(0.1, 8, 6), '#c49a62', [0, 0.44, -0.03]));
-    for (const side of [-1, 1])
-      dog.add(part(new THREE.SphereGeometry(0.018, 6, 4), '#1b1b1b', [side * 0.045, 0.47, -0.11]));
-    dog.add(
-      part(new THREE.CapsuleGeometry(0.035, 0.08, 4, 4), '#e8d6b0', [0, 0.28, -0.1], [0.4, 0, 0]),
-    );
-    outline(dog, 0.012);
+    if (sculpted) dog.add(sculpted);
+    else {
+      dog.add(part(new THREE.CapsuleGeometry(0.11, 0.22, 4, 8), '#c49a62', [0, 0.2, 0]));
+      dog.add(part(new THREE.SphereGeometry(0.1, 8, 6), '#c49a62', [0, 0.44, -0.03]));
+      for (const side of [-1, 1])
+        dog.add(
+          part(new THREE.SphereGeometry(0.018, 6, 4), '#1b1b1b', [side * 0.045, 0.47, -0.11]),
+        );
+      dog.add(
+        part(new THREE.CapsuleGeometry(0.035, 0.08, 4, 4), '#e8d6b0', [0, 0.28, -0.1], [0.4, 0, 0]),
+      );
+      outline(dog, 0.012);
+    }
     dog.position.set(x, y, z);
     g.add(outline(mound, 0.02), hole, dog);
     return { dog, y, phase: rand() * 10, speed: 0.4 + rand() * 0.5 };
